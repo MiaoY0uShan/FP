@@ -1,15 +1,15 @@
 ---
 name: fp
-description: "Use proactively before coding tasks, or when invoked with \"FP:\", to choose the lightest evidence-backed execution route."
+description: "Use automatically when the user's goal is engineering work (build, change, diagnose, review, test, operate, or plan software, repositories, infrastructure, or agent tooling), or when explicitly invoked with \"FP:\" or \"$fp\". Do not use for casual conversation or other non-engineering goals."
 ---
 
 # FP: Universal Execution Protocol
 
-FP is a lightweight execution discipline for AI coding agents. It selects the smallest route that can still produce trustworthy evidence.
+FP is a lightweight execution discipline for AI coding agents. It selects the smallest route that can still produce trustworthy evidence. Infer activation from the user's goal; an explicit keyword is optional.
 
 ## Core Mandates
 
-1. **Ghost Mode:** Activate automatically for coding tasks.
+1. **Goal-Matched Ghost Mode:** Activate automatically for engineering goals. Do not require `FP:` or `$fp`, and stay dormant for casual or other non-engineering goals.
 2. **Lessons First:** Search `lessons-learned/` only for patterns relevant to the task. Only cards whose status is `promoted` may act as reusable policy; observations and bounded shadows are hypotheses that require task-local evidence.
 3. **No Proof, No Edit:** Before editing, state the read set, touch set, acceptance evidence, and verification method.
 4. **Baseline Before Blame:** For medium, risky, or multi-agent work, capture repository root/revision, pre-existing worktree changes and their ownership, and relevant pre-existing failures before the first edit. Do not attribute them to this run or overwrite them. Isolation is a risk decision, not a mandatory worktree.

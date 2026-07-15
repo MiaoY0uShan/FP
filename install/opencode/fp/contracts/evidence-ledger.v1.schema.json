@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://raw.githubusercontent.com/MiaoY0uShan/FP/v0.3.1/fp/contracts/evidence-ledger.v1.schema.json",
+  "$id": "https://raw.githubusercontent.com/MiaoY0uShan/FP/v0.4.0/fp/contracts/evidence-ledger.v1.schema.json",
   "title": "FP Evidence Ledger v1",
   "description": "Structural half of the normative contract. Cross-field, path, evidence-reference, route/profile, and resume-state rules are enforced by evidence-ledger.js.",
   "type": "object",

@@ -1,6 +1,6 @@
 # FP Agent Contract
 
-Use FP proactively for coding work, while choosing the lightest route that can still be verified. Manual trigger remains `FP: <task or idea>`.
+Infer FP activation from the user's goal. Load it automatically for engineering work, keep it dormant for casual or other non-engineering goals, and never require `FP:` or `$fp`; both remain optional explicit invocations. Choose the lightest route that can still be verified.
 
 ## Route Before Editing
 

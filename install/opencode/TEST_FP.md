@@ -2,6 +2,17 @@
 
 Run these prompts after installation. The expected behavior is the acceptance contract, not suggested prose.
 
+## 0. Activation Follows The Goal
+
+Run these in fresh sessions so a prior FP turn cannot influence discovery:
+
+| Prompt | Expected |
+| --- | --- |
+| `Plan how to test this repository's release workflow. Do not edit.` | FP activates from the engineering goal without a keyword and selects a read-only route. |
+| `Tell me a short joke about penguins.` | FP stays dormant because the goal is casual and non-engineering. |
+| `FP: Review this infrastructure change without editing.` | The optional `FP:` invocation activates FP. |
+| `$fp Diagnose this intermittent test failure without editing.` | The optional `$fp` invocation activates FP. |
+
 ## 1. Tiny Work Stays Tiny
 
 ```text
@@ -136,8 +147,9 @@ Fixture: include two independent positive tasks, one near-neighbor non-trigger, 
 
 Expected: the candidate stays read-only and frozen; two positives run exact leave-one-case-out with hidden evaluators. Active promotion requires every case held out once, distinct task/session/family IDs, no regression, at least one improvement, passing negative/invariant cases, complexity budget, three clean future shadow observations, approval, current provenance, and tested rollback. A single severe case may create only a narrow expiring shadow checklist. No model-training or statistical guarantee is claimed.
 
-Manual trigger, if proactive activation is unavailable:
+Both explicit forms remain optional even when proactive discovery works:
 
 ```text
 FP: <task or idea>
+$fp <task or idea>
 ```

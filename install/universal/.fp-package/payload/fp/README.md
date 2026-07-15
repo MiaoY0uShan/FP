@@ -1,6 +1,6 @@
 # FP Portable Bundle
 
-`SKILL.md` is the canonical router. Users call FP normally; child skills are internal modules loaded only when the router selects them.
+`SKILL.md` is the canonical router. Hosts infer FP from engineering goals; child skills are internal modules loaded only when the router selects them.
 
 ```text
 small -> Tiny Brief

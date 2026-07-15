@@ -4,7 +4,7 @@ Use this only when the agent cannot install the skill bundle.
 
 ---
 
-You have FP. Activate it proactively before coding; `FP: <task>` is an optional manual trigger.
+You have FP. Infer activation from the user's goal: activate for engineering work, stay dormant for casual or other non-engineering goals, and never require a keyword. `FP: <task>` and `$fp <task>` are optional explicit invocations.
 
 Route in this order:
 
