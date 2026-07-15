@@ -3,15 +3,19 @@ set -eu
 
 ROOT=${1:-$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)}
 INSTALLER=$ROOT/install/universal/INSTALL-ZEROTOHERO.sh
-TARGET=$(mktemp -d)
-EMPTY_TARGET=$(mktemp -d)
-USER_AIDER_TARGET=$(mktemp -d)
-COLLISION_TARGET=$(mktemp -d)
-TAMPERED_TARGET=$(mktemp -d)
-COMMENTED_AIDER_TARGET=$(mktemp -d)
-MANIFEST_COLLISION_TARGET=$(mktemp -d)
-BACKUP_LINK_TARGET=$(mktemp -d)
-BACKUP_LINK_OUTSIDE=$(mktemp -d)
+make_temp_dir() {
+  directory=$(mktemp -d)
+  (CDPATH= cd -- "$directory" && pwd -P)
+}
+TARGET=$(make_temp_dir)
+EMPTY_TARGET=$(make_temp_dir)
+USER_AIDER_TARGET=$(make_temp_dir)
+COLLISION_TARGET=$(make_temp_dir)
+TAMPERED_TARGET=$(make_temp_dir)
+COMMENTED_AIDER_TARGET=$(make_temp_dir)
+MANIFEST_COLLISION_TARGET=$(make_temp_dir)
+BACKUP_LINK_TARGET=$(make_temp_dir)
+BACKUP_LINK_OUTSIDE=$(make_temp_dir)
 
 cleanup() {
   rm -rf -- "$TARGET" "$EMPTY_TARGET" "$USER_AIDER_TARGET" "$COLLISION_TARGET" "$TAMPERED_TARGET" \
@@ -22,9 +26,9 @@ trap cleanup EXIT HUP INT TERM
 printf 'user AGENTS instructions\n' > "$TARGET/AGENTS.md"
 printf 'user GEMINI instructions\n' > "$TARGET/GEMINI.md"
 printf 'read: [README.md]\nmodel: test\n' > "$TARGET/.aider.conf.yml"
-"$INSTALLER" --target "$TARGET" >/dev/null
-"$INSTALLER" --target "$TARGET" --verify >/dev/null
-"$INSTALLER" --target "$TARGET" --uninstall >/dev/null
+sh "$INSTALLER" --target "$TARGET" >/dev/null
+sh "$INSTALLER" --target "$TARGET" --verify >/dev/null
+sh "$INSTALLER" --target "$TARGET" --uninstall >/dev/null
 [ "$(cat "$TARGET/AGENTS.md")" = 'user AGENTS instructions' ]
 [ "$(cat "$TARGET/GEMINI.md")" = 'user GEMINI instructions' ]
 grep -Fqx 'read: [README.md]' "$TARGET/.aider.conf.yml"
@@ -36,17 +40,17 @@ grep -Fqx 'model: test' "$TARGET/.aider.conf.yml"
 : > "$EMPTY_TARGET/AGENTS.md"
 : > "$EMPTY_TARGET/GEMINI.md"
 : > "$EMPTY_TARGET/.aider.conf.yml"
-"$INSTALLER" --target "$EMPTY_TARGET" >/dev/null
-"$INSTALLER" --target "$EMPTY_TARGET" --uninstall >/dev/null
+sh "$INSTALLER" --target "$EMPTY_TARGET" >/dev/null
+sh "$INSTALLER" --target "$EMPTY_TARGET" --uninstall >/dev/null
 [ -f "$EMPTY_TARGET/AGENTS.md" ] && [ ! -s "$EMPTY_TARGET/AGENTS.md" ]
 [ -f "$EMPTY_TARGET/GEMINI.md" ] && [ ! -s "$EMPTY_TARGET/GEMINI.md" ]
 [ -f "$EMPTY_TARGET/.aider.conf.yml" ] && [ ! -s "$EMPTY_TARGET/.aider.conf.yml" ]
 
 printf 'read: [ZEROTOHERO.md]\nmodel: original\n' > "$USER_AIDER_TARGET/.aider.conf.yml"
-"$INSTALLER" --target "$USER_AIDER_TARGET" >/dev/null
+sh "$INSTALLER" --target "$USER_AIDER_TARGET" >/dev/null
 grep -Eq '"aider_entry_managed"[[:space:]]*:[[:space:]]*false' "$USER_AIDER_TARGET/zerotohero/.install-manifest.json"
 printf 'model: user-updated\n' > "$USER_AIDER_TARGET/.aider.conf.yml"
-"$INSTALLER" --target "$USER_AIDER_TARGET" --uninstall >/dev/null
+sh "$INSTALLER" --target "$USER_AIDER_TARGET" --uninstall >/dev/null
 grep -Fqx 'model: user-updated' "$USER_AIDER_TARGET/.aider.conf.yml"
 
 printf '%s\n' \
@@ -56,14 +60,14 @@ printf '%s\n' \
   '  - README.md' \
   'model: test' > "$COMMENTED_AIDER_TARGET/.aider.conf.yml"
 commented_before=$(cksum "$COMMENTED_AIDER_TARGET/.aider.conf.yml")
-"$INSTALLER" --target "$COMMENTED_AIDER_TARGET" >/dev/null
+sh "$INSTALLER" --target "$COMMENTED_AIDER_TARGET" >/dev/null
 grep -Fqx 'read: # keep this comment' "$COMMENTED_AIDER_TARGET/.aider.conf.yml"
 grep -Fqx '  - ZEROTOHERO.md' "$COMMENTED_AIDER_TARGET/.aider.conf.yml"
-"$INSTALLER" --target "$COMMENTED_AIDER_TARGET" --uninstall >/dev/null
+sh "$INSTALLER" --target "$COMMENTED_AIDER_TARGET" --uninstall >/dev/null
 [ "$(cksum "$COMMENTED_AIDER_TARGET/.aider.conf.yml")" = "$commented_before" ]
 
 printf 'project-owned collision\n' > "$COLLISION_TARGET/ZEROTOHERO.md"
-if "$INSTALLER" --target "$COLLISION_TARGET" >/dev/null 2>&1; then
+if sh "$INSTALLER" --target "$COLLISION_TARGET" >/dev/null 2>&1; then
   echo 'namespace collision unexpectedly installed' >&2
   exit 1
 fi
@@ -72,7 +76,7 @@ grep -Fqx 'project-owned collision' "$COLLISION_TARGET/ZEROTOHERO.md"
 
 mkdir -p "$MANIFEST_COLLISION_TARGET/zerotohero"
 printf 'project-owned control file\n' > "$MANIFEST_COLLISION_TARGET/zerotohero/.install-manifest.json"
-if "$INSTALLER" --target "$MANIFEST_COLLISION_TARGET" >/dev/null 2>&1; then
+if sh "$INSTALLER" --target "$MANIFEST_COLLISION_TARGET" >/dev/null 2>&1; then
   echo 'manifest collision unexpectedly installed' >&2
   exit 1
 fi
@@ -83,7 +87,7 @@ grep -Fqx 'project-owned control file' "$MANIFEST_COLLISION_TARGET/zerotohero/.i
 mkdir -p "$BACKUP_LINK_TARGET/.zerotohero-backups"
 ln -s "$BACKUP_LINK_OUTSIDE" "$BACKUP_LINK_TARGET/.zerotohero-backups/run-known"
 printf 'project instructions\n' > "$BACKUP_LINK_TARGET/AGENTS.md"
-"$INSTALLER" --target "$BACKUP_LINK_TARGET" >/dev/null
+sh "$INSTALLER" --target "$BACKUP_LINK_TARGET" >/dev/null
 [ -z "$(ls -A "$BACKUP_LINK_OUTSIDE")" ]
 found_random_backup=0
 for candidate in "$BACKUP_LINK_TARGET"/.zerotohero-backups/run-*; do
@@ -97,21 +101,21 @@ for candidate in "$BACKUP_LINK_TARGET"/.zerotohero-backups/run-*; do
 done
 [ "$found_random_backup" -eq 1 ]
 
-"$INSTALLER" --target "$TAMPERED_TARGET" >/dev/null
+sh "$INSTALLER" --target "$TAMPERED_TARGET" >/dev/null
 printf '\nuser modification\n' >> "$TAMPERED_TARGET/zerotohero/SKILL.md"
 agents_before=$(cksum "$TAMPERED_TARGET/AGENTS.md")
-if "$INSTALLER" --target "$TAMPERED_TARGET" --uninstall >/dev/null 2>&1; then
+if sh "$INSTALLER" --target "$TAMPERED_TARGET" --uninstall >/dev/null 2>&1; then
   echo 'tampered uninstall unexpectedly succeeded' >&2
   exit 1
 fi
 [ -f "$TAMPERED_TARGET/zerotohero/SKILL.md" ]
 [ "$(cksum "$TAMPERED_TARGET/AGENTS.md")" = "$agents_before" ]
 
-if "$INSTALLER" --target "$TARGET" --verify --migrate-legacy >/dev/null 2>&1; then
+if sh "$INSTALLER" --target "$TARGET" --verify --migrate-legacy >/dev/null 2>&1; then
   echo 'verify plus migrate unexpectedly succeeded' >&2
   exit 1
 fi
-if "$INSTALLER" --target "$TARGET" --uninstall --migrate-legacy >/dev/null 2>&1; then
+if sh "$INSTALLER" --target "$TARGET" --uninstall --migrate-legacy >/dev/null 2>&1; then
   echo 'uninstall plus migrate unexpectedly succeeded' >&2
   exit 1
 fi

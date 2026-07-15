@@ -45,6 +45,18 @@ function Get-RelativePath {
     return $Path.Substring($repoRoot.Length + 1)
 }
 
+function Get-Sha256 {
+    param([string] $Path)
+    $stream = [System.IO.File]::OpenRead($Path)
+    $hasher = [System.Security.Cryptography.SHA256]::Create()
+    try {
+        return ([System.BitConverter]::ToString($hasher.ComputeHash($stream))).Replace("-", "")
+    } finally {
+        $hasher.Dispose()
+        $stream.Dispose()
+    }
+}
+
 function Compare-Directory {
     param(
         [string] $Left,
@@ -68,7 +80,7 @@ function Compare-Directory {
     foreach ($relative in $leftFiles) {
         $leftPath = Join-Path $Left $relative
         $rightPath = Join-Path $Right $relative
-        if ((Get-FileHash -Algorithm SHA256 -Path $leftPath).Hash -ne (Get-FileHash -Algorithm SHA256 -Path $rightPath).Hash) {
+        if ((Get-Sha256 -Path $leftPath) -ne (Get-Sha256 -Path $rightPath)) {
             return $false
         }
     }
@@ -91,7 +103,7 @@ foreach ($entry in $canonicalMetadata) {
         if (-not (Test-Path -LiteralPath $entry.Target)) {
             throw "Missing canonical product metadata: $(Get-RelativePath -Path $entry.Target)"
         }
-        if ((Get-FileHash -Algorithm SHA256 -Path $entry.Source).Hash -ne (Get-FileHash -Algorithm SHA256 -Path $entry.Target).Hash) {
+        if ((Get-Sha256 -Path $entry.Source) -ne (Get-Sha256 -Path $entry.Target)) {
             throw "Canonical product metadata is out of sync: $(Get-RelativePath -Path $entry.Target)"
         }
         Write-Host "ok: $(Get-RelativePath -Path $entry.Target)"
@@ -132,7 +144,7 @@ foreach ($targetRelative in $testTargets) {
         if (-not (Test-Path -LiteralPath $target)) {
             throw "Missing generated install-pack test: $targetRelative"
         }
-        if ((Get-FileHash -Algorithm SHA256 -Path $testSource).Hash -ne (Get-FileHash -Algorithm SHA256 -Path $target).Hash) {
+        if ((Get-Sha256 -Path $testSource) -ne (Get-Sha256 -Path $target)) {
             throw "Generated install-pack test is out of sync: $targetRelative"
         }
         Write-Host "ok: $targetRelative"
@@ -151,7 +163,7 @@ if ($Check) {
     if (-not (Test-Path -LiteralPath $copyPasteTarget)) {
         throw "Missing generated copy-paste fallback: dist/zerotohero-copy-paste.md"
     }
-    if ((Get-FileHash -Algorithm SHA256 -Path $copyPasteSource).Hash -ne (Get-FileHash -Algorithm SHA256 -Path $copyPasteTarget).Hash) {
+    if ((Get-Sha256 -Path $copyPasteSource) -ne (Get-Sha256 -Path $copyPasteTarget)) {
         throw "Generated copy-paste fallback is out of sync: dist/zerotohero-copy-paste.md"
     }
     Write-Host "ok: dist/zerotohero-copy-paste.md"

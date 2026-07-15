@@ -9,6 +9,7 @@ const test = require('node:test');
 const root = path.resolve(__dirname, '..');
 const universal = path.join(root, 'install', 'universal');
 const isWindows = process.platform === 'win32';
+const tempRoot = fs.realpathSync(os.tmpdir());
 
 function runInstaller(target, options = {}) {
   const args = isWindows
@@ -34,7 +35,7 @@ function runInstaller(target, options = {}) {
 }
 
 function tempProject() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'zerotohero-installer-'));
+  return fs.mkdtempSync(path.join(tempRoot, 'zerotohero-installer-'));
 }
 
 function hash(filePath) {
@@ -241,7 +242,7 @@ test('duplicate installer-owned Aider entries block uninstall before any write',
 
 test('backup snapshots use an atomic random directory and ignore attacker-named child links', { timeout: 120_000 }, (t) => {
   const target = tempProject();
-  const outside = fs.mkdtempSync(path.join(os.tmpdir(), 'zerotohero-backup-outside-'));
+  const outside = fs.mkdtempSync(path.join(tempRoot, 'zerotohero-backup-outside-'));
   try {
     const backupContainer = path.join(target, '.zerotohero-backups');
     fs.mkdirSync(backupContainer);
@@ -295,7 +296,7 @@ test('unsafe markers and Aider YAML fail before payload writes', { timeout: 120_
 
 test('link and junction ancestors cannot redirect writes outside the target', { timeout: 120_000 }, (t) => {
   const target = tempProject();
-  const outside = fs.mkdtempSync(path.join(os.tmpdir(), 'zerotohero-outside-'));
+  const outside = fs.mkdtempSync(path.join(tempRoot, 'zerotohero-outside-'));
   try {
     try {
       fs.symlinkSync(outside, path.join(target, '.roo'), isWindows ? 'junction' : 'dir');

@@ -39,6 +39,14 @@ test('product metadata is namespaced and synchronized with release sources', () 
   }
 });
 
+test('PowerShell release paths use the module-independent SHA-256 helper', () => {
+  for (const file of ['install/universal/INSTALL-ZEROTOHERO.ps1', 'scripts/sync-install-packs.ps1']) {
+    const content = fs.readFileSync(path.join(root, file), 'utf8');
+    assert.match(content, /System\.Security\.Cryptography\.SHA256/);
+    assert.doesNotMatch(content, /Get-FileHash/);
+  }
+});
+
 test('release workflow is tag-only, checksummed, licensed, immutable, and includes every installer entrypoint', () => {
   const workflow = fs.readFileSync(path.join(root, '.github', 'workflows', 'release.yml'), 'utf8');
   const validateWorkflow = fs.readFileSync(path.join(root, '.github', 'workflows', 'validate.yml'), 'utf8');

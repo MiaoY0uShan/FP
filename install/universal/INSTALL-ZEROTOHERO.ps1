@@ -28,6 +28,18 @@ function Read-Utf8 {
     return [System.IO.File]::ReadAllText($Path, [System.Text.Encoding]::UTF8)
 }
 
+function Get-Sha256 {
+    param([string] $Path)
+    $stream = [System.IO.File]::OpenRead($Path)
+    $hasher = [System.Security.Cryptography.SHA256]::Create()
+    try {
+        return ([System.BitConverter]::ToString($hasher.ComputeHash($stream))).Replace("-", "")
+    } finally {
+        $hasher.Dispose()
+        $stream.Dispose()
+    }
+}
+
 function Assert-NoReparseChain {
     param([string] $Path, [string] $Label)
     $current = [System.IO.Path]::GetFullPath($Path)
@@ -459,7 +471,7 @@ if ($Verify -or $Uninstall) {
         $installed = Join-Path $targetRoot $relative
         if (-not (Test-Path -LiteralPath $installed -PathType Leaf)) {
             $failures.Add("missing $relative") | Out-Null
-        } elseif ((Get-FileHash -Algorithm SHA256 -LiteralPath $_.FullName).Hash -ne (Get-FileHash -Algorithm SHA256 -LiteralPath $installed).Hash) {
+        } elseif ((Get-Sha256 -Path $_.FullName) -ne (Get-Sha256 -Path $installed)) {
             $failures.Add("changed $relative") | Out-Null
         }
     }
@@ -467,7 +479,7 @@ if ($Verify -or $Uninstall) {
     $aiderRule = Join-Path $targetRoot "ZEROTOHERO.md"
     if (-not (Test-Path -LiteralPath $aiderRule -PathType Leaf)) {
         $failures.Add("missing ZEROTOHERO.md") | Out-Null
-    } elseif ((Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $fragmentRoot "CONVENTIONS.md")).Hash -ne (Get-FileHash -Algorithm SHA256 -LiteralPath $aiderRule).Hash) {
+    } elseif ((Get-Sha256 -Path (Join-Path $fragmentRoot "CONVENTIONS.md")) -ne (Get-Sha256 -Path $aiderRule)) {
         $failures.Add("changed ZEROTOHERO.md") | Out-Null
     }
     foreach ($managed in @("AGENTS.md", "GEMINI.md")) {
@@ -555,7 +567,7 @@ Get-ChildItem -LiteralPath $payloadRoot -Recurse -File -Force | ForEach-Object {
     $destination = Join-Path $targetRoot $relative
     New-Item -ItemType Directory -Path (Split-Path -Parent $destination) -Force | Out-Null
     if (Test-Path -LiteralPath $destination -PathType Leaf) {
-        if ((Get-FileHash -Algorithm SHA256 -LiteralPath $_.FullName).Hash -ne (Get-FileHash -Algorithm SHA256 -LiteralPath $destination).Hash) {
+        if ((Get-Sha256 -Path $_.FullName) -ne (Get-Sha256 -Path $destination)) {
             Backup-ProjectFile -Path $destination -RelativePath $relative
         }
     }
@@ -565,7 +577,7 @@ Get-ChildItem -LiteralPath $payloadRoot -Recurse -File -Force | ForEach-Object {
 
 $aiderRule = Join-Path $targetRoot "ZEROTOHERO.md"
 if (Test-Path -LiteralPath $aiderRule -PathType Leaf) {
-    if ((Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $fragmentRoot "CONVENTIONS.md")).Hash -ne (Get-FileHash -Algorithm SHA256 -LiteralPath $aiderRule).Hash) {
+    if ((Get-Sha256 -Path (Join-Path $fragmentRoot "CONVENTIONS.md")) -ne (Get-Sha256 -Path $aiderRule)) {
         Backup-ProjectFile -Path $aiderRule -RelativePath "ZEROTOHERO.md"
     }
 }
