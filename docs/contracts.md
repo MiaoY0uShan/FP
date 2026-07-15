@@ -1,62 +1,61 @@
-# Contracts Layer
+# ZeroToHero Contracts
 
-Xskill's core differentiator is not a longer prompt. It is a set of execution contracts.
+ZeroToHero is not a longer prompt. It is a small set of execution contracts.
 
-## 1. Context Budget Contract
+## Execution Brief
 
-Defines what the agent may read, touch, and assume.
+Before editing, define the real goal, scope, file/context budget, seven-rung reuse decisions, acceptance evidence matrix, checks, authority, and stop condition. Multi-agent briefs also freeze the parent authority ceiling and every child task envelope. Background-learning briefs freeze candidate identity and blind evaluation gates before a child sees training data.
 
-Key fields:
+## Context Budget
 
-```text
-max_files_to_read
-max_files_to_touch
-max_skill_tokens
-max_execution_notes
-required_semantic_nodes
-required_schema_cards
-forbidden_context
-scope_boundary
-violation_handling
-```
+Bound files to read/touch/avoid, forbidden context, notes, checks, and violation handling. Exceeding the contract means stop, split, or explicitly revise it.
 
-If the contract is exceeded, the agent must stop and split or request a revised contract.
+## Evidence Ledger v1
 
-## 2. Evidence Ledger
+The normative machine contract is `zerotohero/contracts/evidence-ledger.v1.schema.json` **plus** `zerotohero/contracts/evidence-ledger.js`. The portable schema owns structure and basic conditionals; the zero-dependency semantic validator owns cross-field authority, path/glob scope, evidence references, route/profile completion gates, and continuation rehydration. They are tested and versioned together. The ledger records:
 
-Every agent claim needs evidence.
+- task, route/phase/profiles, authority mode, write authorization, and separate explicit repository-read, network-read, and write scopes;
+- embedded required checks, expected exit codes, acceptance rows, and required claims;
+- files read/touched and exact check evidence;
+- hypothesis/probe/result/decision experiments;
+- verified and unverified claims;
+- scope/context violations and remaining risk;
+- remote/live and external-context evidence when applicable;
+- optional continuation, deferred items, distributed delegation envelopes, and finite-sample learning evidence;
+- decision and next action.
 
-The ledger records:
+Markdown is an optional view. Legacy Markdown/JSON is accepted for one migration cycle as parse-only evidence with a warning; it is downgraded to partial/unverified and can never count as verified progress. Strict validation requires v1.
 
-```text
-files_read
-files_touched
-commands_run
-verified_claims
-unverified_claims
-scope_violations
-context_budget_violations
-next_action
-```
+## Acceptance Evidence Matrix
 
-## 3. Failure-to-Smaller-Task Protocol
-
-Failure is not a reason to retry the same task.
-
-A failed run should produce smaller verified tasks with their own budgets and checks.
-
-## 4. Context Diet Map
-
-This is not generic memory.
-
-It decides what context to exclude.
+Every medium, debug, live, or risky task maps:
 
 ```text
-relevant_nodes
-irrelevant_nodes
-files_to_read
-files_to_avoid
-reason
+requirement -> observable -> check/probe -> pass condition -> evidence location
 ```
 
-Other systems use memory to add context. Xskill uses memory to remove context.
+The original symptom is mandatory acceptance evidence for a bug fix.
+
+## Failure-To-Smaller-Task
+
+Failure does not authorize repeating the same patch. Record the observation, shrink to a falsifiable slice, and use a new check.
+
+## Continuation
+
+An incomplete long run may embed a structured continuation in the ledger. Resume recomputes the documented `zerotohero-worktree-v1` fingerprint and verifies task/repository/revision/evidence references before continuing; it never auto-replays writes. Completed ledgers cannot carry continuations.
+
+## Context Retrieval
+
+External documentation is optional and version-pinned. Queries are single-topic, redacted, bounded, freshness-recorded, and reduced to claim-relevant evidence. Provider failure cannot block the base protocol, but an unknown fact required for acceptance blocks the dependent edit and completion.
+
+## Distributed Delegation
+
+The parent records its authority ceiling and one task/result envelope per child: parent/dependency IDs, stable input order, bounded goal/context, role, granted authority, tools/resources, writer ownership, time/iteration/depth limits, idempotency key, result evidence, and terminal cleanup. The semantic validator rejects privilege escalation, cycles, overlapping writers, live mutation in children, unplanned envelope changes, stale leases, and non-terminal descendants.
+
+## Generalization
+
+Adaptive improvement stages a frozen candidate; `generalization-gate` decides whether evidence supports observation, shadow, active, rejection, or archive. Two to four independent positive cases use leave-one-case-out. Active promotion requires distinct source-ledger/task/session/family evidence, hidden-context isolation, complete holdout coverage, same-unit baseline/candidate measurements plus a bound oracle from one independent evaluator, no regression, at least one derived improvement, near-neighbor negative control, zero-tolerance invariants, complexity budget, three distinct future shadow records, explicit promotion authority, an applied target whose bytes match the frozen hash, current source provenance, and tested rollback. This adapts external policy; it is not model-weight training.
+
+Distributed completion is likewise evidence-bound: root and direct-parent envelopes intersect authority/resources/depth; URL scopes use origin and path-segment boundaries rather than string prefixes; dependency timing, input order, concurrency, attempts, timeouts, ancestor cancellation, actual summary size, artifact isolation, and writer lease release are derived from recorded data. Distinct spec and integration reviewers use distinct task/session identities and separate commands bound to the run, producer, gate, and covered tasks.
+
+Active learning and delegated completion require a ledger timestamp. Freeze, source, shadow, child, and release times are ordered against it and against the validator's trusted current clock with a five-minute default skew allowance. Callers may inject `nowMs` and `maxClockSkewMs` for deterministic offline validation; the clock source remains an explicit host trust boundary.

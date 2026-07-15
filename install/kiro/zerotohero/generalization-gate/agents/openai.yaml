@@ -1,0 +1,4 @@
+interface:
+  display_name: "Generalization Gate"
+  short_description: "Promote learned rules only after held-out evidence"
+  default_prompt: "Use $generalization-gate to evaluate this learning candidate against held-out and negative-control evidence."

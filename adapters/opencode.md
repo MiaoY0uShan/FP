@@ -1,17 +1,17 @@
-# Xskill adapter: opencode
+# ZeroToHero adapter: opencode
 
-Xskill is agent-agnostic.
+ZeroToHero is agent-agnostic.
 
 Default behavior:
 
 ```text
-Use Xskill proactively for coding work, then choose the lightest evidence-backed path.
+Use ZeroToHero proactively for coding work, then choose the lightest evidence-backed path.
 ```
 
 Manual override:
 
 ```text
-Xskill: <task or idea>
+ZeroToHero: <task or idea>
 ```
 
 Expected behavior:

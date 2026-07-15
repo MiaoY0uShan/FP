@@ -1,78 +1,37 @@
-# Xskill Execution Protocol
-
-User-facing protocol:
+# ZeroToHero Execution Protocol
 
 ```text
-Xskill: <task or idea>
+task -> route -> smallest brief -> bounded execution -> evidence
 ```
 
-Internal protocol:
+The top router chooses internal modules. Users should not call child skills manually.
 
-```text
-task or idea
--> router
--> smallest useful brief
--> bounded execution
--> evidence
--> optional metrics or improvement
-```
+## Before Editing
 
-## Router behavior
+1. Establish authority and route.
+2. Read only relevant lessons and the real code path.
+3. Separate facts to investigate from decisions the user owns.
+4. Run the seven-rung reuse ladder.
+5. Define scope, acceptance observables, checks, evidence locations, and stop conditions.
 
-The router decides which internal Xskill files are needed.
+## During Work
 
-The user should not have to call:
-
-```text
-question-requirements
-delete-scope
-semantic-architecture
-optimize-path
-shorten-iteration
-```
-
-directly.
-
-## Small clear change
-
-Use a 3-5 line brief:
-
-- task
-- read/touch
-- verification
-- result
-
-Do not produce a full Execution Brief or Evidence Ledger unless risk appears.
-
-## Medium clear task
-
-Use a compact Execution Brief before editing and a compact Evidence Ledger after verification.
-
-## Vague, large, architectural, or risky input
-
-Use Idea Cards or requirements clarification first. Add delete-scope, semantic-architecture, optimize-path, and shorten-iteration only when they reduce risk or scope.
-
-## Protocol or agent-behavior change
-
-Before editing Xskill itself, trigger rules, install boundaries, memory policy, or the default workflow:
-
-- restate the inferred goal
-- challenge unclear or risky assumptions
-- list proposed files or areas
-- ask for confirmation
-
-Skip this only when the user explicitly says to implement already-discussed feedback.
+- Unknown-cause diagnosis stays read-only.
+- One experiment changes one decision.
+- Parallel agents investigate independently; one writer owns shared files/live state.
+- Live-system writes preserve management access and rollback.
+- External context is version-pinned, redacted, and bounded.
+- Long work uses structured continuation, not transcript summaries.
 
 ## Completion
 
-Match evidence weight to task weight:
+- Small: observed validation line.
+- Medium: canonical Evidence Ledger v1.
+- Debug/live/risky: original reproduction, regression, negative control, and profile evidence.
+- Multi-agent: spec/quality verdicts, blocking-finding re-review, parent rerun, all agents terminal.
 
-- small change -> validation result
-- medium task -> Evidence Ledger
-- large/risky task -> Evidence Ledger plus metrics or learning only when useful
+Metrics run only when measurement matters. Adaptive improvement stages evidence-backed observations; it does not silently rewrite the protocol.
 
 ## Boundary
 
-Xskill is not a runtime.
-
-It does not execute commands, edit files automatically, store database state, or run background loops.
+ZeroToHero is a portable skill bundle. It has no database, daemon, scheduler, autonomous executor, or required network service. Maintainer validators and install scripts are not runtime dependencies.

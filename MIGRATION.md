@@ -1,29 +1,40 @@
 # Migration
 
-## v0.1.5 -> v0.1.6
+## Xskill -> ZeroToHero (0.3.0)
 
-Xskill's post-run layer changed:
+This is a full product rename, not a second parallel router.
 
-- `semantic-memory` is replaced by `schema-memory`.
-- `automate-after-stable` and `learn-after-run` are merged into `adaptive-improvement`.
-- `evidence-ledger` is now an explicit skill.
+| Before | Now |
+|---|---|
+| `Xskill` | `ZeroToHero` |
+| `xskill/` | `zerotohero/` |
+| skill name `xskill` | `zerotohero` |
+| internal names `xskill-*` | `zerotohero-*` |
+| `Xskill: <task>` | `ZeroToHero: <task>` |
+| `xskill-*.zip` | `zerotohero-*.zip` |
 
-If you installed a previous Xskill bundle, remove these old directories:
+Use the universal installer's explicit migration mode; keeping both routers active is rejected:
 
-```text
-xskill/automate-after-stable
-xskill/learn-after-run
-xskill/semantic-memory
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\INSTALL-ZEROTOHERO.ps1 -MigrateLegacy
+powershell -NoProfile -ExecutionPolicy Bypass -File .\INSTALL-ZEROTOHERO.ps1 -Verify
 ```
 
-Then copy the new `xskill/` folder from the release zip.
-
-The new post-run loop is:
-
-```text
-evidence-ledger
-→ adaptive-improvement
-→ schema-memory
+```sh
+sh ./INSTALL-ZEROTOHERO.sh --migrate-legacy
+sh ./INSTALL-ZEROTOHERO.sh --verify
 ```
 
-Xskill still has no CLI, npm, npx, pip, runtime, or database.
+Known legacy paths are copied under `.zerotohero-backups/<timestamp>/legacy-xskill/` before removal. Do not delete project-owned `AGENTS.md`, `GEMINI.md`, or tool configuration blindly; the installer does not perform broad text replacement.
+
+Canonical Evidence Ledger v1 is now JSON. Legacy Markdown/JSON remains readable by the metrics collector for one migration cycle with a warning, but strict validation requires `schema_version: "1.0.0"`.
+
+## 0.1.5 -> 0.1.6
+
+The historical post-run layer changed:
+
+- `semantic-memory` became `schema-memory`;
+- `automate-after-stable` and `learn-after-run` became `adaptive-improvement`;
+- `evidence-ledger` became an explicit internal module.
+
+Historical installations should remove those retired directories before copying the current portable bundle.

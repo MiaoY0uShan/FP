@@ -1,41 +1,30 @@
-# Release checklist
+# Release Checklist
 
-## v0.2.4 - One-download release kit and keynote README
+`VERSION` is the release-version source of truth. A release tag must equal `v$(VERSION)`.
 
-Build these assets:
-
-```text
-Xskill-v0.2.4-release-kit.zip
-Xskill-v0.2.4-repo.zip
-xskill-v0.2.4.zip
-xskill-codex-v0.2.4.zip
-xskill-claude-code-v0.2.4.zip
-xskill-gemini-cli-v0.2.4.zip
-xskill-github-copilot-cli-v0.2.4.zip
-xskill-copy-paste-v0.2.4.md
-RELEASE_NOTES-v0.2.4.md
-git-commands-v0.2.4.txt
-```
-
-GitHub Actions can build and upload the per-agent release assets from a `v*` tag or a manual workflow dispatch:
+## Before Tagging
 
 ```text
-.github/workflows/release.yml
+node scripts/lint-zerotohero.js
+node scripts/lint-release.js
+node scripts/lint-contracts.js --ledger zerotohero/examples/password-reset.evidence-ledger.json --brief zerotohero/examples/password-reset.compiled-execution-brief.json
+node --test
+sh test/posix-installer-smoke.sh
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\sync-install-packs.ps1 -Check
+git diff --check
 ```
 
 Verify:
 
-- `xskill/SKILL.md` exists.
-- `xskill/` is treated as the source of truth for bundled install-pack references.
-- Run `powershell -ExecutionPolicy Bypass -File .\scripts\sync-install-packs.ps1` before packaging.
-- Run `powershell -ExecutionPolicy Bypass -File .\scripts\sync-install-packs.ps1 -Check` before release.
-- Confirm `release.yml` packages Codex as `.agents/`, Claude Code as `.claude/`, Gemini CLI as `xskill/`, and GitHub Copilot CLI as `.github/` plus `xskill/`.
-- Idea Cards template exists.
-- Context Budget Contract includes estimated budget fields.
-- All install packs describe proactive activation as the default behavior.
-- All install packs preserve `Xskill: <task or idea>` as the manual override.
-- Each agent package includes `TEST_XSKILL.md`.
-- Each agent package includes its agent-specific entrypoint.
-- Packaged `xskill/` reference folders match the source `xskill/` folder.
-- `dist/README.md`, install READMEs, and Gemini extension metadata all use `v0.2.4`.
-- No CLI, npm, npx, pip, database, or runtime was introduced.
+- root `zerotohero/` is canonical and all generated pack copies match it;
+- every `SKILL.md` begins with `---` and no text file has a UTF-8 BOM;
+- Gemini metadata equals `VERSION`;
+- universal plus every dedicated tool asset is built and contains its entrypoint;
+- every ZIP contains `LICENSE`, `THIRD_PARTY_NOTICES.md`, and `VERSION` inside the ZeroToHero-owned namespace, and standalone release assets retain the same notices without overwriting project-root files;
+- `TEST_ZEROTOHERO.md` is identical in every pack;
+- debug-only remains read-only, distributed delegation rejects authority/DAG/writer/cleanup violations, and unknown metrics remain unknown;
+- background learning rejects train/holdout leakage, single-case permanent promotion, negative-control/invariant failures, holdout regression, no-improvement underfit, self-evaluation, stale provenance, shadow failure, and missing rollback;
+- release workflow runs validation before publishing;
+- PowerShell and POSIX lifecycle checks cover install, verify, idempotency, tamper refusal, and ownership-safe uninstall;
+- exact-host discovery results name the tested version and report authentication/timeouts as blocked or not-run instead of implied passes (see `host-smoke-2026-07-14.md` for the current machine);
+- no database, daemon, scheduler, required MCP/provider, or autonomous executor was introduced.

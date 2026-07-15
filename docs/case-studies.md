@@ -1,72 +1,23 @@
-# Xskill self-use case studies
+# ZeroToHero Case Studies And Evaluation Status
 
-These case studies were created while building Xskill itself.
+The five early self-use files under `examples/case-studies/` illustrate scope and evidence shapes. Their former `characters / 4` comparison against a monolithic prompt was not a controlled agent baseline, so the percentage-reduction claim is retired.
 
-They are preliminary evidence, not a formal benchmark. The purpose is to show how the Xskill protocol can be used to constrain real repository-maintenance tasks before a broader external evaluation.
+They may demonstrate:
 
-## Measurement method
+- which route/resources were selected;
+- declared scope and stop conditions;
+- the intended evidence shape.
 
-Baseline context is defined as a monolithic rules setup that loads:
+They do not prove lower tokens, latency, cost, rework, or higher quality.
 
-- `README.md`
-- `xskill/AGENTS.md`
-- every `xskill/*/SKILL.md`
-- every `xskill/templates/*`
+## Required Future Benchmark
 
-Estimated baseline: **19,562 tokens**.
+A valid comparison must hold constant:
 
-Token estimates use:
+- task and acceptance checks;
+- agent/model and tool permissions;
+- repository revision;
+- fresh isolated workspace/context;
+- timeout and retry policy.
 
-```text
-estimated_tokens = characters / 4
-```
-
-Xskill loaded context is the subset of skill files, adapter docs, and templates required for that task.
-
-## Case summary
-
-| Case | Task | Baseline | Xskill | Reduction |
-|---|---|---:|---:|---:|
-| 1 | Rewrite install docs | 19,562 | 7,120 | 63.6% |
-| 2 | Add Codex adapter guidance | 19,562 | 8,112 | 58.5% |
-| 3 | Add JSON Evidence Ledger example | 19,562 | 6,808 | 65.2% |
-| 4 | Split failed password reset flow | 19,562 | 7,520 | 61.6% |
-| 5 | Add metrics report | 19,562 | 8,365 | 57.2% |
-
-Average reduction: **61.2%**.
-
-## Test 1: prompt/context volume
-
-Target: reduce always-on context by more than 50%.
-
-Result: passed for all five self-use cases.
-
-## Test 2: drift control
-
-For these five self-use cases, Xskill required explicit boundaries such as:
-
-- files or sections to touch
-- files or areas to avoid
-- maximum scope
-- stop conditions
-- evidence required
-
-This is not yet the same as a controlled 10-task external run. The next benchmark should record:
-
-- unrelated files changed
-- skipped checks
-- expanded scope
-- misunderstood requirements
-
-## Test 3: failure-to-smaller-task
-
-The failure-split case demonstrates the protocol:
-
-```text
-failed task
-→ root cause
-→ smaller task list
-→ focused checks
-```
-
-This satisfies the shape of the test, but more external failure cases are needed.
+It must repeat runs, preserve raw transcripts/workspaces, report contamination and failures, and score functional verification/safety separately from token, latency, or changed-line metrics. Results remain preliminary until an external or independently reproducible batch exists.

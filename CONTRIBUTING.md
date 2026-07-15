@@ -1,13 +1,14 @@
 # Contributing
 
-Xskill should stay small.
+ZeroToHero should stay small.
 
 Before adding a new file or workflow, ask:
 
-1. Does this reduce context?
-2. Does this make execution more bounded?
-3. Does this improve evidence quality?
-4. Can this be expressed as a smaller skill or template?
+1. Does it need to exist?
+2. Does the repository, standard library, native platform, or installed tooling already do it?
+3. Does this reduce context or make execution more bounded?
+4. Does this improve observable evidence?
+5. Can it be a smaller rule, template, or check instead of a new subsystem?
 
 ## Good contributions
 

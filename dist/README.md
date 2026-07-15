@@ -1,29 +1,27 @@
-# Xskill distribution
+# ZeroToHero Release Assets
 
-This folder contains generated release-facing files.
-
-Release assets:
+Recommended:
 
 ```text
-xskill-codex-v0.2.4.zip
-xskill-claude-code-v0.2.4.zip
-xskill-gemini-cli-v0.2.4.zip
-xskill-github-copilot-cli-v0.2.4.zip
-xskill-copy-paste-v0.2.4.md
+zerotohero-universal-v{version}.zip
 ```
 
-GitHub Actions builds these assets from `.github/workflows/release.yml` when a `v*` tag is pushed or the release workflow is run manually.
+Smaller packs:
 
-After installing, use your agent normally. Xskill should activate automatically for coding tasks and choose the lightest useful path:
-
-- small change -> 3-5 line brief plus validation result
-- medium task -> compact Execution Brief plus Evidence Ledger
-- large, vague, architectural, or risky task -> full chain
-
-Agent-local directories such as `.agents/skills/` are not project source unless a repository explicitly opts in.
-
-`xskill/` is the source of truth. Generated install-pack copies are refreshed with:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\sync-install-packs.ps1
+```text
+zerotohero-codex-v{version}.zip
+zerotohero-claude-code-v{version}.zip
+zerotohero-gemini-cli-v{version}.zip
+zerotohero-github-copilot-cli-v{version}.zip
+zerotohero-cursor-v{version}.zip
+zerotohero-windsurf-v{version}.zip
+zerotohero-cline-v{version}.zip
+zerotohero-roo-code-v{version}.zip
+zerotohero-opencode-v{version}.zip
+zerotohero-kiro-v{version}.zip
+zerotohero-github-copilot-editor-v{version}.zip
+zerotohero-aider-v{version}.zip
+zerotohero-copy-paste-v{version}.md
 ```
+
+All adapters delegate to one canonical router. Release validation checks contract examples, behavior invariants, BOM/frontmatter, metadata, and byte-for-byte generated pack parity before assets are built.

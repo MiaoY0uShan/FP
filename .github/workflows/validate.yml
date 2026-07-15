@@ -2,133 +2,82 @@ name: validate
 
 on:
   push:
+    branches:
+      - "**"
   pull_request:
+  workflow_call:
 
 jobs:
   validate:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
-      - name: Check required files
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 20
+
+      - name: Check required source and entrypoints
+        shell: bash
         run: |
+          set -euo pipefail
+          test -f VERSION
           test -f README.md
-          test -f START_HERE.md
           test -f INSTALL.md
-          test -f TEST_XSKILL.md
-          test -f xskill/SKILL.md
-          test -f xskill/AGENTS.md
-          test -f xskill/templates/idea-cards.md
-          test -f xskill/templates/compiled-execution-brief.md
-          test -f xskill/templates/context-budget-contract.md
-          test -f xskill/templates/context-budget-contract.json
-          test -f xskill/templates/evidence-ledger.md
-          test -f scripts/sync-install-packs.ps1
-          test -f docs/router.md
-          test -f docs/execution-protocol.md
-          test -f install/codex/TEST_XSKILL.md
-          test -f install/codex/.agents/skills/xskill/SKILL.md
-          test -f install/codex/.agents/skills/xskill/references/xskill/SKILL.md
-          test -f install/claude-code/TEST_XSKILL.md
-          test -f install/claude-code/.claude/skills/xskill/SKILL.md
-          test -f install/claude-code/.claude/skills/xskill/references/xskill/SKILL.md
-          test -f install/gemini-cli/TEST_XSKILL.md
-          test -f install/gemini-cli/xskill/GEMINI.md
-          test -f install/gemini-cli/xskill/gemini-extension.json
-          test -f install/gemini-cli/xskill/xskill/SKILL.md
-          test -f install/github-copilot-cli/TEST_XSKILL.md
-          test -f install/github-copilot-cli/.github/agents/xskill.agent.md
-          test -f install/github-copilot-cli/xskill/SKILL.md
-      - name: Check skill metadata frontmatter
-        run: |
-          python - <<'PY'
-          import json
-          from pathlib import Path
+          test -f TEST_ZEROTOHERO.md
+          test -f zerotohero/SKILL.md
+          test -f zerotohero/contracts/evidence-ledger.v1.schema.json
+          test -f zerotohero/generalization-gate/SKILL.md
+          test -f zerotohero/templates/debug-incident-checklist.md
+          test -f zerotohero/templates/multi-agent-review-protocol.md
+          test -f zerotohero/templates/generalization-evaluation.md
+          test -f zerotohero/templates/context-retrieval-contract.md
+          test -f THIRD_PARTY_NOTICES.md
+          test -f docs/assets/zerotohero-banner.svg
+          test -f install/universal/INSTALL-ZEROTOHERO.ps1
+          test -f install/universal/INSTALL-ZEROTOHERO.sh
+          test -f install/universal/INSTALL-ZEROTOHERO.cmd
+          test -f install/universal/.zerotohero-package/payload/.agents/skills/zerotohero/SKILL.md
+          test -f install/universal/.zerotohero-package/payload/.qoder/rules/zerotohero.md
+          test -f install/universal/.zerotohero-package/payload/.roo/rules/zerotohero.md
+          test -f install/codex/.agents/skills/zerotohero/SKILL.md
+          test -f install/claude-code/.claude/skills/zerotohero/SKILL.md
+          test -f install/gemini-cli/zerotohero/GEMINI.md
+          test -f install/github-copilot-cli/.github/agents/zerotohero.agent.md
+          test -f install/github-copilot-cli/.github/instructions/zerotohero.instructions.md
+          test -f install/cursor/.cursor/rules/zerotohero.mdc
+          test -f install/windsurf/.windsurf/rules/zerotohero.md
+          test -f install/cline/.clinerules/zerotohero.md
+          test -f install/roo-code/.roo/rules/zerotohero.md
+          test -f install/opencode/.opencode/skills/zerotohero/SKILL.md
+          test -f install/kiro/.kiro/steering/zerotohero.md
+          test -f install/github-copilot-editor/.github/instructions/zerotohero.instructions.md
+          test -f install/aider/AIDER-CONFIG-SNIPPET.yml
 
-          failures = []
-          for path in Path(".").rglob("SKILL.md"):
-              lines = path.read_text(encoding="utf-8").splitlines()
-              if len(lines) < 4 or lines[0] != "---":
-                  failures.append(f"{path}: missing YAML frontmatter")
-                  continue
-              try:
-                  end = lines[1:].index("---") + 1
-              except ValueError:
-                  failures.append(f"{path}: unterminated YAML frontmatter")
-                  continue
+      - name: Lint repository, release metadata, and contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/lint-zerotohero.js
+          node scripts/lint-release.js
+          node scripts/lint-contracts.js \
+            --ledger zerotohero/examples/password-reset.evidence-ledger.json \
+            --brief zerotohero/examples/password-reset.compiled-execution-brief.json
 
-              frontmatter = lines[1:end]
-              fields = {}
-              for line in frontmatter:
-                  if not line.strip():
-                      continue
-                  if ": " not in line:
-                      failures.append(f"{path}: invalid frontmatter line: {line}")
-                      continue
-                  key, value = line.split(": ", 1)
-                  fields[key] = value
+      - name: Run textual router invariants and executable contract tests
+        run: node --test
 
-              for key in ("name", "description"):
-                  if key not in fields:
-                      failures.append(f"{path}: missing {key}")
+      - name: Run explicit POSIX installer lifecycle smoke
+        if: runner.os != 'Windows'
+        shell: sh
+        run: sh ./test/posix-installer-smoke.sh
 
-              description = fields.get("description")
-              if description is not None:
-                  if not (description.startswith('"') and description.endswith('"')):
-                      failures.append(f"{path}: description must be double-quoted YAML")
-                  else:
-                      try:
-                          json.loads(description)
-                      except json.JSONDecodeError as exc:
-                          failures.append(f"{path}: invalid quoted description: {exc}")
+      - name: Check generated install packs
+        shell: pwsh
+        run: ./scripts/sync-install-packs.ps1 -Check
 
-          if failures:
-              raise SystemExit("\n".join(failures))
-          PY
-      - name: Check release version references
-        run: |
-          grep -q '## v0.2.4' CHANGELOG.md
-          grep -q 'xskill-codex-v0.2.4.zip' dist/README.md
-          grep -q 'xskill-claude-code-v0.2.4.zip' dist/README.md
-          grep -q 'xskill-gemini-cli-v0.2.4.zip' dist/README.md
-          grep -q 'xskill-github-copilot-cli-v0.2.4.zip' dist/README.md
-          grep -q 'xskill-copy-paste-v0.2.4.md' dist/README.md
-          grep -q 'xskill-codex-v0.2.4.zip' install/codex/README.md
-          grep -q 'xskill-claude-code-v0.2.4.zip' install/claude-code/README.md
-          grep -q 'xskill-gemini-cli-v0.2.4.zip' install/gemini-cli/README.md
-          grep -q 'xskill-github-copilot-cli-v0.2.4.zip' install/github-copilot-cli/README.md
-          grep -q '"version": "0.2.4"' install/gemini-cli/xskill/gemini-extension.json
-          ! grep -E 'v0\.2\.2|v0\.2\.3' \
-            dist/README.md \
-            docs/portable-install.md \
-            docs/release-checklist.md \
-            install/codex/README.md \
-            install/claude-code/README.md \
-            install/gemini-cli/README.md \
-            install/github-copilot-cli/README.md \
-            install/gemini-cli/xskill/gemini-extension.json
-      - name: Check proactive activation docs
-        run: |
-          grep -q 'activate Xskill proactively' xskill/README.md
-          grep -q 'Use Xskill proactively' adapters/README.md
-          grep -q 'Manual override' adapters/README.md
-          ! grep -R 'Default trigger' \
-            adapters \
-            install/codex/.agents/skills/xskill/references/xskill/README.md \
-            install/claude-code/.claude/skills/xskill/references/xskill/README.md \
-            install/gemini-cli/xskill/xskill/README.md \
-            install/github-copilot-cli/xskill/README.md
-      - name: Check install pack source of truth docs
-        run: |
-          grep -q 'sync-install-packs.ps1' install/README.md
-          grep -q 'install/codex/.agents/skills/xskill/references/xskill/' install/README.md
-          grep -q 'sync-install-packs.ps1' docs/release-checklist.md
-      - name: Check packaged xskill references
-        run: |
-          diff -ru xskill install/codex/.agents/skills/xskill/references/xskill
-          diff -ru xskill install/claude-code/.claude/skills/xskill/references/xskill
-          diff -ru xskill install/gemini-cli/xskill/xskill
-          diff -ru xskill install/github-copilot-cli/xskill
-      - name: Check JSON files
-        run: |
-          python -m json.tool install/gemini-cli/xskill/gemini-extension.json >/dev/null
-          python -m json.tool xskill/templates/context-budget-contract.json >/dev/null
+      - name: Check diff hygiene
+        run: git diff --check

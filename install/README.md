@@ -1,66 +1,30 @@
-# Xskill install packs
+# ZeroToHero Install Packs
 
-Pick the package for your agent.
+`universal/` is the only beginner path: extract it into a project root, run `INSTALL-ZEROTOHERO.cmd` on Windows or `sh ./INSTALL-ZEROTOHERO.sh` on macOS/Linux, run verify mode, and reload. The same package provides ownership-checked uninstall mode. See the single normative guide and compatibility matrix in [`../INSTALL.md`](../INSTALL.md).
 
-After installation, use your agent normally. Xskill should activate automatically for coding tasks and choose the lightest useful path.
+Dedicated folders are advanced, namespaced packs. They do not provide the universal installer's safe merge and preflight behavior.
 
-Manual override:
+| Pack | Entry point |
+|---|---|
+| `universal/` | thin entries for all supported tools + canonical `zerotohero/` |
+| `codex/` | `.agents/skills/zerotohero/SKILL.md` |
+| `claude-code/` | `.claude/skills/zerotohero/SKILL.md` |
+| `gemini-cli/` | `zerotohero/GEMINI.md` extension |
+| `github-copilot-cli/` | `.github/instructions/zerotohero.instructions.md` + custom agent |
+| `cursor/` | `.cursor/rules/zerotohero.mdc` |
+| `windsurf/` | `.windsurf/rules/zerotohero.md` |
+| `cline/` | `.clinerules/zerotohero.md` |
+| `roo-code/` | `.roo/rules/zerotohero.md` |
+| `opencode/` | `.opencode/skills/zerotohero/SKILL.md` |
+| `kiro/` | `.kiro/steering/zerotohero.md` |
+| `github-copilot-editor/` | `.github/instructions/zerotohero.instructions.md` |
+| `aider/` | `AIDER-CONFIG-SNIPPET.yml` + `CONVENTIONS.md` |
 
-```text
-Xskill: <task or idea>
-```
-
-## Packages
-
-| Agent | Folder | Release asset |
-|---|---|---|
-| Codex | `install/codex/` | `xskill-codex-{version}.zip` |
-| Claude Code | `install/claude-code/` | `xskill-claude-code-{version}.zip` |
-| Gemini CLI | `install/gemini-cli/` | `xskill-gemini-cli-{version}.zip` |
-| GitHub Copilot CLI | `install/github-copilot-cli/` | `xskill-github-copilot-cli-{version}.zip` |
-
-## Copy install
-
-You can install directly from this repository by copying the agent-specific folder into the target project.
-
-For Codex:
-
-```text
-copy install/codex/.agents -> your-project/.agents
-```
-
-Codex CLI can then discover:
-
-```text
-your-project/.agents/skills/xskill/
-```
-
-`install/codex/.agents/` is a tracked Xskill install template. A copied `your-project/.agents/skills/` directory is local agent configuration unless that target repository explicitly opts in to committing agent config.
-
-If your agent is not listed, use `xskill-copy-paste-{version}.md`.
-
-## Source of truth
-
-`xskill/` is the source of truth for portable skill content.
-
-The bundled copies inside install packs are generated copies:
-
-```text
-install/codex/.agents/skills/xskill/references/xskill/
-install/claude-code/.claude/skills/xskill/references/xskill/
-install/gemini-cli/xskill/xskill/
-install/github-copilot-cli/xskill/
-dist/xskill-copy-paste.md
-```
-
-Do not hand-edit those generated copies. Update `xskill/` or `xskill-copy-paste.md`, then run:
+Root `zerotohero/` is the source of truth. Generated copies are never edited by hand:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\sync-install-packs.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\sync-install-packs.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\sync-install-packs.ps1 -Check
 ```
 
-To verify without changing files:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\sync-install-packs.ps1 -Check
-```
+Every pack includes `TEST_ZEROTOHERO.md` and must pass the same route behavior, not merely contain the same brand name.

@@ -5,13 +5,39 @@ param(
 $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
-$source = Join-Path $repoRoot "xskill"
+$source = Join-Path $repoRoot "zerotohero"
 
 $targets = @(
-    "install/codex/.agents/skills/xskill/references/xskill",
-    "install/claude-code/.claude/skills/xskill/references/xskill",
-    "install/gemini-cli/xskill/xskill",
-    "install/github-copilot-cli/xskill"
+    "install/codex/.agents/skills/zerotohero/references/zerotohero",
+    "install/claude-code/.claude/skills/zerotohero/references/zerotohero",
+    "install/gemini-cli/zerotohero/zerotohero",
+    "install/github-copilot-cli/zerotohero",
+    "install/cursor/zerotohero",
+    "install/windsurf/zerotohero",
+    "install/cline/zerotohero",
+    "install/roo-code/zerotohero",
+    "install/opencode/zerotohero",
+    "install/kiro/zerotohero",
+    "install/github-copilot-editor/zerotohero",
+    "install/aider/zerotohero",
+    "install/universal/.zerotohero-package/payload/zerotohero"
+)
+
+$testSource = Join-Path $repoRoot "TEST_ZEROTOHERO.md"
+$testTargets = @(
+    "install/codex/TEST_ZEROTOHERO.md",
+    "install/claude-code/TEST_ZEROTOHERO.md",
+    "install/gemini-cli/TEST_ZEROTOHERO.md",
+    "install/github-copilot-cli/TEST_ZEROTOHERO.md",
+    "install/cursor/TEST_ZEROTOHERO.md",
+    "install/windsurf/TEST_ZEROTOHERO.md",
+    "install/cline/TEST_ZEROTOHERO.md",
+    "install/roo-code/TEST_ZEROTOHERO.md",
+    "install/opencode/TEST_ZEROTOHERO.md",
+    "install/kiro/TEST_ZEROTOHERO.md",
+    "install/github-copilot-editor/TEST_ZEROTOHERO.md",
+    "install/aider/TEST_ZEROTOHERO.md",
+    "install/universal/.zerotohero-package/payload/TEST_ZEROTOHERO.md"
 )
 
 function Get-RelativePath {
@@ -54,6 +80,28 @@ if (-not (Test-Path -LiteralPath $source)) {
     throw "Missing source directory: $source"
 }
 
+$canonicalMetadata = @(
+    @{ Source = (Join-Path $repoRoot "LICENSE"); Target = (Join-Path $source "LICENSE") },
+    @{ Source = (Join-Path $repoRoot "THIRD_PARTY_NOTICES.md"); Target = (Join-Path $source "THIRD_PARTY_NOTICES.md") },
+    @{ Source = (Join-Path $repoRoot "VERSION"); Target = (Join-Path $source "VERSION") }
+)
+
+foreach ($entry in $canonicalMetadata) {
+    if ($Check) {
+        if (-not (Test-Path -LiteralPath $entry.Target)) {
+            throw "Missing canonical product metadata: $(Get-RelativePath -Path $entry.Target)"
+        }
+        if ((Get-FileHash -Algorithm SHA256 -Path $entry.Source).Hash -ne (Get-FileHash -Algorithm SHA256 -Path $entry.Target).Hash) {
+            throw "Canonical product metadata is out of sync: $(Get-RelativePath -Path $entry.Target)"
+        }
+        Write-Host "ok: $(Get-RelativePath -Path $entry.Target)"
+        continue
+    }
+
+    Copy-Item -LiteralPath $entry.Source -Destination $entry.Target -Force
+    Write-Host "synced: $(Get-RelativePath -Path $entry.Target)"
+}
+
 foreach ($targetRelative in $targets) {
     $target = Join-Path $repoRoot $targetRelative
 
@@ -78,19 +126,37 @@ foreach ($targetRelative in $targets) {
     Write-Host "synced: $(Get-RelativePath -Path $target)"
 }
 
-$copyPasteSource = Join-Path $repoRoot "xskill-copy-paste.md"
-$copyPasteTarget = Join-Path $repoRoot "dist/xskill-copy-paste.md"
+foreach ($targetRelative in $testTargets) {
+    $target = Join-Path $repoRoot $targetRelative
+    if ($Check) {
+        if (-not (Test-Path -LiteralPath $target)) {
+            throw "Missing generated install-pack test: $targetRelative"
+        }
+        if ((Get-FileHash -Algorithm SHA256 -Path $testSource).Hash -ne (Get-FileHash -Algorithm SHA256 -Path $target).Hash) {
+            throw "Generated install-pack test is out of sync: $targetRelative"
+        }
+        Write-Host "ok: $targetRelative"
+        continue
+    }
+
+    New-Item -ItemType Directory -Path (Split-Path -Parent $target) -Force | Out-Null
+    Copy-Item -LiteralPath $testSource -Destination $target -Force
+    Write-Host "synced: $targetRelative"
+}
+
+$copyPasteSource = Join-Path $repoRoot "zerotohero-copy-paste.md"
+$copyPasteTarget = Join-Path $repoRoot "dist/zerotohero-copy-paste.md"
 
 if ($Check) {
     if (-not (Test-Path -LiteralPath $copyPasteTarget)) {
-        throw "Missing generated copy-paste fallback: dist/xskill-copy-paste.md"
+        throw "Missing generated copy-paste fallback: dist/zerotohero-copy-paste.md"
     }
     if ((Get-FileHash -Algorithm SHA256 -Path $copyPasteSource).Hash -ne (Get-FileHash -Algorithm SHA256 -Path $copyPasteTarget).Hash) {
-        throw "Generated copy-paste fallback is out of sync: dist/xskill-copy-paste.md"
+        throw "Generated copy-paste fallback is out of sync: dist/zerotohero-copy-paste.md"
     }
-    Write-Host "ok: dist/xskill-copy-paste.md"
+    Write-Host "ok: dist/zerotohero-copy-paste.md"
 } else {
     New-Item -ItemType Directory -Path (Split-Path -Parent $copyPasteTarget) -Force | Out-Null
     Copy-Item -Path $copyPasteSource -Destination $copyPasteTarget -Force
-    Write-Host "synced: dist/xskill-copy-paste.md"
+    Write-Host "synced: dist/zerotohero-copy-paste.md"
 }

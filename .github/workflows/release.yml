@@ -4,99 +4,61 @@ on:
   push:
     tags:
       - "v*"
-  workflow_dispatch:
-    inputs:
-      version:
-        description: "Release version without the leading v, for example 0.2.4"
-        required: true
-        default: "0.2.4"
 
 permissions:
   contents: write
 
 jobs:
+  validate:
+    uses: ./.github/workflows/validate.yml
+    permissions:
+      contents: read
+
+  powershell_lifecycle:
+    name: PowerShell installer lifecycle
+    runs-on: windows-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 20
+      - name: Run PowerShell installer lifecycle tests
+        run: node --test test/installer-integration.test.js
+
   release:
+    needs: [validate, powershell_lifecycle]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 20
 
-      - name: Resolve version
+      - name: Resolve and verify version
         id: version
         shell: bash
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            VERSION="${{ inputs.version }}"
-            TAG="v${VERSION}"
-          else
-            TAG="${GITHUB_REF_NAME}"
-            VERSION="${TAG#v}"
+          set -euo pipefail
+          VERSION="$(tr -d '\r\n ' < VERSION)"
+          TAG="v${VERSION}"
+          if [ "${GITHUB_REF_NAME}" != "${TAG}" ]; then
+            echo "Tag ${GITHUB_REF_NAME} does not match VERSION ${VERSION}" >&2
+            exit 1
           fi
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
           echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
 
-      - name: Check install pack sync
-        shell: pwsh
-        run: ./scripts/sync-install-packs.ps1 -Check
-
-      - name: Check required files
+      - name: Build and verify release assets
         shell: bash
-        run: |
-          test -f install/codex/.agents/skills/xskill/SKILL.md
-          test -f install/claude-code/.claude/skills/xskill/SKILL.md
-          test -f install/gemini-cli/xskill/GEMINI.md
-          test -f install/gemini-cli/xskill/gemini-extension.json
-          test -f install/github-copilot-cli/.github/agents/xskill.agent.md
-          test -f install/github-copilot-cli/xskill/SKILL.md
-          test -f xskill-copy-paste.md
-
-      - name: Build release assets
-        shell: bash
-        run: |
-          set -euo pipefail
-          VERSION="${{ steps.version.outputs.version }}"
-          rm -rf release-assets .release-build
-          mkdir -p release-assets .release-build
-
-          mkdir -p .release-build/codex
-          cp -a install/codex/.agents .release-build/codex/
-          (cd .release-build/codex && zip -qr "../../release-assets/xskill-codex-v${VERSION}.zip" .agents)
-
-          mkdir -p .release-build/claude-code
-          cp -a install/claude-code/.claude .release-build/claude-code/
-          (cd .release-build/claude-code && zip -qr "../../release-assets/xskill-claude-code-v${VERSION}.zip" .claude)
-
-          mkdir -p .release-build/gemini-cli
-          cp -a install/gemini-cli/xskill .release-build/gemini-cli/
-          (cd .release-build/gemini-cli && zip -qr "../../release-assets/xskill-gemini-cli-v${VERSION}.zip" xskill)
-
-          mkdir -p .release-build/github-copilot-cli
-          cp -a install/github-copilot-cli/.github .release-build/github-copilot-cli/
-          cp -a install/github-copilot-cli/xskill .release-build/github-copilot-cli/
-          (cd .release-build/github-copilot-cli && zip -qr "../../release-assets/xskill-github-copilot-cli-v${VERSION}.zip" .github xskill)
-
-          cp xskill-copy-paste.md "release-assets/xskill-copy-paste-v${VERSION}.md"
-          cp dist/README.md "release-assets/README-v${VERSION}.md"
-
-      - name: Verify release assets
-        shell: bash
-        run: |
-          set -euo pipefail
-          VERSION="${{ steps.version.outputs.version }}"
-          test -f "release-assets/xskill-codex-v${VERSION}.zip"
-          test -f "release-assets/xskill-claude-code-v${VERSION}.zip"
-          test -f "release-assets/xskill-gemini-cli-v${VERSION}.zip"
-          test -f "release-assets/xskill-github-copilot-cli-v${VERSION}.zip"
-          test -f "release-assets/xskill-copy-paste-v${VERSION}.md"
-          unzip -l "release-assets/xskill-codex-v${VERSION}.zip" | grep -q '.agents/skills/xskill/SKILL.md'
-          unzip -l "release-assets/xskill-claude-code-v${VERSION}.zip" | grep -q '.claude/skills/xskill/SKILL.md'
-          unzip -l "release-assets/xskill-gemini-cli-v${VERSION}.zip" | grep -q 'xskill/GEMINI.md'
-          unzip -l "release-assets/xskill-github-copilot-cli-v${VERSION}.zip" | grep -q '.github/agents/xskill.agent.md'
-          unzip -l "release-assets/xskill-github-copilot-cli-v${VERSION}.zip" | grep -q 'xskill/SKILL.md'
+        run: sh ./scripts/build-release-assets.sh
 
       - name: Publish GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2.6.2
         with:
           tag_name: ${{ steps.version.outputs.tag }}
-          name: Xskill ${{ steps.version.outputs.tag }}
+          name: ZeroToHero ${{ steps.version.outputs.tag }}
           files: release-assets/*
           fail_on_unmatched_files: true
+          generate_release_notes: true

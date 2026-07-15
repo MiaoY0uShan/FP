@@ -1,129 +1,39 @@
-# Xskill Metrics
+# ZeroToHero Metrics
 
-Xskill is designed to make AI coding agents produce smaller, safer, more verifiable work.
+Metrics are conservative: missing inputs are `unknown`, zero is used only when zero was observed, and division with no verified progress is undefined.
 
-Metrics are how Xskill proves whether that actually happened.
+## Verified Progress Gate
 
-## Primary metric: TVP
+A task counts only when `result=pass`, the brief supplies required checks, all required checks passed, at least one claim has evidence, and no failed check or contract/scope/context violation remains.
 
-```text
-TVP = total_context_tokens / verified_tasks_completed
-```
-
-TVP means **Tokens to Verified Progress**.
-
-Lower TVP is better only when verified progress is preserved.
-
-If no task was verified, TVP is undefined.
-
-## When token counts are unavailable
-
-Xskill is a portable skill bundle. It does not own the agent runtime and usually cannot access exact token counts.
-
-When exact token counts are unavailable, use a proxy:
+## Formulas
 
 ```text
-Context Load Proxy = files_read + skills_loaded + reports_generated
+TVP = exact_context_tokens / verified_tasks_completed
+Context Load Proxy = files_read + observed_skills_loaded + observed_reports_used
 Proxy TVP = context_load_proxy / verified_tasks_completed
+Scope Creep Rate = unplanned_files_touched / files_touched
+Verification Rate = tasks whose required checks all passed / completed tasks
+Rework Rate = failed_or_reopened_tasks / completed tasks
 ```
 
-This proxy is not perfect. It is meant for early evaluation and manual comparisons.
+Proxy inputs come from ledger `metrics_inputs`; they are never hardcoded.
 
-## Supporting metrics
+## Claims ZeroToHero May Make
 
-### Scope Creep Rate
+- The route constrained scope and checks.
+- Required checks did or did not pass.
+- Scope drift was observed.
+- A comparable repeated evaluation improved or worsened a metric.
+
+It may not claim token, time, code, or quality improvement from one anecdote or without a baseline.
+
+## Comparable Evaluation
+
+Hold task, acceptance checks, agent/model, and repository revision constant. Use fresh isolated workspaces and repeated runs. Preserve raw outputs/workspaces for rescoring. Score functional evidence and safety separately from tokens, latency, or changed lines. Disclose baseline contamination, timeouts, sample size, and limits.
+
+Run:
 
 ```text
-Scope Creep Rate = touched_unplanned_files / touched_files
+node zerotohero/metrics/collect.js <ledger.json> [brief.json]
 ```
-
-Measures whether the agent touched files outside the brief.
-
-### Verification Rate
-
-```text
-Verification Rate = tasks_with_checks / completed_tasks
-```
-
-Measures whether completed tasks had checks.
-
-### Rework Rate
-
-```text
-Rework Rate = failed_or_reopened_tasks / completed_tasks
-```
-
-Measures repeated failure or reopening.
-
-### Context Load Size
-
-```text
-Context Load Size = files_loaded_per_task
-```
-
-Measures how much repository context was loaded per task.
-
-### Iteration Half-life
-
-```text
-Iteration Half-life = time_to_first_verified_slice
-```
-
-If time is unavailable, use TDD micro-loops to first verified slice as a proxy.
-
-## Evidence required
-
-Metrics should come from:
-
-- Compiled Execution Brief
-- Evidence Ledger
-- Shorten Iteration Report
-- Metrics Report
-
-Do not fabricate metrics.
-
-Use `unknown` when the value is unavailable.
-
-## What Xskill can and cannot claim
-
-Xskill can claim:
-
-- the brief constrained files to read, touch, and avoid;
-- required checks were or were not run;
-- scope creep was or was not recorded;
-- proxy context load improved or worsened across comparable runs.
-
-Xskill cannot claim:
-
-- fewer tokens were used without token logs or a comparable baseline;
-- verification improved without evidence;
-- a workflow is better from one anecdotal run.
-
-## Recommended comparison
-
-Run the same task twice when possible:
-
-1. Baseline: agent without Xskill.
-2. Xskill: agent using the compiled Execution Brief.
-
-Compare:
-
-- files read;
-- files touched;
-- unplanned files touched;
-- checks run;
-- failed attempts;
-- time or loops to first verified slice;
-- exact tokens, if available.
-
-
-## v0.1.9 contracts layer
-
-Xskill now treats four artifacts as core differentiators:
-
-- Context Budget Contract;
-- Evidence Ledger;
-- Failure-to-Smaller-Task Protocol;
-- Context Diet Map.
-
-These keep the bundle portable while making each run bounded, auditable, failure-shrinking, and context-reducing.

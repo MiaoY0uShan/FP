@@ -1,77 +1,35 @@
-# Xskill proactive router
+# ZeroToHero Router
 
-Xskill is designed to activate automatically for coding tasks, then select the lightest useful path.
+ZeroToHero activates proactively for coding work. Manual override: `ZeroToHero: <task or idea>`.
 
-The user does not need to say `Xskill`.
-
-Manual override is still supported:
+## Priority
 
 ```text
-Xskill: <task or idea>
+user authority/read-only constraints
+-> active incident
+-> diagnose-only or unknown-cause failure
+-> protocol/agent-behavior change
+-> small / medium / vague / large route
 ```
 
-## Routing
+Profiles—remote/stateful, OpenWrt, external context, multi-agent, continuation, stateful UI, self-iteration, and background learning—layer onto a route without forcing the full chain.
+
+## Routes
+
+- **Incident:** `OBSERVE -> CONTAIN -> RESTORE -> REPAIR -> LEARN`; restoration and permanent repair use separate briefs.
+- **Debug-first:** pin symptom, read-only baseline, at most two active hypotheses, one discriminating probe, then an authorized fix. Three failed hypotheses force an architecture/observability checkpoint.
+- **Protocol:** confirm intent and affected boundaries unless already approved.
+- **Small:** Tiny Brief and validation result.
+- **Medium:** compact Execution Brief, acceptance matrix, and canonical Evidence Ledger.
+- **Vague:** three Idea Cards, then user choice.
+- **Large/risky:** load only required internal modules and compile one final brief.
+- **Failed/blocked:** evidence, smaller falsifiable slice, new check.
+
+Before creating anything, stop at the first safe rung:
 
 ```text
-small clear change
--> 3-5 line brief
--> edit
--> test or validation result
+need -> existing code -> standard library -> native feature
+-> installed dependency -> one line -> minimum new implementation
 ```
 
-```text
-medium clear task
--> compact execution brief
--> bounded execution
--> compact evidence ledger
-```
-
-```text
-vague idea
--> idea cards
--> user chooses
--> compact execution brief or full chain, depending on risk
-```
-
-```text
-large or multi-module task
--> question-requirements
--> delete-scope
--> semantic-architecture, when needed
--> optimize-path
--> shorten-iteration, when needed
--> execution brief
--> evidence ledger
-```
-
-```text
-protocol or agent-behavior change
--> restate inferred goal
--> challenge assumptions and scope
--> list proposed files or areas
--> ask for confirmation
--> implement only after approval
-```
-
-```text
-failed or blocked task
--> evidence ledger or validation note
--> failure-to-smaller-task protocol
--> smaller brief
-```
-
-```text
-completed task
--> evidence at the same weight as the route
--> metrics only when useful
--> adaptive-improvement only from evidence
--> schema-memory only for reusable patterns
-```
-
-## Repository boundary
-
-`.agents/skills/` is local agent configuration, not project source. Do not commit it unless the repository explicitly opts in. Commit portable skills under `xskill/`.
-
-## Rule
-
-Use Xskill when scope, context, verification, or evidence matters. Keep the output focused on what to read, what to change, and how to verify. When the requested change affects Xskill or agent behavior itself, confirm the change before editing.
+Metrics and learning are optional and evidence-gated. Background learning stages read-only proposals; `generalization-gate` separates author from evaluator and blocks single-case schema/automation promotion. Unknown stays unknown; no baseline means no improvement claim.

@@ -1,17 +1,17 @@
-# Xskill adapter: gemini-cli
+# ZeroToHero adapter: gemini-cli
 
-Xskill is agent-agnostic.
+ZeroToHero is agent-agnostic.
 
 Default behavior:
 
 ```text
-Use Xskill proactively for coding work, then choose the lightest evidence-backed path.
+Use ZeroToHero proactively for coding work, then choose the lightest evidence-backed path.
 ```
 
 Manual override:
 
 ```text
-Xskill: <task or idea>
+ZeroToHero: <task or idea>
 ```
 
 Expected behavior:
@@ -21,5 +21,7 @@ Expected behavior:
 - large, vague, architectural, or risky task -> full chain
 - failed task -> Failure-to-Smaller-Task Protocol and a smaller brief
 - protocol or agent-behavior change -> confirm intent and boundaries before editing
+- unknown-cause failure or diagnose-only request -> debug-first, read-only evidence before edits
+- multi-agent task -> independent investigation only, one writer per shared file set, parent re-verification
 
 This adapter does not add a runtime, CLI, npm package, npx installer, pip package, or database.
