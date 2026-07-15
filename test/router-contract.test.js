@@ -181,8 +181,12 @@ test('challenge loop separates facts from user-owned decisions', () => {
     previous = current;
   }
 
-  const prompts = read('install/claude-code/TEST_FP.md');
+  const prompts = read('TEST_FP.md');
   assert.match(prompts, /Grill Decisions Stay Dependency-Ordered/);
+  assert.match(prompts, /ask only the global-versus-project-scope decision/i);
+  assert.match(prompts, /Wait for and record the answer before asking retention/i);
+  assert.match(prompts, /Confirm shared understanding only after both decisions resolve/i);
+  assert.match(prompts, /no edit occurs before that gate/i);
 });
 
 test('medium and risky work captures a pre-edit workspace baseline', () => {
