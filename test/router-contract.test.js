@@ -17,6 +17,20 @@ function markdownSection(content, heading) {
   return content.slice(start, next === -1 ? content.length : next);
 }
 
+function filesUnder(relativePath) {
+  const start = path.join(root, relativePath);
+  const files = [];
+  const visit = (directory) => {
+    for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+      const fullPath = path.join(directory, entry.name);
+      if (entry.isDirectory()) visit(fullPath);
+      else if (entry.isFile()) files.push(fullPath);
+    }
+  };
+  visit(start);
+  return files;
+}
+
 test('router keeps small work light and unknown causes debug-first', () => {
   const router = read('zerotohero/SKILL.md');
   assert.match(router, /Small Clear Change/);
@@ -186,6 +200,28 @@ test('external context stays untrusted and freshness needs evidence', () => {
   assert.match(contract, /one topic per query/i);
   assert.match(contract, /at most three attempts/i);
   assert.match(contract, /freshness=current.*basis/i);
+});
+
+test('semantic architecture routes context gaps without retired modules', () => {
+  const architecture = read('zerotohero/semantic-architecture/SKILL.md');
+  const example = read('zerotohero/examples/zerotohero.semantic-architecture.md');
+  const template = read('zerotohero/templates/semantic-architecture-report.md');
+
+  assert.match(architecture, /smallest bounded local read-only discovery/i);
+  assert.match(architecture, /current, versioned, or external.*context-retrieval-contract\.md/i);
+  assert.match(architecture, /user-owned.*Decision: ask_user/i);
+  assert.match(architecture, /adaptive-improvement.*Evidence Ledger/i);
+  assert.match(architecture, /schema-memory.*generalized repeated patterns, not raw task context/i);
+  assert.match(example, /evidence-ledger` -> `adaptive-improvement/i);
+  assert.match(template, /Do not use `schema-memory` for task-local context retrieval/i);
+
+  const retiredNames = ['semantic-memory', 'learn-after-run', 'automate-after-stable'];
+  for (const filePath of filesUnder('zerotohero')) {
+    const content = fs.readFileSync(filePath, 'utf8');
+    for (const retiredName of retiredNames) {
+      assert.doesNotMatch(content, new RegExp(`\\b${retiredName}\\b`, 'i'), `${path.relative(root, filePath)} contains retired module ${retiredName}`);
+    }
+  }
 });
 
 test('deliberate shortcuts enter the deferred ledger', () => {

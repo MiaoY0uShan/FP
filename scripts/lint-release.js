@@ -56,6 +56,9 @@ function main() {
   if (!releaseJob || !releaseJob.includes('needs: [validate, powershell_lifecycle]')) {
     failures.push('release publication must depend on reusable validation and powershell_lifecycle');
   }
+  for (const marker of ['refs/heads/main:refs/remotes/origin/main', 'GITHUB_SHA}^{commit}', 'origin/main^{commit}', 'TAG_COMMIT', 'MAIN_COMMIT']) {
+    if (!releaseJob || !releaseJob.includes(marker)) failures.push(`release publication is missing main/tag equality gate marker ${marker}`);
+  }
   if (!packaging.includes('sed -i "s/{version}/$version/g"') || !packaging.includes('sed "s/{version}/$version/g"')) {
     failures.push('release README placeholders are not resolved during packaging');
   }

@@ -58,6 +58,7 @@ Choose one:
 - `mvp_ready`
 - `reduce_scope`
 - `needs_context`
+- `ask_user`
 - `stop`
 
 Decision:
@@ -71,4 +72,5 @@ Usually one of:
 - `delete-scope`
 - `optimize-path`
 - `shorten-iteration`
-- `semantic-memory`
+
+For `needs_context`, use `none` and record the smallest bounded read-only discovery step. Inspect only the relevant local files or state; for a current, versioned, or external fact, load `templates/context-retrieval-contract.md`. Use `Decision: ask_user` and `none` only for a blocking user-owned decision. Do not use `schema-memory` for task-local context retrieval.

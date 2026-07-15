@@ -1,6 +1,6 @@
 {
   "name": "zerotohero",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "contextFileName": "GEMINI.md",
   "description": "ZeroToHero router, Idea Cards, and execution brief discipline for Gemini CLI."
 }

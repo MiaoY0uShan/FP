@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.3.1 — Retired-module routing correction
+
+- Replaced retired `learn-after-run` references with the evidence-gated `adaptive-improvement` route.
+- Removed the retired `semantic-memory` context-retrieval route; missing architecture context now uses minimal local discovery, explicit user decisions, or the external-context contract as appropriate.
+- Added a regression contract that prevents retired module names from returning to the canonical ZeroToHero bundle.
+- Added a release gate that requires the version tag and `origin/main` to resolve to the same commit before assets can be published.
+
 ## v0.3.0 — ZeroToHero rename and reliability contracts
 
 - Renamed the product, skill identifiers, source path, install packs, and release assets from Xskill to ZeroToHero.

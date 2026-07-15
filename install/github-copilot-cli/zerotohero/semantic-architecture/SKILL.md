@@ -64,7 +64,11 @@ Use available context from:
 - failure paths,
 - known project structure if provided.
 
-If project structure is unknown, infer a minimal module map and label it as an assumption.
+If project structure is unknown, first perform the smallest bounded local read-only discovery needed to identify the relevant files, modules, or runtime facts. Infer only non-blocking details and label them as assumptions.
+
+- If the missing fact is current, versioned, or external, load `templates/context-retrieval-contract.md`.
+- If the gap is a user-owned product or policy decision, return `Decision: ask_user` and ask only that blocking question.
+- Do not use reusable pattern memory as a substitute for task-local discovery.
 
 ## Procedure
 
@@ -150,7 +154,7 @@ Example:
 
 [execution-result]
   -> [evidence-ledger]
-  -> [learn-after-run]
+  -> [adaptive-improvement, only when ledger evidence supports a reusable change]
 ```
 
 ### 6. Identify coupling risks
@@ -173,8 +177,8 @@ Write rules that keep the MVP modular.
 Good rules:
 
 ```text
-- semantic-memory may inform context, but must not be required for every task.
-- learn-after-run may propose skill patches, but must not modify skills automatically.
+- local context discovery must stay bounded, read-only, and task-specific.
+- adaptive-improvement may propose a skill-patch candidate only after an Evidence Ledger supports it; it must not modify skills automatically.
 - semantic-architecture should guide planning, not become a required runtime.
 ```
 
@@ -217,8 +221,13 @@ Usually choose:
 
 - `delete-scope` if the MVP scope is still too large,
 - `optimize-path` if the MVP is clear,
-- `shorten-iteration` if the work is still too large,
-- `semantic-memory` if the next task requires a narrow context slice.
+- `shorten-iteration` if the work is still too large.
+
+For `needs_context`, do not route to `schema-memory`; it stores generalized repeated patterns, not raw task context. Record the smallest read-only next step instead:
+
+- inspect only the relevant local files, manifests, or runtime state when the missing fact is local;
+- load `templates/context-retrieval-contract.md` when the missing fact is current, versioned, or external;
+- return `Decision: ask_user` only when the unresolved gap is a user-owned decision rather than a discoverable fact.
 
 ## Output contract
 
@@ -258,6 +267,7 @@ Choose one:
 mvp_ready
 reduce_scope
 needs_context
+ask_user
 stop
 ```
 
@@ -265,7 +275,8 @@ Use:
 
 - `mvp_ready` when the module map is clear enough for `optimize-path`.
 - `reduce_scope` when too many modules are being pulled into the first version.
-- `needs_context` when basic project structure is unknown and blocks the module map.
+- `needs_context` when a discoverable local or external fact blocks the module map.
+- `ask_user` when a blocking product or policy choice belongs to the user and cannot be discovered from evidence.
 - `stop` when the architecture would violate the project's non-goals or make the workflow too heavy.
 
 ## Failure mode
@@ -276,12 +287,17 @@ Return:
 
 ```text
 Decision: needs_context
+Context class: local | external_versioned
 Missing context:
 ...
 Smallest context needed:
 ...
-Recommended Next Skill: semantic-memory
+Read-only next step:
+...
+Recommended Next Skill: none
 ```
+
+For `Context class: local`, inspect only the named local files or state and then rerun this step. For `external_versioned`, use `templates/context-retrieval-contract.md`. If the gap is actually a user-owned decision, return `Decision: ask_user` with one blocking question, a recommendation, and the main alternative.
 
 ## Constraints
 
@@ -291,4 +307,6 @@ Recommended Next Skill: semantic-memory
 - Do not turn optional modules into hard dependencies.
 - Do not expand the MVP.
 - Do not replace `delete-scope`; this skill should consume its MVP nucleus.
+- Do not route task-local context discovery to `schema-memory`.
+- Do not invoke `adaptive-improvement` without an Evidence Ledger that supports a reusable change.
 - Do not produce architecture that cannot be verified by the next task.

@@ -41,6 +41,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          git fetch --no-tags --depth=1 origin +refs/heads/main:refs/remotes/origin/main
+          TAG_COMMIT="$(git rev-parse "${GITHUB_SHA}^{commit}")"
+          MAIN_COMMIT="$(git rev-parse "origin/main^{commit}")"
+          if [ "${TAG_COMMIT}" != "${MAIN_COMMIT}" ]; then
+            echo "Tag commit ${TAG_COMMIT} does not match origin/main ${MAIN_COMMIT}" >&2
+            exit 1
+          fi
           VERSION="$(tr -d '\r\n ' < VERSION)"
           TAG="v${VERSION}"
           if [ "${GITHUB_REF_NAME}" != "${TAG}" ]; then

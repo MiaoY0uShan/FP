@@ -2,7 +2,7 @@
 
 ## Clarified Goal
 
-Add a lightweight semantic architecture step to ZeroToHero so an agent can sketch module boundaries, choose an MVP slice, and identify coupling risks before planning multi-module work.
+Add a lightweight semantic architecture step to ZeroToHero so an agent can turn an already scoped MVP into module boundaries, identify coupling risks, and prepare the smallest implementation path.
 
 ## MVP Slice
 
@@ -23,16 +23,16 @@ Do not build a graph database, automatic indexer, diagram renderer, CLI, npm pac
   should not own: architecture planning or implementation path
   status: MVP
 
-- name: `semantic-architecture`
-  purpose: turn clarified requirements into a lightweight module map, MVP slice, and decoupling rules
-  owns: module relationships, coupling risks, MVP-first build order
-  should not own: graph runtime, repository indexer, or automatic diagrams
+- name: `delete-scope`
+  purpose: reduce the clarified goal to the smallest verifiable MVP
+  owns: MVP nucleus, non-goals, deferred scope, files to avoid
+  should not own: module relationships or implementation path
   status: MVP
 
-- name: `delete-scope`
-  purpose: remove unnecessary work after the module map is clear
-  owns: non-goals, deferred scope, files to avoid
-  should not own: requirement root-cause analysis
+- name: `semantic-architecture`
+  purpose: turn the scoped MVP into a lightweight module map and decoupling rules
+  owns: module relationships, coupling risks, MVP-first build order
+  should not own: graph runtime, repository indexer, or automatic diagrams
   status: MVP
 
 - name: `optimize-path`
@@ -41,58 +41,49 @@ Do not build a graph database, automatic indexer, diagram renderer, CLI, npm pac
   should not own: architecture discovery
   status: MVP
 
-- name: `semantic-memory`
-  purpose: select relevant context slices and files to avoid
-  owns: context selection
-  should not own: architecture decisions or graph database behavior
-  status: later
-
-- name: `learn-after-run`
-  purpose: extract reusable learning after evidence exists
-  owns: learning note and promotion recommendation
+- name: `adaptive-improvement`
+  purpose: evaluate a reusable change only after an Evidence Ledger supports it
+  owns: evidence-backed candidate and promotion recommendation
   should not own: automatic skill mutation
   status: later
 
 ## Module Relationships
 
-- `question-requirements` -> `semantic-architecture`: provides clarified goal, non-goals, failure paths, and success criteria.
-- `semantic-architecture` -> `delete-scope`: provides module map, coupling risks, and deferred modules.
-- `delete-scope` -> `optimize-path`: provides minimum scope and boundaries.
+- `question-requirements` -> `delete-scope`: provides clarified goal, non-goals, failure paths, and success criteria.
+- `delete-scope` -> `semantic-architecture`: provides the MVP nucleus and scope boundaries.
+- `semantic-architecture` -> `optimize-path`: provides module boundaries, coupling risks, and build order.
 - `optimize-path` -> `execution-brief`: creates the plan the agent follows.
 - `execution-result` -> `evidence-ledger`: records what changed and what was verified.
-- `evidence-ledger` -> `learn-after-run`: provides facts for learning.
-- `semantic-architecture` should not depend on `semantic-memory`: architecture sketching must remain usable without a memory system.
+- `evidence-ledger` -> `adaptive-improvement`: provides facts for evaluating a reusable change.
 
 ## Lightweight Diagram
 
 ```text
 [question-requirements]
-  -> [semantic-architecture]
   -> [delete-scope]
+  -> [semantic-architecture]
   -> [optimize-path]
   -> [execution-brief]
 
 [execution-result]
   -> [evidence-ledger]
-  -> [learn-after-run]
-
-[semantic-memory]
-  -> optional context slice for any step
+  -> [adaptive-improvement, only with reusable evidence]
 ```
 
 ## Coupling Risks
 
 - `semantic-architecture` could become a required step for every task, making ZeroToHero heavy.
-- `semantic-memory` could become a hidden dependency if architecture reports require a repository index.
-- `learn-after-run` could overreach if it starts editing skills automatically.
+- Context discovery could expand into an unnecessary repository-wide index.
+- `adaptive-improvement` could overreach if it runs without ledger evidence or starts editing skills automatically.
 - Architecture diagrams could become decorative instead of reducing scope.
 
 ## Decoupling Rules
 
 - `semantic-architecture` is optional and only used for projects, systems, features, refactors, workflows, or multi-module tasks.
 - `semantic-architecture` produces a planning artifact, not a runtime dependency.
-- `semantic-memory` may inform the architecture report, but is not required.
-- `learn-after-run` may propose changes, but must not modify skills automatically.
+- Missing local context is discovered through the smallest bounded read-only inspection, not through a repository index.
+- Current or versioned external facts use `templates/context-retrieval-contract.md`; user-owned decisions use `ask_user`.
+- `adaptive-improvement` may evaluate a candidate only after an Evidence Ledger exists, and it must not modify skills automatically.
 - `optimize-path` consumes architecture boundaries; it should not rewrite the architecture.
 
 ## MVP-first Build Order
@@ -120,4 +111,4 @@ Reason: the feature can be added as one optional skill and one template without 
 
 ## Recommended Next Skill
 
-`delete-scope`
+`optimize-path`
