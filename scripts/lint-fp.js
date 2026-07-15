@@ -188,10 +188,11 @@ function main() {
     'install/universal/.fp-package/payload/.windsurf/rules/fp.md'
   ];
   entrypoints.forEach((filePath) => {
-    requireText(filePath, ['canonical router', 'debug-first', 'multi-agent', 'engineering', 'FP:', '$fp'], failures);
+    requireText(filePath, ['debug-first', 'multi-agent', 'engineering', 'FP:', '$fp'], failures);
     requirePatterns(filePath, [
       ['engineering goals load FP without a required keyword', /(?:automatically[^.\n]*engineering|(?:when|for)[^.\n]*engineering[^.\n]*(?:read|load))/i],
-      ['casual or other non-engineering goals do not load the full router', /(?:casual|non-engineering|otherwise[^.\n]*(?:dormant|do not (?:load|read|use)))/i]
+      ['casual or other non-engineering goals do not load the full router', /(?:casual|non-engineering|otherwise[^.\n]*(?:dormant|do not (?:load|read|use)))/i],
+      ['contains routing rules or delegates to the canonical router', /(?:canonical router|Route Before Editing)/i]
     ], failures);
   });
 

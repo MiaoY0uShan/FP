@@ -61,7 +61,7 @@ test('dedicated archives cannot overwrite a project README or Aider config', () 
   assert.ok(fs.existsSync(path.join(install, 'aider', 'AIDER-CONFIG-SNIPPET.yml')));
 });
 
-test('host entrypoints gate the full router by goal and keep both explicit invocations optional', () => {
+test('host entrypoints embed self-contained routing and keep both explicit invocations optional', () => {
   const entrypoints = [
     'install/codex/.agents/skills/fp/SKILL.md',
     'install/claude-code/.claude/skills/fp/SKILL.md',
@@ -83,7 +83,10 @@ test('host entrypoints gate the full router by goal and keep both explicit invoc
 
   for (const filePath of entrypoints) {
     const content = read(filePath);
-    assert.match(content, /canonical router/i, `${filePath} must defer to the canonical router`);
+    assert.ok(
+      /canonical router/i.test(content) || /Route Before Editing/i.test(content),
+      `${filePath} must contain self-contained routing rules or delegate to the canonical router`
+    );
     assertActivationBoundary(content, filePath);
   }
 });
