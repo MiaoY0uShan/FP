@@ -1,56 +1,51 @@
 ---
 name: fp
-description: "Use automatically when the user's goal is engineering work (build, change, diagnose, review, test, operate, or plan software, repositories, infrastructure, or agent tooling), or when explicitly invoked with \"FP:\" or \"$fp\". Do not use for casual conversation or other non-engineering goals."
+description: "Use automatically for engineering goals, or when explicitly invoked with \"FP:\" or \"$fp\". Do not use for casual or other non-engineering goals."
 ---
 
-# FP
+# FP — Goal-Matched Execution Discipline
 
-FP is the goal-matched execution discipline layer for AI coding agents.
+Activate automatically for engineering work: build, change, diagnose, review, test, operate, or plan software, repositories, infrastructure, or agent tooling. Stay dormant for casual conversation. No keyword required; `FP:` and `$fp` are optional.
 
-Infer FP from the user's goal. Load it for engineering work, keep it dormant for casual or other non-engineering goals, and never require a keyword.
+## Route Before Editing
 
-Bundled references are under:
+Apply user authority and read-only limits as a global gate first. Then:
 
-```text
-references/fp/
-```
+1. **Active incident** → `OBSERVE → CONTAIN → RESTORE → REPAIR → LEARN`.
+2. **Explicit grill/challenge** → investigate facts, ask one decision at a time.
+3. **Diagnose-only or unknown-cause** → debug-first, read-only until a cause is supported.
+4. **Protocol/agent-behavior change** → confirm before editing unless already approved.
+5. **Small → Medium → Vague → Large** route.
 
-## Canonical router
+Layer remote/live-system, OpenWrt, stateful-UI, external-context, multi-agent, continuation, self-iteration, and background-learning as profiles on the selected route.
 
-Read `references/fp/SKILL.md` before choosing a route, then load only the template or internal module that route names. The bundled router is the canonical behavior contract.
+## Route Weight
 
-## Implicit trigger
+- **Small:** 3-5 lines: task, read/touch, done-when, verify, result. Record first safe reuse rung.
+- **Medium:** compact Execution Brief + acceptance evidence matrix + Evidence Ledger.
+- **Vague:** three Idea Cards (Title, Assumption, MVP, Risk) before implementation.
+- **Large/risky:** only the internal modules that reduce scope or risk, compiled into one final brief.
+- **Failed:** capture evidence, split smaller. Do not repeat the same large attempt.
 
-Use FP when the user asks to build, change, diagnose, review, test, operate, or plan software, repositories, infrastructure, or agent tooling. Do not load the full router for casual conversation or other non-engineering goals.
+## Core Rules
 
-## Default behavior
+1. **No evidence, no done.** Implementation or child summary is not completion evidence.
+2. **Debug before patching.** Gather discriminating evidence before changing code. Speculative patches are not probes.
+3. **Reuse before creation:** need to exist? → already in codebase? → stdlib? → native platform? → installed dep? → one line? → only then add minimum new code.
+4. **State read set, touch set, verify method** before the first edit.
+5. **Rerun original symptom + regression + negative control** after a fix.
+6. **One writer per shared file set.** Parallelize only independent investigation or review.
+7. **Live systems**: preserve management path, create rollback point, inspect desired/generated/effective state, verify with real client path. A service restart or `ready` label is not proof of function.
+8. **Redact secrets** from logs, examples, handoffs, and final answers.
 
-- Small change -> produce a 3-5 line brief and validation result.
-- Medium task -> produce a compact Execution Brief and Evidence Ledger.
-- Large, vague, architectural, or risky task -> use Idea Cards or the full chain before execution.
-- Protocol or agent-behavior change -> confirm intent and boundaries before editing.
-- Unknown-cause failure or diagnose-only request -> use debug-first and stay read-only until a cause is supported.
-- Multi-agent work -> parallelize independent investigation, keep one writer per shared file set, and require parent verification.
-- Failed task -> use Failure-to-Smaller-Task Protocol.
+## Multi-Agent
 
-## Repository boundary
+Parent is integrator, default writer, and final verifier. Subagents get bounded envelopes (goal, scope, invariants, forbidden actions, output). Leaves cannot delegate, deploy, promote memory, message externally, use credentials, or mutate live state. Parent reruns critical checks.
 
-`.agents/skills/` is local agent configuration, not project source, unless the repository explicitly opts in.
+## External Context
 
-## Optional explicit invocation
+Retrieve only the exact topic and installed version needed. Prefer authoritative sources. A stale external claim blocks dependent completion. Provider failure never disables routing.
 
-```text
-FP: <task or idea>
-$fp <task or idea>
-```
+## Learning
 
-## Hard rules
-
-1. Pick small, medium, full-chain, or confirm-first routing before editing.
-2. Confirm before changing protocol, trigger rules, install boundaries, memory policy, or default workflow unless already approved.
-3. State what to read, what to touch, and how to verify.
-4. Respect files to read, files to touch, and files to avoid.
-5. If vague, generate Idea Cards before asking many questions.
-6. If blocked or over budget, split smaller instead of retrying.
-7. No evidence, no done.
-8. FP learns from evidence, not confidence.
+One run is not a reusable law. Lessons are promoted only through adaptive improvement backed by evidence from multiple independent cases.

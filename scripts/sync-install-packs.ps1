@@ -23,6 +23,12 @@ $targets = @(
     "install/universal/.fp-package/payload/fp"
 )
 
+$claudeMdSource = Join-Path $repoRoot "fp/CLAUDE.md"
+$claudeMdTargets = @(
+    "install/universal/.fp-package/payload/.claude/CLAUDE.md",
+    "install/claude-code/.claude/CLAUDE.md"
+)
+
 $testSource = Join-Path $repoRoot "TEST_FP.md"
 $testTargets = @(
     "install/codex/TEST_FP.md",
@@ -171,4 +177,23 @@ if ($Check) {
     New-Item -ItemType Directory -Path (Split-Path -Parent $copyPasteTarget) -Force | Out-Null
     Copy-Item -Path $copyPasteSource -Destination $copyPasteTarget -Force
     Write-Host "synced: dist/fp-copy-paste.md"
+}
+
+# --- sync CLAUDE.md (auto-injected into every Claude Code session) ---
+foreach ($targetRelative in $claudeMdTargets) {
+    $target = Join-Path $repoRoot $targetRelative
+    if ($Check) {
+        if (-not (Test-Path -LiteralPath $target)) {
+            throw "Missing CLAUDE.md: $targetRelative"
+        }
+        if ((Get-Sha256 -Path $claudeMdSource) -ne (Get-Sha256 -Path $target)) {
+            throw "CLAUDE.md is out of sync: $targetRelative"
+        }
+        Write-Host "ok: $targetRelative"
+        continue
+    }
+
+    New-Item -ItemType Directory -Path (Split-Path -Parent $target) -Force | Out-Null
+    Copy-Item -LiteralPath $claudeMdSource -Destination $target -Force
+    Write-Host "synced: $targetRelative"
 }
