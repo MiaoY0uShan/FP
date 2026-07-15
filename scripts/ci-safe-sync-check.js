@@ -26,6 +26,9 @@ const targets = [
 ];
 
 const noFrontmatterTargets = [
+  "install/windsurf/.windsurf/rules/fp.md",
+  "install/roo-code/.roo/rules/fp.md",
+  "install/cline/.clinerules/fp.md",
   "install/universal/.fp-package/payload/.windsurf/rules/fp.md",
   "install/universal/.fp-package/payload/.roo/rules/fp.md",
   "install/universal/.fp-package/payload/.clinerules/fp.md",
@@ -36,7 +39,8 @@ const noFrontmatterTargets = [
 const claudeMdSource = path.join(root, 'fp', 'CLAUDE.md');
 const claudeMdTargets = [
   "install/universal/.fp-package/payload/.claude/CLAUDE.md",
-  "install/claude-code/.claude/CLAUDE.md"
+  "install/claude-code/.claude/CLAUDE.md",
+  "install/codex/.agents/CLAUDE.md"
 ];
 
 const testSource = path.join(root, 'TEST_FP.md');
