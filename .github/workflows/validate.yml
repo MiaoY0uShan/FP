@@ -71,11 +71,17 @@ jobs:
         run: node --test
 
       - name: Run explicit POSIX installer lifecycle smoke
-        if: runner.os != 'Windows'
+        if: runner.os == 'Linux' || runner.os == 'macOS'
         shell: sh
         run: sh ./test/posix-installer-smoke.sh
 
       - name: Check generated install packs
+        if: runner.os == 'Linux' || runner.os == 'macOS'
+        shell: bash
+        run: node scripts/ci-safe-sync-check.js
+
+      - name: Check generated install packs
+        if: runner.os == 'Windows'
         shell: pwsh
         run: ./scripts/sync-install-packs.ps1 -Check
 
