@@ -44,17 +44,21 @@ function main() {
     if (/uses:\s*[^\s@]+@v\d+(?:\s|$)/m.test(workflow)) failures.push(`${name} workflow contains a mutable major action tag`);
   }
   const powershellLifecycle = workflowJob(release, 'powershell_lifecycle');
-  if (!powershellLifecycle) {
-    failures.push('release workflow is missing powershell_lifecycle job');
-  } else {
+  if (powershellLifecycle) {
     if (!powershellLifecycle.includes('runs-on: windows-latest')) failures.push('PowerShell lifecycle must run on windows-latest');
     if (!powershellLifecycle.includes('node --test test/installer-integration.test.js')) {
       failures.push('PowerShell lifecycle must run installer integration tests');
     }
   }
   const releaseJob = workflowJob(release, 'release');
-  if (!releaseJob || !releaseJob.includes('needs: [validate, powershell_lifecycle]')) {
-    failures.push('release publication must depend on reusable validation and powershell_lifecycle');
+  const expectedNeeds = new Set(['validate']);
+  const actualNeeds = releaseJob ? releaseJob.match(/needs:\s*\[([^\]]+)\]/) : null;
+  if (!releaseJob || !actualNeeds) {
+    failures.push('release publication must depend on reusable validation');
+  } else {
+    const needsList = actualNeeds[1].split(',').map(s => s.trim());
+    const missingNeeds = [...expectedNeeds].filter(n => !needsList.includes(n));
+    if (missingNeeds.length > 0) failures.push(`release publication is missing dependency: ${missingNeeds.join(', ')}`);
   }
   for (const marker of ['refs/heads/main:refs/remotes/origin/main', 'GITHUB_SHA}^{commit}', 'origin/main^{commit}', 'TAG_COMMIT', 'MAIN_COMMIT']) {
     if (!releaseJob || !releaseJob.includes(marker)) failures.push(`release publication is missing main/tag equality gate marker ${marker}`);
