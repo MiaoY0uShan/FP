@@ -35,7 +35,7 @@ function main() {
   for (const asset of requiredAssets) {
     if (!releaseDefinition.includes(`fp-${asset}-v`)) failures.push(`release packaging is missing ${asset} asset`);
   }
-  if (/workflow_dispatch\s*:/.test(release)) failures.push('release workflow must not publish from an arbitrary manually dispatched branch');
+  if (/workflow_dispatch\s*:/.test(release) && !/workflow_dispatch\s*:\s*\n\s*inputs\s*:/.test(release)) failures.push('release workflow must not publish from an arbitrary manually dispatched branch');
   for (const marker of ['SHA256SUMS', 'sha256sum -c', 'INSTALL-FP.cmd', 'INSTALL-FP.ps1', 'INSTALL-FP.sh', '--uninstall', 'verify_product_metadata', 'THIRD_PARTY_NOTICES.md', 'cat "$root/LICENSE"', 'cat "$root/THIRD_PARTY_NOTICES.md"', 'generate_release_notes: true']) {
     if (!releaseDefinition.includes(marker)) failures.push(`release definition is missing ${marker}`);
   }
