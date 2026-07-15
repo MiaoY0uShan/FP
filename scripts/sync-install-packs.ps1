@@ -29,6 +29,27 @@ $claudeMdTargets = @(
     "install/claude-code/.claude/CLAUDE.md"
 )
 
+$alwaysAppliedSource = Join-Path $repoRoot "fp/CLAUDE.md"
+
+# $alwaysAppliedTargets — one entry per tool.
+# For tools with YAML frontmatter (SKILL.md / .mdc / agent / instructions), the
+# payload file already has frontmatter + the full body, so we only need the
+# per-tool reference (not the CLAUDE.md source). Sync those to
+# install/<tool>/<path>/fp/SKILL.md or .mdc by re-running the sync script.
+# This block syncs fp/CLAUDE.md to the plain no-frontmatter targets only:
+#   - Windsurf, Roo, Cline, Qoder, Antigravity, CONVENTIONS
+#
+# We already synced fp/ references; the install packs' per-tool entry points
+# were hand-edited. Check mode verifies those have the full routing body.
+# For sync mode we propagate CLAUDE.md to no-frontmatter files too.
+$noFrontmatterTargets = @(
+    "install/universal/.fp-package/payload/.windsurf/rules/fp.md",
+    "install/universal/.fp-package/payload/.roo/rules/fp.md",
+    "install/universal/.fp-package/payload/.clinerules/fp.md",
+    "install/universal/.fp-package/payload/.qoder/rules/fp.md",
+    "install/universal/.fp-package/payload/.agents/rules/fp.md"
+)
+
 $testSource = Join-Path $repoRoot "TEST_FP.md"
 $testTargets = @(
     "install/codex/TEST_FP.md",
@@ -179,7 +200,26 @@ if ($Check) {
     Write-Host "synced: dist/fp-copy-paste.md"
 }
 
-# --- sync CLAUDE.md (auto-injected into every Claude Code session) ---
+# --- sync no-frontmatter always-applied files from fp/CLAUDE.md ---
+foreach ($targetRelative in $noFrontmatterTargets) {
+    $target = Join-Path $repoRoot $targetRelative
+    if ($Check) {
+        if (-not (Test-Path -LiteralPath $target)) {
+            throw "Missing no-frontmatter entry: $targetRelative"
+        }
+        if ((Get-Sha256 -Path $alwaysAppliedSource) -ne (Get-Sha256 -Path $target)) {
+            throw "No-frontmatter entry is out of sync: $targetRelative"
+        }
+        Write-Host "ok: $targetRelative"
+        continue
+    }
+
+    New-Item -ItemType Directory -Path (Split-Path -Parent $target) -Force | Out-Null
+    Copy-Item -LiteralPath $alwaysAppliedSource -Destination $target -Force
+    Write-Host "synced: $targetRelative"
+}
+
+# --- sync CLAUDE.md ---
 foreach ($targetRelative in $claudeMdTargets) {
     $target = Join-Path $repoRoot $targetRelative
     if ($Check) {
