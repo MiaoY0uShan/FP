@@ -68,7 +68,7 @@ jobs:
             --brief fp/examples/password-reset.compiled-execution-brief.json
 
       - name: Run textual router invariants and executable contract tests
-        run: node --test
+        run: node --test test/install-pack-contract.test.js test/router-contract.test.js test/evidence-ledger-contract.test.js test/metrics-collect.test.js
 
       - name: Run explicit POSIX installer lifecycle smoke
         if: runner.os == 'Linux' || runner.os == 'macOS'
