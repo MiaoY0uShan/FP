@@ -27,45 +27,45 @@ jobs:
           test -f VERSION
           test -f README.md
           test -f INSTALL.md
-          test -f TEST_ZEROTOHERO.md
-          test -f zerotohero/SKILL.md
-          test -f zerotohero/contracts/evidence-ledger.v1.schema.json
-          test -f zerotohero/generalization-gate/SKILL.md
-          test -f zerotohero/templates/debug-incident-checklist.md
-          test -f zerotohero/templates/multi-agent-review-protocol.md
-          test -f zerotohero/templates/generalization-evaluation.md
-          test -f zerotohero/templates/context-retrieval-contract.md
+          test -f TEST_FP.md
+          test -f fp/SKILL.md
+          test -f fp/contracts/evidence-ledger.v1.schema.json
+          test -f fp/generalization-gate/SKILL.md
+          test -f fp/templates/debug-incident-checklist.md
+          test -f fp/templates/multi-agent-review-protocol.md
+          test -f fp/templates/generalization-evaluation.md
+          test -f fp/templates/context-retrieval-contract.md
           test -f THIRD_PARTY_NOTICES.md
-          test -f docs/assets/zerotohero-banner.svg
-          test -f install/universal/INSTALL-ZEROTOHERO.ps1
-          test -f install/universal/INSTALL-ZEROTOHERO.sh
-          test -f install/universal/INSTALL-ZEROTOHERO.cmd
-          test -f install/universal/.zerotohero-package/payload/.agents/skills/zerotohero/SKILL.md
-          test -f install/universal/.zerotohero-package/payload/.qoder/rules/zerotohero.md
-          test -f install/universal/.zerotohero-package/payload/.roo/rules/zerotohero.md
-          test -f install/codex/.agents/skills/zerotohero/SKILL.md
-          test -f install/claude-code/.claude/skills/zerotohero/SKILL.md
-          test -f install/gemini-cli/zerotohero/GEMINI.md
-          test -f install/github-copilot-cli/.github/agents/zerotohero.agent.md
-          test -f install/github-copilot-cli/.github/instructions/zerotohero.instructions.md
-          test -f install/cursor/.cursor/rules/zerotohero.mdc
-          test -f install/windsurf/.windsurf/rules/zerotohero.md
-          test -f install/cline/.clinerules/zerotohero.md
-          test -f install/roo-code/.roo/rules/zerotohero.md
-          test -f install/opencode/.opencode/skills/zerotohero/SKILL.md
-          test -f install/kiro/.kiro/steering/zerotohero.md
-          test -f install/github-copilot-editor/.github/instructions/zerotohero.instructions.md
+          test -f docs/assets/fp-banner.svg
+          test -f install/universal/INSTALL-FP.ps1
+          test -f install/universal/INSTALL-FP.sh
+          test -f install/universal/INSTALL-FP.cmd
+          test -f install/universal/.fp-package/payload/.agents/skills/fp/SKILL.md
+          test -f install/universal/.fp-package/payload/.qoder/rules/fp.md
+          test -f install/universal/.fp-package/payload/.roo/rules/fp.md
+          test -f install/codex/.agents/skills/fp/SKILL.md
+          test -f install/claude-code/.claude/skills/fp/SKILL.md
+          test -f install/gemini-cli/fp/GEMINI.md
+          test -f install/github-copilot-cli/.github/agents/fp.agent.md
+          test -f install/github-copilot-cli/.github/instructions/fp.instructions.md
+          test -f install/cursor/.cursor/rules/fp.mdc
+          test -f install/windsurf/.windsurf/rules/fp.md
+          test -f install/cline/.clinerules/fp.md
+          test -f install/roo-code/.roo/rules/fp.md
+          test -f install/opencode/.opencode/skills/fp/SKILL.md
+          test -f install/kiro/.kiro/steering/fp.md
+          test -f install/github-copilot-editor/.github/instructions/fp.instructions.md
           test -f install/aider/AIDER-CONFIG-SNIPPET.yml
 
       - name: Lint repository, release metadata, and contracts
         shell: bash
         run: |
           set -euo pipefail
-          node scripts/lint-zerotohero.js
+          node scripts/lint-fp.js
           node scripts/lint-release.js
           node scripts/lint-contracts.js \
-            --ledger zerotohero/examples/password-reset.evidence-ledger.json \
-            --brief zerotohero/examples/password-reset.compiled-execution-brief.json
+            --ledger fp/examples/password-reset.evidence-ledger.json \
+            --brief fp/examples/password-reset.compiled-execution-brief.json
 
       - name: Run textual router invariants and executable contract tests
         run: node --test

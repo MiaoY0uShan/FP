@@ -1,6 +1,6 @@
-# ZeroToHero Contracts
+# FP Contracts
 
-ZeroToHero is not a longer prompt. It is a small set of execution contracts.
+FP is not a longer prompt. It is a small set of execution contracts.
 
 ## Execution Brief
 
@@ -12,7 +12,7 @@ Bound files to read/touch/avoid, forbidden context, notes, checks, and violation
 
 ## Evidence Ledger v1
 
-The normative machine contract is `zerotohero/contracts/evidence-ledger.v1.schema.json` **plus** `zerotohero/contracts/evidence-ledger.js`. The portable schema owns structure and basic conditionals; the zero-dependency semantic validator owns cross-field authority, path/glob scope, evidence references, route/profile completion gates, and continuation rehydration. They are tested and versioned together. The ledger records:
+The normative machine contract is `fp/contracts/evidence-ledger.v1.schema.json` **plus** `fp/contracts/evidence-ledger.js`. The portable schema owns structure and basic conditionals; the zero-dependency semantic validator owns cross-field authority, path/glob scope, evidence references, route/profile completion gates, and continuation rehydration. They are tested and versioned together. The ledger records:
 
 - task, route/phase/profiles, authority mode, write authorization, and separate explicit repository-read, network-read, and write scopes;
 - embedded required checks, expected exit codes, acceptance rows, and required claims;
@@ -42,7 +42,7 @@ Failure does not authorize repeating the same patch. Record the observation, shr
 
 ## Continuation
 
-An incomplete long run may embed a structured continuation in the ledger. Resume recomputes the documented `zerotohero-worktree-v1` fingerprint and verifies task/repository/revision/evidence references before continuing; it never auto-replays writes. Completed ledgers cannot carry continuations.
+An incomplete long run may embed a structured continuation in the ledger. Resume recomputes the documented `fp-worktree-v1` fingerprint and verifies task/repository/revision/evidence references before continuing; it never auto-replays writes. Completed ledgers cannot carry continuations.
 
 ## Context Retrieval
 

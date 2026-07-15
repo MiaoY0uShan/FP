@@ -1,4 +1,4 @@
-# ZeroToHero Execution Protocol
+# FP Execution Protocol
 
 ```text
 task -> route -> smallest brief -> bounded execution -> evidence
@@ -34,4 +34,4 @@ Metrics run only when measurement matters. Adaptive improvement stages evidence-
 
 ## Boundary
 
-ZeroToHero is a portable skill bundle. It has no database, daemon, scheduler, autonomous executor, or required network service. Maintainer validators and install scripts are not runtime dependencies.
+FP is a portable skill bundle. It has no database, daemon, scheduler, autonomous executor, or required network service. Maintainer validators and install scripts are not runtime dependencies.

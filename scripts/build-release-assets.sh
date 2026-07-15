@@ -56,10 +56,10 @@ pack() {
   stage=$stages/$name
   mkdir -p "$stage"
   cp -a "$root/$source"/. "$stage"/
-  if [ -f "$stage/README-ZEROTOHERO.md" ]; then
-    sed -i "s/{version}/$version/g" "$stage/README-ZEROTOHERO.md"
+  if [ -f "$stage/README-FP.md" ]; then
+    sed -i "s/{version}/$version/g" "$stage/README-FP.md"
   fi
-  make_zip "$assets/zerotohero-$name-v$version.zip" "$stage"
+  make_zip "$assets/fp-$name-v$version.zip" "$stage"
 }
 
 pack install/universal universal
@@ -77,12 +77,12 @@ pack install/github-copilot-editor github-copilot-editor
 pack install/aider aider
 
 {
-  cat "$root/zerotohero-copy-paste.md"
+  cat "$root/fp-copy-paste.md"
   printf '\n\n---\n\n## License\n\n'
   cat "$root/LICENSE"
   printf '\n\n'
   cat "$root/THIRD_PARTY_NOTICES.md"
-} > "$assets/zerotohero-copy-paste-v$version.md"
+} > "$assets/fp-copy-paste-v$version.md"
 
 sed "s/{version}/$version/g" "$root/dist/README.md" > "$assets/README-v$version.md"
 cp "$root/LICENSE" "$assets/LICENSE-v$version.txt"
@@ -92,9 +92,9 @@ cp "$root/THIRD_PARTY_NOTICES.md" "$assets/THIRD_PARTY_NOTICES-v$version.md"
 mv "$build_root/SHA256SUMS" "$assets/SHA256SUMS"
 
 for asset in universal codex claude-code gemini-cli github-copilot-cli cursor windsurf cline roo-code opencode kiro github-copilot-editor aider; do
-  test -f "$assets/zerotohero-$asset-v$version.zip"
+  test -f "$assets/fp-$asset-v$version.zip"
 done
-test -f "$assets/zerotohero-copy-paste-v$version.md"
+test -f "$assets/fp-copy-paste-v$version.md"
 test -f "$assets/LICENSE-v$version.txt"
 test -f "$assets/THIRD_PARTY_NOTICES-v$version.md"
 (cd "$assets" && sha256sum -c SHA256SUMS)
@@ -115,57 +115,57 @@ verify_product_metadata() {
   verify_entry "$archive" "${prefix}VERSION"
 }
 
-verify_product_metadata "$assets/zerotohero-universal-v$version.zip" '.zerotohero-package/payload/zerotohero/'
-verify_product_metadata "$assets/zerotohero-codex-v$version.zip" '.agents/skills/zerotohero/references/zerotohero/'
-verify_product_metadata "$assets/zerotohero-claude-code-v$version.zip" '.claude/skills/zerotohero/references/zerotohero/'
-verify_product_metadata "$assets/zerotohero-gemini-cli-v$version.zip" 'zerotohero/zerotohero/'
+verify_product_metadata "$assets/fp-universal-v$version.zip" '.fp-package/payload/fp/'
+verify_product_metadata "$assets/fp-codex-v$version.zip" '.agents/skills/fp/references/fp/'
+verify_product_metadata "$assets/fp-claude-code-v$version.zip" '.claude/skills/fp/references/fp/'
+verify_product_metadata "$assets/fp-gemini-cli-v$version.zip" 'fp/fp/'
 for asset in github-copilot-cli cursor windsurf cline roo-code opencode kiro github-copilot-editor aider; do
-  verify_product_metadata "$assets/zerotohero-$asset-v$version.zip" 'zerotohero/'
+  verify_product_metadata "$assets/fp-$asset-v$version.zip" 'fp/'
 done
 
 for asset in universal codex claude-code gemini-cli github-copilot-cli cursor windsurf cline roo-code opencode kiro github-copilot-editor aider; do
-  archive=$assets/zerotohero-$asset-v$version.zip
-  verify_entry "$archive" 'README-ZEROTOHERO.md'
-  readme_entry=$(unzip -Z1 "$archive" | grep -E '^(\./)?README-ZEROTOHERO\.md$')
+  archive=$assets/fp-$asset-v$version.zip
+  verify_entry "$archive" 'README-FP.md'
+  readme_entry=$(unzip -Z1 "$archive" | grep -E '^(\./)?README-FP\.md$')
   if unzip -p "$archive" "$readme_entry" | grep -Fq '{version}'; then
     echo "Unresolved version placeholder in $archive" >&2
     exit 1
   fi
 done
 
-grep -Fq 'MIT License' "$assets/zerotohero-copy-paste-v$version.md"
-grep -Fq '# Third-Party Notices' "$assets/zerotohero-copy-paste-v$version.md"
+grep -Fq 'MIT License' "$assets/fp-copy-paste-v$version.md"
+grep -Fq '# Third-Party Notices' "$assets/fp-copy-paste-v$version.md"
 cmp "$root/LICENSE" "$assets/LICENSE-v$version.txt"
 cmp "$root/THIRD_PARTY_NOTICES.md" "$assets/THIRD_PARTY_NOTICES-v$version.md"
 
-verify_entry "$assets/zerotohero-universal-v$version.zip" 'INSTALL-ZEROTOHERO.cmd'
-verify_entry "$assets/zerotohero-universal-v$version.zip" 'INSTALL-ZEROTOHERO.ps1'
-verify_entry "$assets/zerotohero-universal-v$version.zip" 'INSTALL-ZEROTOHERO.sh'
-verify_entry "$assets/zerotohero-universal-v$version.zip" '.zerotohero-package/payload/.agents/skills/zerotohero/SKILL.md'
-verify_entry "$assets/zerotohero-universal-v$version.zip" '.zerotohero-package/payload/.qoder/rules/zerotohero.md'
-verify_entry "$assets/zerotohero-universal-v$version.zip" '.zerotohero-package/payload/.roo/rules/zerotohero.md'
-verify_entry "$assets/zerotohero-codex-v$version.zip" '.agents/skills/zerotohero/SKILL.md'
-verify_entry "$assets/zerotohero-claude-code-v$version.zip" '.claude/skills/zerotohero/SKILL.md'
-verify_entry "$assets/zerotohero-gemini-cli-v$version.zip" 'zerotohero/GEMINI.md'
-verify_entry "$assets/zerotohero-github-copilot-cli-v$version.zip" '.github/agents/zerotohero.agent.md'
-verify_entry "$assets/zerotohero-github-copilot-cli-v$version.zip" '.github/instructions/zerotohero.instructions.md'
-verify_entry "$assets/zerotohero-cursor-v$version.zip" '.cursor/rules/zerotohero.mdc'
-verify_entry "$assets/zerotohero-windsurf-v$version.zip" '.windsurf/rules/zerotohero.md'
-verify_entry "$assets/zerotohero-cline-v$version.zip" '.clinerules/zerotohero.md'
-verify_entry "$assets/zerotohero-roo-code-v$version.zip" '.roo/rules/zerotohero.md'
-verify_entry "$assets/zerotohero-opencode-v$version.zip" '.opencode/skills/zerotohero/SKILL.md'
-verify_entry "$assets/zerotohero-kiro-v$version.zip" '.kiro/steering/zerotohero.md'
-verify_entry "$assets/zerotohero-github-copilot-editor-v$version.zip" '.github/instructions/zerotohero.instructions.md'
-verify_entry "$assets/zerotohero-aider-v$version.zip" 'AIDER-CONFIG-SNIPPET.yml'
+verify_entry "$assets/fp-universal-v$version.zip" 'INSTALL-FP.cmd'
+verify_entry "$assets/fp-universal-v$version.zip" 'INSTALL-FP.ps1'
+verify_entry "$assets/fp-universal-v$version.zip" 'INSTALL-FP.sh'
+verify_entry "$assets/fp-universal-v$version.zip" '.fp-package/payload/.agents/skills/fp/SKILL.md'
+verify_entry "$assets/fp-universal-v$version.zip" '.fp-package/payload/.qoder/rules/fp.md'
+verify_entry "$assets/fp-universal-v$version.zip" '.fp-package/payload/.roo/rules/fp.md'
+verify_entry "$assets/fp-codex-v$version.zip" '.agents/skills/fp/SKILL.md'
+verify_entry "$assets/fp-claude-code-v$version.zip" '.claude/skills/fp/SKILL.md'
+verify_entry "$assets/fp-gemini-cli-v$version.zip" 'fp/GEMINI.md'
+verify_entry "$assets/fp-github-copilot-cli-v$version.zip" '.github/agents/fp.agent.md'
+verify_entry "$assets/fp-github-copilot-cli-v$version.zip" '.github/instructions/fp.instructions.md'
+verify_entry "$assets/fp-cursor-v$version.zip" '.cursor/rules/fp.mdc'
+verify_entry "$assets/fp-windsurf-v$version.zip" '.windsurf/rules/fp.md'
+verify_entry "$assets/fp-cline-v$version.zip" '.clinerules/fp.md'
+verify_entry "$assets/fp-roo-code-v$version.zip" '.roo/rules/fp.md'
+verify_entry "$assets/fp-opencode-v$version.zip" '.opencode/skills/fp/SKILL.md'
+verify_entry "$assets/fp-kiro-v$version.zip" '.kiro/steering/fp.md'
+verify_entry "$assets/fp-github-copilot-editor-v$version.zip" '.github/instructions/fp.instructions.md'
+verify_entry "$assets/fp-aider-v$version.zip" 'AIDER-CONFIG-SNIPPET.yml'
 
 install_test=$build_root/install-test
 mkdir -p "$install_test/package" "$install_test/project"
-unzip -q "$assets/zerotohero-universal-v$version.zip" -d "$install_test/package"
-sh "$install_test/package/INSTALL-ZEROTOHERO.sh" --target "$install_test/project"
-sh "$install_test/package/INSTALL-ZEROTOHERO.sh" --verify --target "$install_test/project"
-sh "$install_test/package/INSTALL-ZEROTOHERO.sh" --uninstall --target "$install_test/project"
-test ! -e "$install_test/project/ZEROTOHERO.md"
-test ! -e "$install_test/project/zerotohero"
+unzip -q "$assets/fp-universal-v$version.zip" -d "$install_test/package"
+sh "$install_test/package/INSTALL-FP.sh" --target "$install_test/project"
+sh "$install_test/package/INSTALL-FP.sh" --verify --target "$install_test/project"
+sh "$install_test/package/INSTALL-FP.sh" --uninstall --target "$install_test/project"
+test ! -e "$install_test/project/FP.md"
+test ! -e "$install_test/project/fp"
 
 asset_count=$(find "$assets" -maxdepth 1 -type f | wc -l | tr -d ' ')
 if [ "$asset_count" -ne 18 ]; then
@@ -174,4 +174,4 @@ if [ "$asset_count" -ne 18 ]; then
 fi
 
 mv "$assets" "$output"
-echo "ok: 18 verified release assets for ZeroToHero $version -> $output"
+echo "ok: 18 verified release assets for FP $version -> $output"

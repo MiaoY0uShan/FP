@@ -5,7 +5,7 @@ const {
   loadLedger,
   parseJsonFile,
   validateCompletion
-} = require('../zerotohero/contracts/evidence-ledger');
+} = require('../fp/contracts/evidence-ledger');
 
 function usage() {
   return 'Usage: node scripts/lint-contracts.js --ledger <json> [--brief <json>] [--budget <json>] [--legacy]';

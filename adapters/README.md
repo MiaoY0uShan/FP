@@ -1,17 +1,18 @@
-# ZeroToHero adapters
+# FP adapters
 
-ZeroToHero is agent-agnostic. Adapters describe how each agent should discover and apply the same routing rules.
+FP is agent-agnostic. Adapters describe how each agent should discover and apply the same routing rules.
 
 Default behavior:
 
 ```text
-Use ZeroToHero proactively for coding work, then choose the lightest evidence-backed path.
+Infer FP from the user's goal. Activate it automatically for engineering work and keep it dormant for casual or other non-engineering goals. `FP:` and `$fp` are optional, never required.
 ```
 
-Manual override:
+Optional explicit invocation:
 
 ```text
-ZeroToHero: <task or idea>
+FP: <task or idea>
+$fp <task or idea>
 ```
 
 Expected behavior:

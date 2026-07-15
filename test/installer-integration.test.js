@@ -14,14 +14,14 @@ const tempRoot = fs.realpathSync(os.tmpdir());
 function runInstaller(target, options = {}) {
   const args = isWindows
     ? [
-        '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', path.join(universal, 'INSTALL-ZEROTOHERO.ps1'),
+        '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', path.join(universal, 'INSTALL-FP.ps1'),
         '-Target', target,
         ...(options.verify ? ['-Verify'] : []),
         ...(options.uninstall ? ['-Uninstall'] : []),
         ...(options.migrate ? ['-MigrateLegacy'] : [])
       ]
     : [
-        path.join(universal, 'INSTALL-ZEROTOHERO.sh'), '--target', target,
+        path.join(universal, 'INSTALL-FP.sh'), '--target', target,
         ...(options.verify ? ['--verify'] : []),
         ...(options.uninstall ? ['--uninstall'] : []),
         ...(options.migrate ? ['--migrate-legacy'] : [])
@@ -35,7 +35,7 @@ function runInstaller(target, options = {}) {
 }
 
 function tempProject() {
-  return fs.mkdtempSync(path.join(tempRoot, 'zerotohero-installer-'));
+  return fs.mkdtempSync(path.join(tempRoot, 'fp-installer-'));
 }
 
 function hash(filePath) {
@@ -60,21 +60,80 @@ function walk(directory, output = []) {
   return output;
 }
 
+function legacyZeroToHeroOwnedFiles() {
+  const payloadRoot = path.join(universal, '.fp-package', 'payload');
+  const mapped = walk(payloadRoot).map((file) => path.relative(payloadRoot, file)
+    .replace(/\\/g, '/')
+    .replace(/FP/g, 'ZEROTOHERO')
+    .replace(/fp/g, 'zerotohero'));
+  return [...mapped, 'ZEROTOHERO.md'].sort();
+}
+
+function writeProjectFile(target, relative, content) {
+  const destination = path.join(target, ...relative.split('/'));
+  fs.mkdirSync(path.dirname(destination), { recursive: true });
+  fs.writeFileSync(destination, content);
+}
+
+function createLegacyZeroToHeroInstall(target) {
+  const ownedFiles = legacyZeroToHeroOwnedFiles();
+  for (const relative of ownedFiles) {
+    writeProjectFile(target, relative, `legacy ZeroToHero file: ${relative}\n`);
+  }
+  fs.writeFileSync(path.join(target, 'AGENTS.md'), [
+    'user AGENTS instructions',
+    '',
+    '<!-- zerotohero:start -->',
+    'legacy AGENTS router',
+    '<!-- zerotohero:end -->',
+    ''
+  ].join('\n'));
+  fs.writeFileSync(path.join(target, 'GEMINI.md'), [
+    '<!-- zerotohero:start -->',
+    'legacy GEMINI router',
+    '<!-- zerotohero:end -->',
+    ''
+  ].join('\n'));
+  fs.writeFileSync(path.join(target, '.aider.conf.yml'), [
+    'read: # preserve this block',
+    '  - README.md',
+    '  - ZEROTOHERO.md',
+    'model: test',
+    ''
+  ].join('\n'));
+
+  const manifest = {
+    product: 'ZeroToHero',
+    version: '0.3.1',
+    installed_at: '2026-01-01T00:00:00Z',
+    target: 'project-local',
+    owned_files: ownedFiles,
+    managed_files: ['.aider.conf.yml', 'AGENTS.md', 'GEMINI.md'],
+    changed_files: ['.aider.conf.yml', 'AGENTS.md', 'GEMINI.md'],
+    created_managed_files: ['GEMINI.md'],
+    aider_entry_managed: true,
+    aider_read_created: false
+  };
+  const manifestPath = path.join(target, 'zerotohero', '.install-manifest.json');
+  fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+  return { manifest, manifestPath };
+}
+
 test('universal installer installs, verifies, is idempotent, and detects tampering', { timeout: 120_000 }, () => {
   const target = tempProject();
   try {
     fs.writeFileSync(path.join(target, 'AGENTS.md'), 'user AGENTS instructions\n');
     fs.writeFileSync(path.join(target, 'GEMINI.md'), 'user GEMINI instructions\n');
-    fs.writeFileSync(path.join(target, '.aider.conf.yml'), 'read: [] # ZEROTOHERO.md is only a comment\nmodel: test\n');
+    fs.writeFileSync(path.join(target, '.aider.conf.yml'), 'read: [] # FP.md is only a comment\nmodel: test\n');
 
     assertSucceeded(runInstaller(target), 'initial install');
     assertSucceeded(runInstaller(target, { verify: true }), 'initial verify');
-    assert.ok(fs.existsSync(path.join(target, '.roo', 'rules', 'zerotohero.md')));
-    assert.ok(!fs.existsSync(path.join(target, '.openclaw', 'skills', 'zerotohero')));
-    assert.ok(!fs.existsSync(path.join(target, '.junie', 'zerotohero.md')));
+    assert.ok(fs.existsSync(path.join(target, '.roo', 'rules', 'fp.md')));
+    assert.ok(!fs.existsSync(path.join(target, '.openclaw', 'skills', 'fp')));
+    assert.ok(!fs.existsSync(path.join(target, '.junie', 'fp.md')));
     const aider = fs.readFileSync(path.join(target, '.aider.conf.yml'), 'utf8');
-    assert.match(aider, /read:\s*\["ZEROTOHERO\.md"\]/);
-    assert.match(aider, /# ZEROTOHERO\.md is only a comment/);
+    assert.match(aider, /read:\s*\["FP\.md"\]/);
+    assert.match(aider, /# FP\.md is only a comment/);
 
     const managed = ['AGENTS.md', 'GEMINI.md', '.aider.conf.yml'];
     const before = managed.map((relative) => hash(path.join(target, relative)));
@@ -83,12 +142,12 @@ test('universal installer installs, verifies, is idempotent, and detects tamperi
     assert.deepEqual(after, before);
     assertSucceeded(runInstaller(target, { verify: true }), 'verify after reinstall');
 
-    const skill = path.join(target, 'zerotohero', 'SKILL.md');
+    const skill = path.join(target, 'fp', 'SKILL.md');
     fs.appendFileSync(skill, '\ntampered\n');
     assertFailed(runInstaller(target, { verify: true }), 'payload tamper verify');
-    fs.copyFileSync(path.join(universal, '.zerotohero-package', 'payload', 'zerotohero', 'SKILL.md'), skill);
+    fs.copyFileSync(path.join(universal, '.fp-package', 'payload', 'fp', 'SKILL.md'), skill);
 
-    const manifestPath = path.join(target, 'zerotohero', '.install-manifest.json');
+    const manifestPath = path.join(target, 'fp', '.install-manifest.json');
     const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
     manifest.owned_files[0] = 'NOT-AN-OWNED-FILE';
     fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
@@ -98,7 +157,7 @@ test('universal installer installs, verifies, is idempotent, and detects tamperi
   }
 });
 
-test('uninstall removes only verified ZeroToHero content and preserves project files', { timeout: 120_000 }, () => {
+test('uninstall removes only verified FP content and preserves project files', { timeout: 120_000 }, () => {
   const target = tempProject();
   const tamperedTarget = tempProject();
   try {
@@ -119,13 +178,13 @@ test('uninstall removes only verified ZeroToHero content and preserves project f
       assert.equal(fs.readFileSync(path.join(target, relative), 'utf8'), content, `${relative} was not restored semantically`);
     }
     assert.equal(fs.readFileSync(unrelated, 'utf8'), 'project-owned rule\n');
-    assert.ok(!fs.existsSync(path.join(target, 'ZEROTOHERO.md')));
-    assert.ok(!fs.existsSync(path.join(target, 'zerotohero')));
-    assert.ok(!fs.existsSync(path.join(target, '.roo', 'rules', 'zerotohero.md')));
-    assert.ok(fs.existsSync(path.join(target, '.zerotohero-backups')));
+    assert.ok(!fs.existsSync(path.join(target, 'FP.md')));
+    assert.ok(!fs.existsSync(path.join(target, 'fp')));
+    assert.ok(!fs.existsSync(path.join(target, '.roo', 'rules', 'fp.md')));
+    assert.ok(fs.existsSync(path.join(target, '.fp-backups')));
 
     assertSucceeded(runInstaller(tamperedTarget), 'install before tampered uninstall');
-    const owned = path.join(tamperedTarget, 'zerotohero', 'SKILL.md');
+    const owned = path.join(tamperedTarget, 'fp', 'SKILL.md');
     fs.appendFileSync(owned, '\nuser modification\n');
     const agentsBefore = hash(path.join(tamperedTarget, 'AGENTS.md'));
     assertFailed(runInstaller(tamperedTarget, { uninstall: true }), 'tampered uninstall');
@@ -154,27 +213,27 @@ test('uninstall ownership metadata preserves empty files and user-owned Aider en
     }
 
     const aiderPath = path.join(userAiderTarget, '.aider.conf.yml');
-    fs.writeFileSync(aiderPath, 'read: [ZEROTOHERO.md]\nmodel: original\n');
+    fs.writeFileSync(aiderPath, 'read: [FP.md]\nmodel: original\n');
     assertSucceeded(runInstaller(userAiderTarget), 'install with user-owned Aider entry');
-    const manifest = JSON.parse(fs.readFileSync(path.join(userAiderTarget, 'zerotohero', '.install-manifest.json'), 'utf8'));
+    const manifest = JSON.parse(fs.readFileSync(path.join(userAiderTarget, 'fp', '.install-manifest.json'), 'utf8'));
     assert.equal(manifest.aider_entry_managed, false);
     fs.writeFileSync(aiderPath, 'model: user-updated\n');
     assertSucceeded(runInstaller(userAiderTarget, { uninstall: true }), 'uninstall with changed user-owned Aider entry');
     assert.equal(fs.readFileSync(aiderPath, 'utf8'), 'model: user-updated\n');
 
-    const collision = path.join(collisionTarget, 'ZEROTOHERO.md');
+    const collision = path.join(collisionTarget, 'FP.md');
     fs.writeFileSync(collision, 'project-owned collision\n');
     assertFailed(runInstaller(collisionTarget), 'project-owned namespace collision');
     assert.equal(fs.readFileSync(collision, 'utf8'), 'project-owned collision\n');
-    assert.ok(!fs.existsSync(path.join(collisionTarget, 'zerotohero')));
+    assert.ok(!fs.existsSync(path.join(collisionTarget, 'fp')));
 
-    const manifestCollision = path.join(manifestCollisionTarget, 'zerotohero', '.install-manifest.json');
+    const manifestCollision = path.join(manifestCollisionTarget, 'fp', '.install-manifest.json');
     fs.mkdirSync(path.dirname(manifestCollision), { recursive: true });
     fs.writeFileSync(manifestCollision, 'project-owned control file\n');
     assertFailed(runInstaller(manifestCollisionTarget), 'project-owned manifest collision');
     assert.equal(fs.readFileSync(manifestCollision, 'utf8'), 'project-owned control file\n');
-    assert.deepEqual(fs.readdirSync(path.join(manifestCollisionTarget, 'zerotohero')), ['.install-manifest.json']);
-    assert.ok(!fs.existsSync(path.join(manifestCollisionTarget, 'ZEROTOHERO.md')));
+    assert.deepEqual(fs.readdirSync(path.join(manifestCollisionTarget, 'fp')), ['.install-manifest.json']);
+    assert.ok(!fs.existsSync(path.join(manifestCollisionTarget, 'FP.md')));
 
     assertFailed(runInstaller(collisionTarget, { verify: true, migrate: true }), 'verify and migrate are mutually exclusive');
     assertFailed(runInstaller(collisionTarget, { uninstall: true, migrate: true }), 'uninstall and migrate are mutually exclusive');
@@ -191,7 +250,7 @@ test('Aider block comments and unrelated YAML entries survive managed install an
   try {
     const original = [
       'other:',
-      '  - ZEROTOHERO.md',
+      '  - FP.md',
       'read: # keep this comment',
       '  - README.md',
       'model: test',
@@ -204,8 +263,8 @@ test('Aider block comments and unrelated YAML entries survive managed install an
     assertSucceeded(runInstaller(target, { verify: true }), 'verify commented Aider block list');
     const installed = fs.readFileSync(aiderPath, 'utf8');
     assert.match(installed, /^read: # keep this comment$/m);
-    assert.match(installed, /^  - ZEROTOHERO\.md$/m);
-    assert.match(installed, /^other:\n  - ZEROTOHERO\.md$/m);
+    assert.match(installed, /^  - FP\.md$/m);
+    assert.match(installed, /^other:\n  - FP\.md$/m);
 
     assertSucceeded(runInstaller(target, { uninstall: true }), 'uninstall commented Aider block list');
     assert.equal(fs.readFileSync(aiderPath, 'utf8'), original);
@@ -221,13 +280,13 @@ test('duplicate installer-owned Aider entries block uninstall before any write',
     fs.writeFileSync(aiderPath, 'read: [README.md]\n');
     assertSucceeded(runInstaller(target), 'install before duplicate Aider tamper');
     const tampered = fs.readFileSync(aiderPath, 'utf8')
-      .replace(/\](\s*(?:#.*)?\r?\n)/, ', "ZEROTOHERO.md"]$1');
+      .replace(/\](\s*(?:#.*)?\r?\n)/, ', "FP.md"]$1');
     fs.writeFileSync(aiderPath, tampered);
     const protectedFiles = [
       '.aider.conf.yml',
       'AGENTS.md',
-      'zerotohero/SKILL.md',
-      'zerotohero/.install-manifest.json'
+      'fp/SKILL.md',
+      'fp/.install-manifest.json'
     ];
     const before = new Map(protectedFiles.map((relative) => [relative, hash(path.join(target, relative))]));
 
@@ -242,9 +301,9 @@ test('duplicate installer-owned Aider entries block uninstall before any write',
 
 test('backup snapshots use an atomic random directory and ignore attacker-named child links', { timeout: 120_000 }, (t) => {
   const target = tempProject();
-  const outside = fs.mkdtempSync(path.join(tempRoot, 'zerotohero-backup-outside-'));
+  const outside = fs.mkdtempSync(path.join(tempRoot, 'fp-backup-outside-'));
   try {
-    const backupContainer = path.join(target, '.zerotohero-backups');
+    const backupContainer = path.join(target, '.fp-backups');
     fs.mkdirSync(backupContainer);
     const attacker = path.join(backupContainer, 'run-attacker');
     try {
@@ -273,8 +332,8 @@ test('backup snapshots use an atomic random directory and ignore attacker-named 
 
 test('unsafe markers and Aider YAML fail before payload writes', { timeout: 120_000 }, () => {
   const fixtures = [
-    ['AGENTS.md', 'prefix <!-- zerotohero:start --> private <!-- zerotohero:end --> suffix\n'],
-    ['AGENTS.md', '<!-- zerotohero:start -->\nmissing end\n'],
+    ['AGENTS.md', 'prefix <!-- fp:start --> private <!-- fp:end --> suffix\n'],
+    ['AGENTS.md', '<!-- fp:start -->\nmissing end\n'],
     ['.aider.conf.yml', 'read: >\n  README.md\n'],
     ['.aider.conf.yml', 'read:\n  nested: README.md\n'],
     ['.roo', 'user file blocks the required directory\n']
@@ -285,8 +344,8 @@ test('unsafe markers and Aider YAML fail before payload writes', { timeout: 120_
       fs.writeFileSync(path.join(target, relative), content);
       assertFailed(runInstaller(target), `preflight ${relative}: ${JSON.stringify(content)}`);
       assert.equal(fs.readFileSync(path.join(target, relative), 'utf8'), content);
-      assert.ok(!fs.existsSync(path.join(target, 'zerotohero')));
-      assert.ok(!fs.existsSync(path.join(target, 'ZEROTOHERO.md')));
+      assert.ok(!fs.existsSync(path.join(target, 'fp')));
+      assert.ok(!fs.existsSync(path.join(target, 'FP.md')));
       assert.ok(!fs.existsSync(path.join(target, '.agents')));
     } finally {
       fs.rmSync(target, { recursive: true, force: true });
@@ -296,7 +355,7 @@ test('unsafe markers and Aider YAML fail before payload writes', { timeout: 120_
 
 test('link and junction ancestors cannot redirect writes outside the target', { timeout: 120_000 }, (t) => {
   const target = tempProject();
-  const outside = fs.mkdtempSync(path.join(tempRoot, 'zerotohero-outside-'));
+  const outside = fs.mkdtempSync(path.join(tempRoot, 'fp-outside-'));
   try {
     try {
       fs.symlinkSync(outside, path.join(target, '.roo'), isWindows ? 'junction' : 'dir');
@@ -309,7 +368,7 @@ test('link and junction ancestors cannot redirect writes outside the target', { 
     }
     assertFailed(runInstaller(target), 'linked adapter directory preflight');
     assert.deepEqual(fs.readdirSync(outside), []);
-    assert.ok(!fs.existsSync(path.join(target, 'zerotohero')));
+    assert.ok(!fs.existsSync(path.join(target, 'fp')));
     assert.ok(!fs.existsSync(path.join(target, '.agents')));
   } finally {
     fs.rmSync(target, { recursive: true, force: true });
@@ -324,15 +383,71 @@ test('legacy Xskill paths are rejected by default and explicitly migrated with b
     fs.mkdirSync(legacy, { recursive: true });
     fs.writeFileSync(path.join(legacy, 'SKILL.md'), 'legacy router\n');
     assertFailed(runInstaller(target), 'legacy default preflight');
-    assert.ok(!fs.existsSync(path.join(target, 'zerotohero')));
+    assert.ok(!fs.existsSync(path.join(target, 'fp')));
 
     assertSucceeded(runInstaller(target, { migrate: true }), 'explicit legacy migration');
     assert.ok(!fs.existsSync(legacy));
     assertSucceeded(runInstaller(target, { verify: true }), 'verify after legacy migration');
-    const backups = walk(path.join(target, '.zerotohero-backups'))
+    const backups = walk(path.join(target, '.fp-backups'))
       .map((file) => file.replace(/\\/g, '/'));
     assert.ok(backups.some((file) => file.endsWith('/legacy-xskill/.agents/skills/xskill/SKILL.md')));
   } finally {
     fs.rmSync(target, { recursive: true, force: true });
+  }
+});
+
+test('legacy ZeroToHero v0.3.x is rejected by default and safely migrated from its ownership manifest', { timeout: 120_000 }, () => {
+  const target = tempProject();
+  const tamperedTarget = tempProject();
+  try {
+    const { manifestPath } = createLegacyZeroToHeroInstall(target);
+    const agentsBefore = hash(path.join(target, 'AGENTS.md'));
+    const manifestBefore = hash(manifestPath);
+
+    assertFailed(runInstaller(target), 'legacy ZeroToHero default preflight');
+    assert.equal(hash(path.join(target, 'AGENTS.md')), agentsBefore, 'failed preflight changed AGENTS.md');
+    assert.equal(hash(manifestPath), manifestBefore, 'failed preflight changed the legacy manifest');
+    assert.ok(!fs.existsSync(path.join(target, 'fp')));
+    assert.ok(!fs.existsSync(path.join(target, '.fp-backups')));
+
+    assertSucceeded(runInstaller(target, { migrate: true }), 'explicit ZeroToHero migration');
+    assertSucceeded(runInstaller(target, { verify: true }), 'verify after ZeroToHero migration');
+    assert.ok(!fs.existsSync(path.join(target, 'zerotohero')));
+    assert.ok(!fs.existsSync(path.join(target, 'ZEROTOHERO.md')));
+    assert.ok(!fs.existsSync(path.join(target, '.agents', 'skills', 'zerotohero')));
+    assert.ok(fs.existsSync(path.join(target, '.agents', 'skills', 'fp', 'SKILL.md')));
+
+    const agents = fs.readFileSync(path.join(target, 'AGENTS.md'), 'utf8');
+    assert.match(agents, /^user AGENTS instructions$/m);
+    assert.doesNotMatch(agents, /<!-- zerotohero:(?:start|end) -->/);
+    assert.match(agents, /<!-- fp:start -->/);
+    const aider = fs.readFileSync(path.join(target, '.aider.conf.yml'), 'utf8');
+    assert.match(aider, /^  - README\.md$/m);
+    assert.match(aider, /^  - FP\.md$/m);
+    assert.doesNotMatch(aider, /ZEROTOHERO\.md/);
+
+    const fpManifest = JSON.parse(fs.readFileSync(path.join(target, 'fp', '.install-manifest.json'), 'utf8'));
+    assert.ok(fpManifest.created_managed_files.includes('GEMINI.md'));
+    assert.ok(!fpManifest.created_managed_files.includes('AGENTS.md'));
+    const backups = walk(path.join(target, '.fp-backups')).map((file) => file.replace(/\\/g, '/'));
+    assert.ok(backups.some((file) => file.endsWith('/legacy-zerotohero/zerotohero/SKILL.md')));
+    assert.ok(backups.some((file) => file.endsWith('/legacy-zerotohero/zerotohero/.install-manifest.json')));
+    assert.ok(backups.some((file) => file.endsWith('/legacy-zerotohero/AGENTS.md')));
+    assert.ok(backups.some((file) => file.endsWith('/legacy-zerotohero/.aider.conf.yml')));
+
+    const { manifest, manifestPath: tamperedManifestPath } = createLegacyZeroToHeroInstall(tamperedTarget);
+    fs.writeFileSync(path.join(tamperedTarget, 'README.md'), 'project README\n');
+    manifest.owned_files[0] = 'README.md';
+    fs.writeFileSync(tamperedManifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+    const tamperedAgentsBefore = hash(path.join(tamperedTarget, 'AGENTS.md'));
+    assertFailed(runInstaller(tamperedTarget, { migrate: true }), 'tampered legacy ownership manifest');
+    assert.equal(fs.readFileSync(path.join(tamperedTarget, 'README.md'), 'utf8'), 'project README\n');
+    assert.equal(hash(path.join(tamperedTarget, 'AGENTS.md')), tamperedAgentsBefore);
+    assert.ok(fs.existsSync(path.join(tamperedTarget, 'zerotohero', 'SKILL.md')));
+    assert.ok(!fs.existsSync(path.join(tamperedTarget, 'fp')));
+    assert.ok(!fs.existsSync(path.join(tamperedTarget, '.fp-backups')));
+  } finally {
+    fs.rmSync(target, { recursive: true, force: true });
+    fs.rmSync(tamperedTarget, { recursive: true, force: true });
   }
 });

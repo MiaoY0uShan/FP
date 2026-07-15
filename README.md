@@ -1,18 +1,20 @@
 <p align="center">
-  <img src="docs/assets/zerotohero-banner.svg" alt="ZeroToHero turns ambiguous tasks, parallel agents, and limited examples into verified progress" width="100%">
+  <img src="docs/assets/fp-banner.svg" alt="FP turns ambiguous tasks, parallel agents, and limited examples into verified progress" width="100%">
 </p>
 
-# ZeroToHero
+# FP
 
 **The patch is not the finish line. Proof is.**
 
-[![Validate](https://github.com/MiaoY0uShan/ZeroToHero/actions/workflows/validate.yml/badge.svg)](https://github.com/MiaoY0uShan/ZeroToHero/actions/workflows/validate.yml)
-[![Release](https://img.shields.io/github/v/release/MiaoY0uShan/ZeroToHero)](https://github.com/MiaoY0uShan/ZeroToHero/releases)
+[![Validate](https://github.com/MiaoY0uShan/FP/actions/workflows/validate.yml/badge.svg)](https://github.com/MiaoY0uShan/FP/actions/workflows/validate.yml)
+[![Release](https://img.shields.io/github/v/release/MiaoY0uShan/FP)](https://github.com/MiaoY0uShan/FP/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-22c55e.svg)](LICENSE)
 
-Most coding agents rush from prompt to patch. ZeroToHero makes yours find the real task, bound every delegation, and finish with evidence a parent agent can independently verify.
+Most coding agents rush from prompt to patch. FP makes yours find the real task, bound every delegation, and finish with evidence a parent agent can independently verify.
 
 It can learn from prior runs too. Just not by turning one lucky anecdote into permanent law.
+
+FP infers activation from the goal: it loads automatically for engineering work and stays dormant for casual conversation or other non-engineering goals. `FP:` and `$fp` remain optional explicit invocations.
 
 No daemon. No database. No required MCP server. Install it, reload your agent, and work normally.
 
@@ -22,14 +24,14 @@ No daemon. No database. No required MCP server. Install it, reload your agent, a
 
 Four agents touch the same files. One restarts the service. Another reports a green build. Nobody reruns the phone that still cannot connect.
 
-ZeroToHero gives the work a boundary, an owner, and a finish line that can be observed.
+FP gives the work a boundary, an owner, and a finish line that can be observed.
 
 ```text
 Without
 
 edit config -> restart service -> green status -> "done"
 
-With ZeroToHero
+With FP
 
 reproduce the real client
 -> compare desired / generated / effective state
@@ -55,7 +57,7 @@ request
 
 Small work stays small. Incidents restore service before polishing. Unknown causes trigger diagnosis before patches. Current external facts carry a version, source, freshness basis, and trust boundary.
 
-Before adding code, ZeroToHero also walks a short reuse ladder:
+Before adding code, FP also walks a short reuse ladder:
 
 ```text
 1. Does this need to exist?      no -> skip it (YAGNI)
@@ -101,7 +103,7 @@ Parallelism is for independent work. Two agents editing the same shared tree are
 
 ## Learn without memorizing the accident
 
-ZeroToHero evolves external policy: skills, schemas, checklists, and bounded automation. It does not claim to train model weights or guarantee statistical generalization.
+FP evolves external policy: skills, schemas, checklists, and bounded automation. It does not claim to train model weights or guarantee statistical generalization.
 
 ```text
 one evidenced run
@@ -133,11 +135,11 @@ An active candidate needs:
 
 Training failures expose underfitting. Holdout regressions expose overfitting. Negative-control failures expose an over-broad trigger. None can be averaged away.
 
-See [the Generalization Gate](zerotohero/generalization-gate/SKILL.md) and its [machine contract](zerotohero/contracts/evidence-ledger.v1.schema.json).
+See [the Generalization Gate](fp/generalization-gate/SKILL.md) and its [machine contract](fp/contracts/evidence-ledger.v1.schema.json).
 
 ## Evidence that can say "no"
 
-`zerotohero/contracts/evidence-ledger.v1.schema.json` plus the zero-dependency semantic validator form the source of truth.
+`fp/contracts/evidence-ledger.v1.schema.json` plus the zero-dependency semantic validator form the source of truth.
 
 They bind claims to observed commands, enforce separate repository/network/write scopes, compare the final run with its brief, validate live-system and external-context evidence, and fail closed on unrelated checks, fabricated metrics, future-dated learning, or stale continuation state.
 
@@ -151,26 +153,27 @@ A green process, service restart, child summary, or implementation diff is not c
 
 One archive. One installer. One read-only verification.
 
-1. Download the latest `zerotohero-universal-v{version}.zip` from [Releases](https://github.com/MiaoY0uShan/ZeroToHero/releases).
+1. Download the latest `fp-universal-v{version}.zip` from [Releases](https://github.com/MiaoY0uShan/FP/releases).
 2. Extract it into the project root.
-3. On Windows, run `INSTALL-ZEROTOHERO.cmd`. On macOS/Linux, run `sh ./INSTALL-ZEROTOHERO.sh`.
-4. Verify with `INSTALL-ZEROTOHERO.cmd -Verify` on Windows or `sh ./INSTALL-ZEROTOHERO.sh --verify` on macOS/Linux, then reload the AI tool and work normally.
+3. On Windows, run `INSTALL-FP.cmd`. On macOS/Linux, run `sh ./INSTALL-FP.sh`.
+4. Verify with `INSTALL-FP.cmd -Verify` on Windows or `sh ./INSTALL-FP.sh --verify` on macOS/Linux, then reload the AI tool and work normally.
 
 The installer checks ownership, collisions, links/reparse points, managed blocks, and backups before writing. Verified uninstall removes only installer-owned content.
 
-[Exact commands and compatibility tiers](INSTALL.md) | [Migration from Xskill](MIGRATION.md) | [Copy-paste fallback](zerotohero-copy-paste.md)
+[Exact commands and compatibility tiers](INSTALL.md) | [Migration from ZeroToHero or Xskill](MIGRATION.md) | [Copy-paste fallback](fp-copy-paste.md)
 
-Manual activation remains optional:
+Engineering goals activate FP without a keyword. These explicit forms remain optional:
 
 ```text
-ZeroToHero: Diagnose and fix the password-reset regression.
+FP: Diagnose and fix the password-reset regression.
+$fp Review this repository's release workflow without editing.
 ```
 
 ## Numbers, when they are real
 
 **No baseline means no improvement claim.**
 
-ZeroToHero can calculate verification rate, scope creep, rework, context-load proxy, and Tokens to Verified Progress from an evidenced run. Missing values remain `unknown`. A fair comparison fixes the task, model, repository revision, authority, and acceptance checks.
+FP can calculate verification rate, scope creep, rework, context-load proxy, and Tokens to Verified Progress from an evidenced run. Missing values remain `unknown`. A fair comparison fixes the task, model, repository revision, authority, and acceptance checks.
 
 There is no decorative "42% better" chart here. The validator would ask where the baseline went.
 
@@ -178,7 +181,7 @@ There is no decorative "42% better" chart here. The validator would ask where th
 
 ## Routes
 
-| Situation | ZeroToHero response |
+| Situation | FP response |
 | --- | --- |
 | Tiny clear edit | Five-line brief and one relevant check |
 | Unknown cause / diagnose-only | Read-only causal probes before any fix |
@@ -191,12 +194,12 @@ Live systems, external context, multi-agent work, continuation, self-iteration, 
 
 ## Develop
 
-Canonical source lives in `zerotohero/`. Generated host packs live in `install/` and are refreshed by script, never hand-edited.
+Canonical source lives in `fp/`. Generated host packs live in `install/` and are refreshed by script, never hand-edited.
 
 ```text
-node scripts/lint-zerotohero.js
+node scripts/lint-fp.js
 node scripts/lint-release.js
-node scripts/lint-contracts.js --ledger zerotohero/examples/password-reset.evidence-ledger.json --brief zerotohero/examples/password-reset.compiled-execution-brief.json
+node scripts/lint-contracts.js --ledger fp/examples/password-reset.evidence-ledger.json --brief fp/examples/password-reset.compiled-execution-brief.json
 node --test
 powershell -NoProfile -File scripts/sync-install-packs.ps1 -Check
 ```
@@ -231,7 +234,7 @@ Only after a controlled repeated comparison proves it.
 
 ## Influences
 
-ZeroToHero remains an original implementation. Its design was sharpened by studying [Superpowers](https://github.com/obra/superpowers), [Hermes Agent](https://github.com/NousResearch/hermes-agent), [Ponytail](https://github.com/DietrichGebert/ponytail), [Context7](https://github.com/upstash/context7), and [Grill Me](https://github.com/mattpocock/skills/tree/main/skills/productivity/grill-me).
+FP remains an original implementation. Its design was sharpened by studying [Superpowers](https://github.com/obra/superpowers), [Hermes Agent](https://github.com/NousResearch/hermes-agent), [Ponytail](https://github.com/DietrichGebert/ponytail), [Context7](https://github.com/upstash/context7), and [Grill Me](https://github.com/mattpocock/skills/tree/main/skills/productivity/grill-me).
 
 The exact revisions, adopted behaviors, exclusions, and inference boundaries are in [docs/upstream-influences.md](docs/upstream-influences.md). License provenance is in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 

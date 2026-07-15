@@ -1,6 +1,6 @@
-# ZeroToHero design
+# FP design
 
-ZeroToHero is a portable execution discipline layer for AI coding agents.
+FP is a portable execution discipline layer for AI coding agents.
 
 It is not a CLI, runtime, database, package manager, or automatic executor.
 
@@ -9,15 +9,15 @@ It is not a CLI, runtime, database, package manager, or automatic executor.
 Users should be able to work normally. Manual override remains:
 
 ```text
-ZeroToHero: <task or idea>
+FP: <task or idea>
 ```
 
-ZeroToHero should decide the workflow and keep the process weight proportional to the task.
+FP should decide the workflow and keep the process weight proportional to the task.
 
 ## Main loop
 
 ```text
-ZeroToHero trigger
+FP trigger
 -> router
 -> smallest useful brief
 -> bounded execution
@@ -63,7 +63,7 @@ Use explicit budgets only when the task is medium or large enough for budget ris
 
 ## Portable boundary
 
-ZeroToHero remains portable:
+FP remains portable:
 
 ```text
 No CLI

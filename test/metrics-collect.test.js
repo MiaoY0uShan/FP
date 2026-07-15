@@ -4,11 +4,11 @@ const os = require('node:os');
 const path = require('node:path');
 const test = require('node:test');
 
-const { collectMetrics, deriveMetrics, main } = require('../zerotohero/metrics/collect');
+const { collectMetrics, deriveMetrics, main } = require('../fp/metrics/collect');
 
 const root = path.resolve(__dirname, '..');
-const ledgerPath = path.join(root, 'zerotohero/examples/password-reset.evidence-ledger.json');
-const briefPath = path.join(root, 'zerotohero/examples/password-reset.compiled-execution-brief.json');
+const ledgerPath = path.join(root, 'fp/examples/password-reset.evidence-ledger.json');
+const briefPath = path.join(root, 'fp/examples/password-reset.compiled-execution-brief.json');
 
 function readLedger() {
   return JSON.parse(fs.readFileSync(ledgerPath, 'utf8'));
@@ -19,7 +19,7 @@ function readBrief() {
 }
 
 function temporaryJson(value, name = 'ledger.json') {
-  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'zerotohero-metrics-'));
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'fp-metrics-'));
   const output = path.join(directory, name);
   fs.writeFileSync(output, JSON.stringify(value, null, 2));
   return output;
@@ -66,7 +66,7 @@ test('failed run has no verified progress', () => {
 });
 
 test('legacy Markdown is parse-only and never upgraded to verified progress', () => {
-  const markdownPath = path.join(root, 'zerotohero/examples/password-reset.evidence-ledger.md');
+  const markdownPath = path.join(root, 'fp/examples/password-reset.evidence-ledger.md');
   const output = collectMetrics(markdownPath, briefPath);
   assert.equal(output.metrics.verifiedTasksCompleted, 'unknown');
   assert.equal(output.ledger.verified_claims.length, 0);

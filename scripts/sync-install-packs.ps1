@@ -5,39 +5,39 @@ param(
 $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
-$source = Join-Path $repoRoot "zerotohero"
+$source = Join-Path $repoRoot "fp"
 
 $targets = @(
-    "install/codex/.agents/skills/zerotohero/references/zerotohero",
-    "install/claude-code/.claude/skills/zerotohero/references/zerotohero",
-    "install/gemini-cli/zerotohero/zerotohero",
-    "install/github-copilot-cli/zerotohero",
-    "install/cursor/zerotohero",
-    "install/windsurf/zerotohero",
-    "install/cline/zerotohero",
-    "install/roo-code/zerotohero",
-    "install/opencode/zerotohero",
-    "install/kiro/zerotohero",
-    "install/github-copilot-editor/zerotohero",
-    "install/aider/zerotohero",
-    "install/universal/.zerotohero-package/payload/zerotohero"
+    "install/codex/.agents/skills/fp/references/fp",
+    "install/claude-code/.claude/skills/fp/references/fp",
+    "install/gemini-cli/fp/fp",
+    "install/github-copilot-cli/fp",
+    "install/cursor/fp",
+    "install/windsurf/fp",
+    "install/cline/fp",
+    "install/roo-code/fp",
+    "install/opencode/fp",
+    "install/kiro/fp",
+    "install/github-copilot-editor/fp",
+    "install/aider/fp",
+    "install/universal/.fp-package/payload/fp"
 )
 
-$testSource = Join-Path $repoRoot "TEST_ZEROTOHERO.md"
+$testSource = Join-Path $repoRoot "TEST_FP.md"
 $testTargets = @(
-    "install/codex/TEST_ZEROTOHERO.md",
-    "install/claude-code/TEST_ZEROTOHERO.md",
-    "install/gemini-cli/TEST_ZEROTOHERO.md",
-    "install/github-copilot-cli/TEST_ZEROTOHERO.md",
-    "install/cursor/TEST_ZEROTOHERO.md",
-    "install/windsurf/TEST_ZEROTOHERO.md",
-    "install/cline/TEST_ZEROTOHERO.md",
-    "install/roo-code/TEST_ZEROTOHERO.md",
-    "install/opencode/TEST_ZEROTOHERO.md",
-    "install/kiro/TEST_ZEROTOHERO.md",
-    "install/github-copilot-editor/TEST_ZEROTOHERO.md",
-    "install/aider/TEST_ZEROTOHERO.md",
-    "install/universal/.zerotohero-package/payload/TEST_ZEROTOHERO.md"
+    "install/codex/TEST_FP.md",
+    "install/claude-code/TEST_FP.md",
+    "install/gemini-cli/TEST_FP.md",
+    "install/github-copilot-cli/TEST_FP.md",
+    "install/cursor/TEST_FP.md",
+    "install/windsurf/TEST_FP.md",
+    "install/cline/TEST_FP.md",
+    "install/roo-code/TEST_FP.md",
+    "install/opencode/TEST_FP.md",
+    "install/kiro/TEST_FP.md",
+    "install/github-copilot-editor/TEST_FP.md",
+    "install/aider/TEST_FP.md",
+    "install/universal/.fp-package/payload/TEST_FP.md"
 )
 
 function Get-RelativePath {
@@ -156,19 +156,19 @@ foreach ($targetRelative in $testTargets) {
     Write-Host "synced: $targetRelative"
 }
 
-$copyPasteSource = Join-Path $repoRoot "zerotohero-copy-paste.md"
-$copyPasteTarget = Join-Path $repoRoot "dist/zerotohero-copy-paste.md"
+$copyPasteSource = Join-Path $repoRoot "fp-copy-paste.md"
+$copyPasteTarget = Join-Path $repoRoot "dist/fp-copy-paste.md"
 
 if ($Check) {
     if (-not (Test-Path -LiteralPath $copyPasteTarget)) {
-        throw "Missing generated copy-paste fallback: dist/zerotohero-copy-paste.md"
+        throw "Missing generated copy-paste fallback: dist/fp-copy-paste.md"
     }
     if ((Get-Sha256 -Path $copyPasteSource) -ne (Get-Sha256 -Path $copyPasteTarget)) {
-        throw "Generated copy-paste fallback is out of sync: dist/zerotohero-copy-paste.md"
+        throw "Generated copy-paste fallback is out of sync: dist/fp-copy-paste.md"
     }
-    Write-Host "ok: dist/zerotohero-copy-paste.md"
+    Write-Host "ok: dist/fp-copy-paste.md"
 } else {
     New-Item -ItemType Directory -Path (Split-Path -Parent $copyPasteTarget) -Force | Out-Null
     Copy-Item -Path $copyPasteSource -Destination $copyPasteTarget -Force
-    Write-Host "synced: dist/zerotohero-copy-paste.md"
+    Write-Host "synced: dist/fp-copy-paste.md"
 }

@@ -1,0 +1,8 @@
+---
+description: FP evidence-led coding router
+alwaysApply: true
+---
+
+# FP
+
+Use this always-applied file only as a lightweight gate. When the user's goal is engineering work or explicitly invokes `FP:`/`$fp`, read `fp/SKILL.md` as the canonical router and load only the named template/module; otherwise keep the full router dormant. Use debug-first for unknown causes, one writer per shared file set for multi-agent work, and no completion claim without required evidence.

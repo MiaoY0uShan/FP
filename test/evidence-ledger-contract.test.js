@@ -11,16 +11,16 @@ const {
   validateCompletion,
   validateContinuationForResume,
   validateLedger
-} = require('../zerotohero/contracts/evidence-ledger');
+} = require('../fp/contracts/evidence-ledger');
 
 const root = path.resolve(__dirname, '..');
 
 function fixture() {
-  return JSON.parse(fs.readFileSync(path.join(root, 'zerotohero/examples/password-reset.evidence-ledger.json'), 'utf8'));
+  return JSON.parse(fs.readFileSync(path.join(root, 'fp/examples/password-reset.evidence-ledger.json'), 'utf8'));
 }
 
 function briefFixture() {
-  return JSON.parse(fs.readFileSync(path.join(root, 'zerotohero/examples/password-reset.compiled-execution-brief.json'), 'utf8'));
+  return JSON.parse(fs.readFileSync(path.join(root, 'fp/examples/password-reset.compiled-execution-brief.json'), 'utf8'));
 }
 
 function codes(errors) {
@@ -54,7 +54,7 @@ function continuationFixture() {
     status: 'handoff',
     repo_root: root,
     base_revision: 'abc123',
-    fingerprint_algorithm: 'zerotohero-worktree-v1',
+    fingerprint_algorithm: 'fp-worktree-v1',
     worktree_fingerprint: `sha256:${'a'.repeat(64)}`,
     current_slice: 'Run the final regression check',
     verified_claim_ids: ['claim-expired-token'],
@@ -166,7 +166,7 @@ function delegationFixture(id, taskInputIndex, role, overrides = {}) {
     granted_authority: ['read'],
     toolsets: ['filesystem-read'],
     context_refs: ['brief:T001'],
-    allowed_resources: ['zerotohero/**', 'test/**'],
+    allowed_resources: ['fp/**', 'test/**'],
     owned_paths: [],
     depends_on: [],
     max_iterations: 8,
@@ -178,7 +178,7 @@ function delegationFixture(id, taskInputIndex, role, overrides = {}) {
     idempotency_key: `idempotency-${id}`,
     attempts_used: 1,
     summary_budget: { unit: 'words', limit: 300 },
-    artifact_path: `.zerotohero/artifacts/${id}.md`,
+    artifact_path: `.fp/artifacts/${id}.md`,
     artifact_persistence: 'parent_only',
     proposal_evidence_refs: ['/commands_run/0'],
     check_evidence_refs: ['/commands_run/0'],
@@ -255,15 +255,15 @@ function multiAgentEvidenceFixture(ledger, runId = 'multi-run-fixture') {
 
 function learningFixture() {
   const ledger = fixture();
-  const target = 'zerotohero/schema-memory/SKILL.md';
+  const target = 'fp/schema-memory/SKILL.md';
   const targetHash = `sha256:${crypto.createHash('sha256').update(fs.readFileSync(path.join(root, target))).digest('hex')}`;
   ledger.profiles = ['multi_agent', 'background_learning'];
   ledger.created_at = '2026-07-14T04:00:00Z';
-  ledger.delegation_artifact_root = '.zerotohero/artifacts';
+  ledger.delegation_artifact_root = '.fp/artifacts';
   ledger.parent_authority = ['read', 'write', 'execute_checks', 'delegate', 'memory_propose', 'memory_promote'];
   ledger.files_touched.push(target);
   ledger.scope.allowed_touch.push(target);
-  ledger.scope.allowed_read.push('zerotohero/**', 'test/**');
+  ledger.scope.allowed_read.push('fp/**', 'test/**');
   ledger.delegations = [
     delegationFixture('candidate', 0, 'learning_candidate', { granted_authority: ['read', 'memory_propose'] }),
     delegationFixture('evaluator-a', 1, 'learning_evaluator', { context_refs: ['holdout:auth'] }),
@@ -739,7 +739,7 @@ test('resume helper compares actual repository, revision, and fingerprint', () =
   const current = {
     repo_root: root,
     base_revision: 'abc123',
-    fingerprint_algorithm: 'zerotohero-worktree-v1',
+    fingerprint_algorithm: 'fp-worktree-v1',
     worktree_fingerprint: `sha256:${'a'.repeat(64)}`
   };
   assert.deepEqual(validateContinuationForResume(ledger, current), []);
@@ -969,8 +969,8 @@ test('incident, multi-agent, and self-iteration profiles have completion evidenc
   const multi = fixture();
   multi.profiles.push('multi_agent');
   multi.created_at = '2026-07-14T01:00:00Z';
-  multi.delegation_artifact_root = '.zerotohero/artifacts';
-  multi.scope.allowed_read.push('zerotohero/**', 'test/**');
+  multi.delegation_artifact_root = '.fp/artifacts';
+  multi.scope.allowed_read.push('fp/**', 'test/**');
   assert.ok(codes(validateLedger(multi)).includes('E_MULTI_AGENT_EVIDENCE'));
   multi.parent_authority = ['read', 'write', 'execute_checks', 'delegate'];
   multi.delegations = [
@@ -1177,7 +1177,7 @@ test('distributed runtime claims require bound observed evidence and derived lim
   assert.ok(codes(validateLedger(oversizedCjkSummary)).includes('E_DELEGATION_SUMMARY_OVERFLOW'));
 
   const artifactEscape = learningFixture();
-  artifactEscape.delegations[0].artifact_path = 'zerotohero/schema-memory/SKILL.md';
+  artifactEscape.delegations[0].artifact_path = 'fp/schema-memory/SKILL.md';
   assert.ok(codes(validateLedger(artifactEscape)).includes('E_DELEGATION_ARTIFACT_ESCAPE'));
 
   const writerWithoutLease = learningFixture();
@@ -1238,8 +1238,8 @@ test('nested delegations intersect direct-parent authority, resources, depth, an
   const nested = fixture();
   nested.profiles = ['multi_agent'];
   nested.created_at = '2026-07-14T01:00:00Z';
-  nested.delegation_artifact_root = '.zerotohero/artifacts';
-  nested.scope.allowed_read.push('zerotohero/**', 'test/**');
+  nested.delegation_artifact_root = '.fp/artifacts';
+  nested.scope.allowed_read.push('fp/**', 'test/**');
   nested.parent_authority = ['read', 'delegate', 'memory_propose'];
   nested.delegations = [
     delegationFixture('parent-orchestrator', 0, 'orchestrator', {

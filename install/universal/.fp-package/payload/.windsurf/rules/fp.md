@@ -1,0 +1,1 @@
+Use this file only as a lightweight gate. For engineering goals or explicit `FP:`/`$fp` invocation, read `fp/SKILL.md` as the canonical router; otherwise keep the full router dormant. Use debug-first for unknown causes, one writer for shared multi-agent files, and required-check evidence before completion.

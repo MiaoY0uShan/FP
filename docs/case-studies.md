@@ -1,4 +1,4 @@
-# ZeroToHero Case Studies And Evaluation Status
+# FP Case Studies And Evaluation Status
 
 The five early self-use files under `examples/case-studies/` illustrate scope and evidence shapes. Their former `characters / 4` comparison against a monolithic prompt was not a controlled agent baseline, so the percentage-reduction claim is retired.
 

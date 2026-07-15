@@ -5,7 +5,7 @@ const {
   computeWorktreeFingerprint,
   parseJsonFile,
   validateContinuationForResume
-} = require('../zerotohero/contracts/evidence-ledger');
+} = require('../fp/contracts/evidence-ledger');
 
 function usage() {
   return 'Usage: node scripts/fingerprint-worktree.js [--repo <path>] [--ledger <continuation-ledger.json>]';

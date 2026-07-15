@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.4.0 — FP rename and goal-matched activation
+
+- Renamed the current product, skill identifiers, canonical source path, install packs, managed entries, and release assets from ZeroToHero to FP.
+- Made activation goal-based: FP loads automatically for engineering work, stays dormant for casual or other non-engineering goals, and keeps `FP:` plus `$fp` as optional explicit invocations.
+- Added fail-closed migration from ZeroToHero v0.3.x and earlier Xskill installations so two branded routers cannot remain active together.
+- Moved continuation fingerprints and parent-owned artifacts to the FP namespace; pre-0.4.0 continuations require a fresh baseline before any write can resume.
+- Preserved dated ZeroToHero validation and host-smoke records as historical evidence rather than rewriting past runs under the new name.
+- Updated the canonical schema ID and release version to v0.4.0.
+
 ## v0.3.1 — Retired-module routing correction
 
 - Replaced retired `learn-after-run` references with the evidence-gated `adaptive-improvement` route.

@@ -1,4 +1,4 @@
-# ZeroToHero Metrics
+# FP Metrics
 
 Metrics are conservative: missing inputs are `unknown`, zero is used only when zero was observed, and division with no verified progress is undefined.
 
@@ -19,7 +19,7 @@ Rework Rate = failed_or_reopened_tasks / completed tasks
 
 Proxy inputs come from ledger `metrics_inputs`; they are never hardcoded.
 
-## Claims ZeroToHero May Make
+## Claims FP May Make
 
 - The route constrained scope and checks.
 - Required checks did or did not pass.
@@ -35,5 +35,5 @@ Hold task, acceptance checks, agent/model, and repository revision constant. Use
 Run:
 
 ```text
-node zerotohero/metrics/collect.js <ledger.json> [brief.json]
+node fp/metrics/collect.js <ledger.json> [brief.json]
 ```

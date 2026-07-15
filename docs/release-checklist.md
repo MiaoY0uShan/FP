@@ -5,9 +5,9 @@
 ## Before Tagging
 
 ```text
-node scripts/lint-zerotohero.js
+node scripts/lint-fp.js
 node scripts/lint-release.js
-node scripts/lint-contracts.js --ledger zerotohero/examples/password-reset.evidence-ledger.json --brief zerotohero/examples/password-reset.compiled-execution-brief.json
+node scripts/lint-contracts.js --ledger fp/examples/password-reset.evidence-ledger.json --brief fp/examples/password-reset.compiled-execution-brief.json
 node --test
 sh test/posix-installer-smoke.sh
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\sync-install-packs.ps1 -Check
@@ -16,12 +16,12 @@ git diff --check
 
 Verify:
 
-- root `zerotohero/` is canonical and all generated pack copies match it;
+- root `fp/` is canonical and all generated pack copies match it;
 - every `SKILL.md` begins with `---` and no text file has a UTF-8 BOM;
 - Gemini metadata equals `VERSION`;
 - universal plus every dedicated tool asset is built and contains its entrypoint;
-- every ZIP contains `LICENSE`, `THIRD_PARTY_NOTICES.md`, and `VERSION` inside the ZeroToHero-owned namespace, and standalone release assets retain the same notices without overwriting project-root files;
-- `TEST_ZEROTOHERO.md` is identical in every pack;
+- every ZIP contains `LICENSE`, `THIRD_PARTY_NOTICES.md`, and `VERSION` inside the FP-owned namespace, and standalone release assets retain the same notices without overwriting project-root files;
+- `TEST_FP.md` is identical in every pack;
 - debug-only remains read-only, distributed delegation rejects authority/DAG/writer/cleanup violations, and unknown metrics remain unknown;
 - background learning rejects train/holdout leakage, single-case permanent promotion, negative-control/invariant failures, holdout regression, no-improvement underfit, self-evaluation, stale provenance, shadow failure, and missing rollback;
 - release workflow runs validation before publishing;

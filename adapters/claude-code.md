@@ -1,10 +1,10 @@
-# ZeroToHero adapter: claude-code
+# FP adapter: claude-code
 
-ZeroToHero is agent-agnostic.
+FP is agent-agnostic.
 
-## Default behavior (Ghost Mode)
+## Default behavior (Goal-Matched Ghost Mode)
 
-Proactively activate ZeroToHero for coding work, then choose the lightest evidence-backed path.
+Infer FP from the user's goal. Activate it automatically for engineering work and keep it dormant for casual or other non-engineering goals. `FP:` and `$fp` are optional, never required.
 
 - **Small change:** Generate a 3-5 line brief and capture the validation result.
 - **Medium task:** Create a compact Execution Brief, run verification, and produce an Evidence Ledger.
@@ -16,6 +16,6 @@ Proactively activate ZeroToHero for coding work, then choose the lightest eviden
 
 ## Rules
 
-- Check `zerotohero/lessons-learned/` before planning.
+- Check `fp/lessons-learned/` before planning.
 - State what to read, what to touch, and how to verify before editing.
 - No evidence, no done.

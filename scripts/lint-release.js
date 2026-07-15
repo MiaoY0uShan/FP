@@ -20,8 +20,8 @@ function main() {
   const version = read('VERSION').trim();
   if (!/^\d+\.\d+\.\d+$/.test(version)) failures.push('VERSION must be semver without a leading v');
 
-  const gemini = JSON.parse(read('install/gemini-cli/zerotohero/gemini-extension.json'));
-  if (gemini.name !== 'zerotohero') failures.push('Gemini extension name must be zerotohero');
+  const gemini = JSON.parse(read('install/gemini-cli/fp/gemini-extension.json'));
+  if (gemini.name !== 'fp') failures.push('Gemini extension name must be fp');
   if (gemini.version !== version) failures.push(`Gemini version ${gemini.version} does not match VERSION ${version}`);
 
   const release = read('.github/workflows/release.yml');
@@ -33,10 +33,10 @@ function main() {
     'cursor', 'windsurf', 'cline', 'roo-code', 'opencode', 'kiro', 'github-copilot-editor', 'aider', 'copy-paste'
   ];
   for (const asset of requiredAssets) {
-    if (!releaseDefinition.includes(`zerotohero-${asset}-v`)) failures.push(`release packaging is missing ${asset} asset`);
+    if (!releaseDefinition.includes(`fp-${asset}-v`)) failures.push(`release packaging is missing ${asset} asset`);
   }
   if (/workflow_dispatch\s*:/.test(release)) failures.push('release workflow must not publish from an arbitrary manually dispatched branch');
-  for (const marker of ['SHA256SUMS', 'sha256sum -c', 'INSTALL-ZEROTOHERO.cmd', 'INSTALL-ZEROTOHERO.ps1', 'INSTALL-ZEROTOHERO.sh', '--uninstall', 'verify_product_metadata', 'THIRD_PARTY_NOTICES.md', 'cat "$root/LICENSE"', 'cat "$root/THIRD_PARTY_NOTICES.md"', 'generate_release_notes: true']) {
+  for (const marker of ['SHA256SUMS', 'sha256sum -c', 'INSTALL-FP.cmd', 'INSTALL-FP.ps1', 'INSTALL-FP.sh', '--uninstall', 'verify_product_metadata', 'THIRD_PARTY_NOTICES.md', 'cat "$root/LICENSE"', 'cat "$root/THIRD_PARTY_NOTICES.md"', 'generate_release_notes: true']) {
     if (!releaseDefinition.includes(marker)) failures.push(`release definition is missing ${marker}`);
   }
   if (!/workflow_call\s*:/.test(validate)) failures.push('validate workflow must be reusable by the release gate');
@@ -63,16 +63,16 @@ function main() {
     failures.push('release README placeholders are not resolved during packaging');
   }
 
-  const universalVersion = read('install/universal/.zerotohero-package/VERSION').trim();
+  const universalVersion = read('install/universal/.fp-package/VERSION').trim();
   if (universalVersion !== version) failures.push(`universal package version ${universalVersion} does not match VERSION ${version}`);
-  const canonicalVersion = read('zerotohero/VERSION').trim();
+  const canonicalVersion = read('fp/VERSION').trim();
   if (canonicalVersion !== version) failures.push(`canonical product version ${canonicalVersion} does not match VERSION ${version}`);
   for (const file of ['LICENSE', 'THIRD_PARTY_NOTICES.md']) {
-    if (read(file) !== read(`zerotohero/${file}`)) failures.push(`zerotohero/${file} does not match root ${file}`);
+    if (read(file) !== read(`fp/${file}`)) failures.push(`fp/${file} does not match root ${file}`);
   }
-  for (const file of ['README.md', 'INSTALL.md', 'START_HERE.md', 'install/universal/README-ZEROTOHERO.md']) {
+  for (const file of ['README.md', 'INSTALL.md', 'START_HERE.md', 'install/universal/README-FP.md']) {
     const content = read(file);
-    if (!/INSTALL-ZEROTOHERO\.(?:cmd|ps1|sh)/.test(content)) failures.push(`${file} does not tell the user to run the staged installer`);
+    if (!/INSTALL-FP\.(?:cmd|ps1|sh)/.test(content)) failures.push(`${file} does not tell the user to run the staged installer`);
   }
   const dedicated = fs.readdirSync(path.join(root, 'install'), { withFileTypes: true }).filter((entry) => entry.isDirectory() && entry.name !== 'universal');
   for (const entry of dedicated) {
@@ -87,7 +87,7 @@ function main() {
     console.error(failures.join('\n'));
     return 1;
   }
-  console.log(`ok: release metadata targets ZeroToHero ${version}`);
+  console.log(`ok: release metadata targets FP ${version}`);
   return 0;
 }
 

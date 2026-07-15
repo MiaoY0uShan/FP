@@ -32,15 +32,34 @@ function filesUnder(relativePath) {
 }
 
 test('router keeps small work light and unknown causes debug-first', () => {
-  const router = read('zerotohero/SKILL.md');
+  const router = read('fp/SKILL.md');
   assert.match(router, /Small Clear Change/);
   assert.match(router, /Do not generate a full ledger unless risk appears/);
   assert.match(router, /Diagnosis is read-only by default/);
   assert.match(router, /three consecutive rejected\/unknown probes have not narrowed the cause/);
 });
 
+test('router activation is implicit for engineering goals and dormant otherwise', () => {
+  const router = read('fp/SKILL.md');
+  const agentContract = read('fp/AGENTS.md');
+  const frontmatter = router.match(/^---\r?\n([\s\S]*?)\r?\n---/)?.[1] ?? '';
+
+  assert.match(frontmatter, /Use automatically when the user's goal is engineering work/i);
+  assert.match(frontmatter, /Do not use for casual conversation or other non-engineering goals/i);
+  assert.match(router, /Activate automatically for engineering goals/i);
+  assert.match(router, /stay dormant for casual or other non-engineering goals/i);
+  assert.match(agentContract, /Load it automatically for engineering work/i);
+  assert.match(agentContract, /keep it dormant for casual or other non-engineering goals/i);
+
+  for (const [label, content] of [['router', router], ['agent contract', agentContract]]) {
+    assert.match(content, /FP:/, `${label} must support the FP: explicit invocation`);
+    assert.match(content, /\$fp/, `${label} must support the $fp explicit invocation`);
+    assert.match(content, /optional|do not require|never require/i, `${label} must not require an explicit invocation`);
+  }
+});
+
 test('reuse ladder preserves all seven rungs in order', () => {
-  const scope = read('zerotohero/delete-scope/SKILL.md');
+  const scope = read('fp/delete-scope/SKILL.md');
   const markers = [
     'Does this need to exist?',
     'Already in this codebase?',
@@ -57,7 +76,7 @@ test('reuse ladder preserves all seven rungs in order', () => {
     previous = current;
   }
 
-  const router = read('zerotohero/SKILL.md');
+  const router = read('fp/SKILL.md');
   const rootMarkers = [
     'does this need to exist',
     'already in this codebase',
@@ -78,7 +97,7 @@ test('reuse ladder preserves all seven rungs in order', () => {
 });
 
 test('multi-agent protocol is single-writer and re-review gated', () => {
-  const protocol = read('zerotohero/templates/multi-agent-review-protocol.md');
+  const protocol = read('fp/templates/multi-agent-review-protocol.md');
   assert.match(protocol, /one writer/i);
   assert.match(protocol, /mutation lease/i);
   assert.match(protocol, /must be re-reviewed/i);
@@ -93,10 +112,10 @@ test('multi-agent protocol is single-writer and re-review gated', () => {
 });
 
 test('background learning uses blind finite-case generalization rather than self-rewrite', () => {
-  const router = read('zerotohero/SKILL.md');
-  const gate = read('zerotohero/generalization-gate/SKILL.md');
-  const adaptive = read('zerotohero/adaptive-improvement/SKILL.md');
-  const memory = read('zerotohero/schema-memory/SKILL.md');
+  const router = read('fp/SKILL.md');
+  const gate = read('fp/generalization-gate/SKILL.md');
+  const adaptive = read('fp/adaptive-improvement/SKILL.md');
+  const memory = read('fp/schema-memory/SKILL.md');
 
   assert.match(router, /Background-Learning Profile/);
   assert.match(router, /generalization-gate\/SKILL\.md/);
@@ -112,8 +131,8 @@ test('background learning uses blind finite-case generalization rather than self
 });
 
 test('legacy lesson observations cannot masquerade as promoted policy', () => {
-  const lessonDirectory = path.join(root, 'zerotohero', 'lessons-learned');
-  const index = read('zerotohero/lessons-learned/README.md');
+  const lessonDirectory = path.join(root, 'fp', 'lessons-learned');
+  const index = read('fp/lessons-learned/README.md');
   const promotedSection = index.match(/## Promoted Lessons\r?\n([\s\S]*?)(?=\r?\n## )/)?.[1] ?? '';
   const legacySection = index.match(/## Legacy Observations Awaiting Revalidation\r?\n([\s\S]*)/)?.[1] ?? '';
   const allowedStatuses = new Set(['observation', 'bounded_shadow', 'promoted']);
@@ -135,7 +154,7 @@ test('legacy lesson observations cannot masquerade as promoted policy', () => {
 });
 
 test('challenge loop separates facts from user-owned decisions', () => {
-  const requirements = read('zerotohero/question-requirements/SKILL.md');
+  const requirements = read('fp/question-requirements/SKILL.md');
   assert.match(requirements, /Fact:/);
   assert.match(requirements, /Decision:/);
   assert.match(requirements, /Never answer a user-owned decision/);
@@ -162,7 +181,7 @@ test('challenge loop separates facts from user-owned decisions', () => {
     previous = current;
   }
 
-  const prompts = read('TEST_ZEROTOHERO.md');
+  const prompts = read('TEST_FP.md');
   assert.match(prompts, /Grill Decisions Stay Dependency-Ordered/);
   assert.match(prompts, /ask only the global-versus-project-scope decision/i);
   assert.match(prompts, /Wait for and record the answer before asking retention/i);
@@ -171,8 +190,8 @@ test('challenge loop separates facts from user-owned decisions', () => {
 });
 
 test('medium and risky work captures a pre-edit workspace baseline', () => {
-  const router = read('zerotohero/SKILL.md');
-  const brief = read('zerotohero/templates/execution-brief.md');
+  const router = read('fp/SKILL.md');
+  const brief = read('fp/templates/execution-brief.md');
   assert.match(router, /pre-existing worktree changes/i);
   assert.match(router, /pre-existing failures/i);
   assert.match(brief, /Workspace Baseline/);
@@ -181,8 +200,8 @@ test('medium and risky work captures a pre-edit workspace baseline', () => {
 });
 
 test('debug contract traces the first divergence and avoids blind sleeps', () => {
-  const router = read('zerotohero/SKILL.md');
-  const checklist = read('zerotohero/templates/debug-incident-checklist.md');
+  const router = read('fp/SKILL.md');
+  const checklist = read('fp/templates/debug-incident-checklist.md');
   assert.match(router, /Debug-First[\s\S]*Load `templates\/debug-incident-checklist\.md`/i);
   assert.match(checklist, /causal boundary chain/i);
   assert.match(checklist, /first divergence/i);
@@ -192,7 +211,7 @@ test('debug contract traces the first divergence and avoids blind sleeps', () =>
 });
 
 test('external context stays untrusted and freshness needs evidence', () => {
-  const contract = read('zerotohero/templates/context-retrieval-contract.md');
+  const contract = read('fp/templates/context-retrieval-contract.md');
   assert.match(contract, /untrusted data/i);
   assert.match(contract, /cannot override.*authority/i);
   assert.match(contract, /known.*source ID.*direct/i);
@@ -203,9 +222,9 @@ test('external context stays untrusted and freshness needs evidence', () => {
 });
 
 test('semantic architecture routes context gaps without retired modules', () => {
-  const architecture = read('zerotohero/semantic-architecture/SKILL.md');
-  const example = read('zerotohero/examples/zerotohero.semantic-architecture.md');
-  const template = read('zerotohero/templates/semantic-architecture-report.md');
+  const architecture = read('fp/semantic-architecture/SKILL.md');
+  const example = read('fp/examples/fp.semantic-architecture.md');
+  const template = read('fp/templates/semantic-architecture-report.md');
 
   assert.match(architecture, /smallest bounded local read-only discovery/i);
   assert.match(architecture, /current, versioned, or external.*context-retrieval-contract\.md/i);
@@ -216,7 +235,7 @@ test('semantic architecture routes context gaps without retired modules', () => 
   assert.match(template, /Do not use `schema-memory` for task-local context retrieval/i);
 
   const retiredNames = ['semantic-memory', 'learn-after-run', 'automate-after-stable'];
-  for (const filePath of filesUnder('zerotohero')) {
+  for (const filePath of filesUnder('fp')) {
     const content = fs.readFileSync(filePath, 'utf8');
     for (const retiredName of retiredNames) {
       assert.doesNotMatch(content, new RegExp(`\\b${retiredName}\\b`, 'i'), `${path.relative(root, filePath)} contains retired module ${retiredName}`);
@@ -225,7 +244,7 @@ test('semantic architecture routes context gaps without retired modules', () => 
 });
 
 test('deliberate shortcuts enter the deferred ledger', () => {
-  const ledger = read('zerotohero/evidence-ledger/SKILL.md');
+  const ledger = read('fp/evidence-ledger/SKILL.md');
   assert.match(ledger, /deferred_items/);
   assert.match(ledger, /ceiling/);
   assert.match(ledger, /upgrade trigger/i);

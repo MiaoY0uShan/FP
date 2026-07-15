@@ -1,6 +1,6 @@
-# ZeroToHero Router
+# FP Router
 
-ZeroToHero activates proactively for coding work. Manual override: `ZeroToHero: <task or idea>`.
+FP activates implicitly when the user's goal is engineering work and stays dormant for casual or other non-engineering goals. `FP: <task or idea>` and `$fp <task or idea>` are optional explicit invocations, never requirements.
 
 ## Priority
 

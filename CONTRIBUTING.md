@@ -1,6 +1,6 @@
 # Contributing
 
-ZeroToHero should stay small.
+FP should stay small.
 
 Before adding a new file or workflow, ask:
 
