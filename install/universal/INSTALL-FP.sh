@@ -330,6 +330,16 @@ recognize_legacy_zerotohero() {
   LEGACY_ZTH_PATHS=$(expected_zerotohero_owned_files | while IFS= read -r relative; do
     [ ! -e "$TARGET/$relative" ] || printf '%s\n' "$relative"
   done)
+  if [ -n "$LEGACY_ZTH_PATHS" ]; then
+    report_fp_owned=$(expected_owned_files)
+    LEGACY_ZTH_PATHS=$(printf '%s\n' "$LEGACY_ZTH_PATHS" | while IFS= read -r zth; do
+      already_fp=0
+      printf '%s\n' "$report_fp_owned" | while IFS= read -r fp_path; do
+        [ "$zth" = "$fp_path" ] && echo "MATCH" || true
+      done | grep -q "MATCH" && already_fp=1 || true
+      [ "$already_fp" -eq 1 ] || printf '%s\n' "$zth"
+    done)
+  fi
 }
 
 recognize_previous_install() {
