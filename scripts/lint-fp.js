@@ -134,10 +134,19 @@ function main() {
   requireText('fp/templates/multi-agent-review-protocol.md', ['idempotency_key', 'task_input_index', 'parent cancellation', 'dependency cycles'], failures);
   requireText('THIRD_PARTY_NOTICES.md', ['superpowers', 'hermes-agent', 'ponytail', 'context7', 'mattpocock/skills'], failures);
   requireText('fp-copy-paste.md', ['Debug-first', 'one writer', 'required-check'], failures);
+  requireText('TEST_FP.md', ['diagnose-only', 'single writer', 'unknown'], failures);
 
   const portableActivationContracts = [
     'fp/AGENTS.md',
     'fp-copy-paste.md',
+    'adapters/README.md',
+    'adapters/claude-code.md',
+    'adapters/codex.md',
+    'adapters/cursor.md',
+    'adapters/gemini-cli.md',
+    'adapters/generic.md',
+    'adapters/github-copilot-cli.md',
+    'adapters/opencode.md'
   ];
   portableActivationContracts.forEach((filePath) => {
     requireText(filePath, ['engineering', 'FP:', '$fp', 'non-engineering'], failures);

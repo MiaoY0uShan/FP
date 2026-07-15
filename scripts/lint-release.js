@@ -74,7 +74,7 @@ function main() {
   for (const file of ['LICENSE', 'THIRD_PARTY_NOTICES.md']) {
     if (read(file) !== read(`fp/${file}`)) failures.push(`fp/${file} does not match root ${file}`);
   }
-  for (const file of ['README.md', 'install/README.md', 'install/universal/README-FP.md']) {
+  for (const file of ['README.md', 'INSTALL.md', 'START_HERE.md', 'install/universal/README-FP.md']) {
     const content = read(file);
     if (!/INSTALL-FP\.(?:cmd|ps1|sh)/.test(content)) failures.push(`${file} does not tell the user to run the staged installer`);
   }
@@ -83,7 +83,7 @@ function main() {
     if (fs.existsSync(path.join(root, 'install', entry.name, 'README.md'))) failures.push(`install/${entry.name}/README.md could overwrite a project README`);
   }
   if (fs.existsSync(path.join(root, 'install/aider/.aider.conf.yml'))) failures.push('dedicated Aider pack must not overwrite .aider.conf.yml');
-  for (const file of []) { /* stale-version check skipped: CHANGELOG removed */
+  for (const file of ['INSTALL.md', 'START_HERE.md', 'dist/README.md', 'docs/release-checklist.md']) {
     if (/v0\.2\.[0-9]/.test(read(file))) failures.push(`${file} contains a stale hardcoded v0.2 release`);
   }
 

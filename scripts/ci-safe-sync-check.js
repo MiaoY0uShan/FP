@@ -43,6 +43,23 @@ const claudeMdTargets = [
   "install/codex/.agents/CLAUDE.md"
 ];
 
+const testSource = path.join(root, 'TEST_FP.md');
+const testTargets = [
+  "install/codex/TEST_FP.md",
+  "install/claude-code/TEST_FP.md",
+  "install/gemini-cli/TEST_FP.md",
+  "install/github-copilot-cli/TEST_FP.md",
+  "install/cursor/TEST_FP.md",
+  "install/windsurf/TEST_FP.md",
+  "install/cline/TEST_FP.md",
+  "install/roo-code/TEST_FP.md",
+  "install/opencode/TEST_FP.md",
+  "install/kiro/TEST_FP.md",
+  "install/github-copilot-editor/TEST_FP.md",
+  "install/aider/TEST_FP.md",
+  "install/universal/.fp-package/payload/TEST_FP.md"
+];
+
 const copyPasteSource = path.join(root, 'fp-copy-paste.md');
 const copyPasteTarget = path.join(root, 'dist', 'fp-copy-paste.md');
 
@@ -96,6 +113,20 @@ for (const t of targets) {
     console.error(`missing: ${t}`);
     failures++;
   } else if (!compareDirectory(source, dst)) {
+    console.error(`out of sync: ${t}`);
+    failures++;
+  } else {
+    console.log(`ok: ${t}`);
+  }
+}
+
+// TEST_FP.md
+for (const t of testTargets) {
+  const dst = path.join(root, t);
+  if (!fs.existsSync(dst)) {
+    console.error(`missing: ${t}`);
+    failures++;
+  } else if (sha256(testSource) !== sha256(dst)) {
     console.error(`out of sync: ${t}`);
     failures++;
   } else {
