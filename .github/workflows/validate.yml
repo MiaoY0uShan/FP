@@ -26,16 +26,17 @@ jobs:
           set -euo pipefail
           test -f VERSION
           test -f README.md
-          test -f fp-copy-paste.md
-          test -f THIRD_PARTY_NOTICES.md
+          test -f INSTALL.md
+          test -f TEST_FP.md
           test -f fp/SKILL.md
-          test -f fp/CLAUDE.md
           test -f fp/contracts/evidence-ledger.v1.schema.json
           test -f fp/generalization-gate/SKILL.md
           test -f fp/templates/debug-incident-checklist.md
           test -f fp/templates/multi-agent-review-protocol.md
           test -f fp/templates/generalization-evaluation.md
           test -f fp/templates/context-retrieval-contract.md
+          test -f THIRD_PARTY_NOTICES.md
+          test -f docs/assets/fp-banner.svg
           test -f install/universal/INSTALL-FP.ps1
           test -f install/universal/INSTALL-FP.sh
           test -f install/universal/INSTALL-FP.cmd
