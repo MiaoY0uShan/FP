@@ -4,12 +4,6 @@ on:
   push:
     tags:
       - "v*"
-  workflow_dispatch:
-    inputs:
-      version:
-        description: "Release version (e.g., 0.4.2)"
-        required: true
-        default: "0.4.2"
 
 permissions:
   contents: write
@@ -34,13 +28,6 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            VERSION="${{ inputs.version }}"
-            TAG="v${VERSION}"
-            echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
-            echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
           git fetch --no-tags --depth=1 origin +refs/heads/main:refs/remotes/origin/main
           TAG_COMMIT="$(git rev-parse "${GITHUB_SHA}^{commit}")"
           MAIN_COMMIT="$(git rev-parse "origin/main^{commit}")"
