@@ -145,7 +145,7 @@ test('release workflow is tag-only, checksummed, licensed, immutable, and includ
   const releaseDefinition = `${workflow}\n${packaging}`;
   const powershellLifecycle = workflow.match(/(?:^|\r?\n)  powershell_lifecycle:\r?\n([\s\S]*?)(?=\r?\n  [A-Za-z0-9_-]+:\r?\n|$)/)?.[1] || '';
   const releaseJob = workflow.match(/(?:^|\r?\n)  release:\r?\n([\s\S]*?)(?=\r?\n  [A-Za-z0-9_-]+:\r?\n|$)/)?.[1] || '';
-  assert.match(workflow, /workflow_dispatch\s*:\s*\n\s+inputs\s*:/);
+  assert.doesNotMatch(workflow, /workflow_dispatch\s*:/);
   assert.match(packaging, /SHA256SUMS/);
   assert.match(packaging, /sha256sum -c/);
   assert.match(packaging, /fp-roo-code-v/);
