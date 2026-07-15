@@ -162,6 +162,8 @@ The installer checks ownership, collisions, links/reparse points, managed blocks
 
 [Exact commands and compatibility tiers](INSTALL.md) | [Migration from ZeroToHero or Xskill](MIGRATION.md) | [Copy-paste fallback](fp-copy-paste.md)
 
+The Claude Code pack includes `.claude/skills/fp/` for skill discovery and `.claude/CLAUDE.md` for system-level auto-injection — the same mechanism Superpowers uses. Other hosts get tool-specific entrypoints via the universal installer.
+
 Engineering goals activate FP without a keyword. These explicit forms remain optional:
 
 ```text
@@ -194,7 +196,7 @@ Live systems, external context, multi-agent work, continuation, self-iteration, 
 
 ## Develop
 
-Canonical source lives in `fp/`. Generated host packs live in `install/` and are refreshed by script, never hand-edited.
+Canonical source lives in `fp/`. Generated host packs live in `install/` for 18 agents (Claude Code, Codex, Gemini CLI, Cursor, Windsurf, Cline, Roo Code, OpenCode, Kiro, Qoder, Aider, GitHub Copilot CLI, GitHub Copilot Editor, and more). All generated copies are refreshed by script, never hand-edited.
 
 ```text
 node scripts/lint-fp.js
