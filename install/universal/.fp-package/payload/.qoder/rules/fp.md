@@ -21,16 +21,17 @@ Layer remote/live-system, OpenWrt, stateful-UI, external-context, multi-agent, c
 - **Vague:** three Idea Cards (Title, Assumption, MVP, Risk) before implementation.
 - **Large/risky:** only the internal modules that reduce scope or risk, compiled into one final brief.
 - **Failed:** capture evidence, split smaller. Do not repeat the same large attempt.
+- **Remote/stateful, OpenWrt, continuation, multi-agent, or background-learning tasks**: layer the matching profile onto the selected route; they are not reasons to load the full chain by themselves.
 
 ## Core Rules
 
-1. **No evidence, no done.** Implementation, a process, or child summary is not completion evidence by itself.
-2. **Debug before patching.** When cause is unknown, gather discriminating evidence before changing code. Speculative patches are not probes.
-3. **Reuse before creation** (first safe rung): need to exist? → already in codebase? → stdlib? → native platform? → installed dep? → one line? → only then add minimum new code.
-4. **State what to read, what to touch, what must not change, and how to verify** before the first edit.
-5. **Rerun the original symptom + regression + negative control** after a fix.
+1. **No evidence, no done.** Implementation or child summary is not completion evidence.
+2. **Debug before patching.** Gather discriminating evidence before changing code. Speculative patches are not probes.
+3. **Reuse before creation:** need to exist? → already in codebase? → stdlib? → native platform? → installed dep? → one line? → only then add minimum new code.
+4. **State read set, touch set, verify method** before the first edit.
+5. **Rerun original symptom + regression + negative control** after a fix.
 6. **One writer per shared file set.** Parallelize only independent investigation or review.
-7. **Live systems**: preserve management path, create rollback point, inspect desired/generated/effective state, verify with real client path, prove stop/restart/reload don't leak resources. A service restart or `ready` label is not proof of function.
+7. **Live systems**: preserve management path, create rollback point, inspect desired/generated/effective state, verify with real client path. A service restart or `ready` label is not proof of function.
 8. **Redact secrets** from logs, examples, handoffs, and final answers.
 
 ## Multi-Agent
