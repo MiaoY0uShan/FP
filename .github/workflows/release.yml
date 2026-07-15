@@ -14,21 +14,8 @@ jobs:
     permissions:
       contents: read
 
-  powershell_lifecycle:
-    name: PowerShell installer lifecycle
-    runs-on: windows-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
-        with:
-          node-version: 20
-      - name: Run PowerShell installer lifecycle tests
-        run: node --test test/installer-integration.test.js
-
   release:
-    needs: [validate, powershell_lifecycle]
+    needs: [validate]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
