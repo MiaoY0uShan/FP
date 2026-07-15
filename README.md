@@ -1,13 +1,9 @@
-<p align="center">
-  <img src="docs/assets/fp-banner.svg" alt="FP turns ambiguous tasks, parallel agents, and limited examples into verified progress" width="100%">
-</p>
-
 # FP
 
 **The patch is not the finish line. Proof is.**
 
 [![Validate](https://github.com/MiaoY0uShan/FP/actions/workflows/validate.yml/badge.svg)](https://github.com/MiaoY0uShan/FP/actions/workflows/validate.yml)
-[![Release](https://img.shields.io/github/v/release/MiaoY0uShan/FP)](https://github.com/MiaoY0uShan/FP/releases)
+[![Tag](https://img.shields.io/github/v/tag/MiaoY0uShan/FP?label=release)](https://github.com/MiaoY0uShan/FP/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-22c55e.svg)](LICENSE)
 
 Most coding agents rush from prompt to patch. FP makes yours find the real task, bound every delegation, and finish with evidence a parent agent can independently verify.
@@ -160,7 +156,7 @@ One archive. One installer. One read-only verification.
 
 The installer checks ownership, collisions, links/reparse points, managed blocks, and backups before writing. Verified uninstall removes only installer-owned content.
 
-[Exact commands and compatibility tiers](INSTALL.md) | [Migration from ZeroToHero or Xskill](MIGRATION.md) | [Copy-paste fallback](fp-copy-paste.md)
+[Exact commands and compatibility tiers](install/README.md) | [Copy-paste fallback](fp-copy-paste.md)
 
 The Claude Code pack includes `.claude/skills/fp/` for skill discovery and `.claude/CLAUDE.md` for system-level auto-injection — the same mechanism Superpowers uses. Other hosts get tool-specific entrypoints via the universal installer.
 
@@ -178,8 +174,6 @@ $fp Review this repository's release workflow without editing.
 FP can calculate verification rate, scope creep, rework, context-load proxy, and Tokens to Verified Progress from an evidenced run. Missing values remain `unknown`. A fair comparison fixes the task, model, repository revision, authority, and acceptance checks.
 
 There is no decorative "42% better" chart here. The validator would ask where the baseline went.
-
-[Metrics contract](docs/metrics.md) | [Case studies](docs/case-studies.md) | [Forward-test record](docs/forward-tests-2026-07-14.md)
 
 ## Routes
 
@@ -236,11 +230,7 @@ Only after a controlled repeated comparison proves it.
 
 ## Influences
 
-FP remains an original implementation. Its design was sharpened by studying [Superpowers](https://github.com/obra/superpowers), [Hermes Agent](https://github.com/NousResearch/hermes-agent), [Ponytail](https://github.com/DietrichGebert/ponytail), [Context7](https://github.com/upstash/context7), and [Grill Me](https://github.com/mattpocock/skills/tree/main/skills/productivity/grill-me).
-
-The exact revisions, adopted behaviors, exclusions, and inference boundaries are in [docs/upstream-influences.md](docs/upstream-influences.md). License provenance is in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
-
-Formerly Xskill. See [MIGRATION.md](MIGRATION.md).
+FP remains an original implementation. Its design was sharpened by studying [Superpowers](https://github.com/obra/superpowers), [Hermes Agent](https://github.com/NousResearch/hermes-agent), [Ponytail](https://github.com/DietrichGebert/ponytail), [Context7](https://github.com/upstash/context7), and [Grill Me](https://github.com/mattpocock/skills/tree/main/skills/productivity/grill-me). License provenance is in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 ## License
 
