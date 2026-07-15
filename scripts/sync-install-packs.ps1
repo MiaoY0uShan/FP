@@ -26,7 +26,8 @@ $targets = @(
 $claudeMdSource = Join-Path $repoRoot "fp/CLAUDE.md"
 $claudeMdTargets = @(
     "install/universal/.fp-package/payload/.claude/CLAUDE.md",
-    "install/claude-code/.claude/CLAUDE.md"
+    "install/claude-code/.claude/CLAUDE.md",
+    "install/codex/.agents/CLAUDE.md"
 )
 
 $alwaysAppliedSource = Join-Path $repoRoot "fp/CLAUDE.md"
@@ -39,10 +40,15 @@ $alwaysAppliedSource = Join-Path $repoRoot "fp/CLAUDE.md"
 # This block syncs fp/CLAUDE.md to the plain no-frontmatter targets only:
 #   - Windsurf, Roo, Cline, Qoder, Antigravity, CONVENTIONS
 #
-# We already synced fp/ references; the install packs' per-tool entry points
-# were hand-edited. Check mode verifies those have the full routing body.
-# For sync mode we propagate CLAUDE.md to no-frontmatter files too.
+# We already synced fp/ references. Per-tool entry points with frontmatter
+# (SKILL.md / .mdc / agent / instructions / steering) are hand-edited with the
+# full routing body + tool-specific frontmatter; check mode verifies they are
+# in sync with fp/CLAUDE.md (ignoring their frontmatter).
+# Sync mode propagates CLAUDE.md to no-frontmatter files too.
 $noFrontmatterTargets = @(
+    "install/windsurf/.windsurf/rules/fp.md",
+    "install/roo-code/.roo/rules/fp.md",
+    "install/cline/.clinerules/fp.md",
     "install/universal/.fp-package/payload/.windsurf/rules/fp.md",
     "install/universal/.fp-package/payload/.roo/rules/fp.md",
     "install/universal/.fp-package/payload/.clinerules/fp.md",
