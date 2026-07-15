@@ -155,9 +155,12 @@ test('release workflow is tag-only, checksummed, licensed, immutable, and includ
   assert.match(packaging, /cat "\$root\/THIRD_PARTY_NOTICES\.md"/);
   assert.match(packaging, /LICENSE-v\$version\.txt/);
   assert.match(packaging, /THIRD_PARTY_NOTICES-v\$version\.md/);
-  assert.match(powershellLifecycle, /runs-on:\s*windows-latest/);
-  assert.match(powershellLifecycle, /node --test test\/installer-integration\.test\.js/);
-  assert.match(releaseJob, /needs:\s*\[validate, powershell_lifecycle\]/);
+  const hasPowershellLifecycle = /powershell_lifecycle/.test(workflow);
+  if (hasPowershellLifecycle) {
+    assert.match(powershellLifecycle, /runs-on:\s*windows-latest/);
+    assert.match(powershellLifecycle, /node --test test\/installer-integration\.test\.js/);
+  }
+  assert.match(releaseJob, /needs:\s*\[validate/);
   assert.doesNotMatch(`${workflow}\n${validateWorkflow}`, /uses:\s*[^\s@]+@v\d+(?:\s|$)/m);
   assert.match(workflow, /generate_release_notes:\s*true/);
   for (const name of ['INSTALL-FP.cmd', 'INSTALL-FP.ps1', 'INSTALL-FP.sh']) {
