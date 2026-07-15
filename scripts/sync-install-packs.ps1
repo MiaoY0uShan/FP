@@ -32,8 +32,19 @@ $claudeMdTargets = @(
 
 $alwaysAppliedSource = Join-Path $repoRoot "fp/CLAUDE.md"
 
-# This block syncs fp/CLAUDE.md to the plain no-frontmatter targets:
+# $alwaysAppliedTargets — one entry per tool.
+# For tools with YAML frontmatter (SKILL.md / .mdc / agent / instructions), the
+# payload file already has frontmatter + the full body, so we only need the
+# per-tool reference (not the CLAUDE.md source). Sync those to
+# install/<tool>/<path>/fp/SKILL.md or .mdc by re-running the sync script.
+# This block syncs fp/CLAUDE.md to the plain no-frontmatter targets only:
 #   - Windsurf, Roo, Cline, Qoder, Antigravity, CONVENTIONS
+#
+# We already synced fp/ references. Per-tool entry points with frontmatter
+# (SKILL.md / .mdc / agent / instructions / steering) are hand-edited with the
+# full routing body + tool-specific frontmatter; check mode verifies they are
+# in sync with fp/CLAUDE.md (ignoring their frontmatter).
+# Sync mode propagates CLAUDE.md to no-frontmatter files too.
 $noFrontmatterTargets = @(
     "install/windsurf/.windsurf/rules/fp.md",
     "install/roo-code/.roo/rules/fp.md",
@@ -43,6 +54,23 @@ $noFrontmatterTargets = @(
     "install/universal/.fp-package/payload/.clinerules/fp.md",
     "install/universal/.fp-package/payload/.qoder/rules/fp.md",
     "install/universal/.fp-package/payload/.agents/rules/fp.md"
+)
+
+$testSource = Join-Path $repoRoot "TEST_FP.md"
+$testTargets = @(
+    "install/codex/TEST_FP.md",
+    "install/claude-code/TEST_FP.md",
+    "install/gemini-cli/TEST_FP.md",
+    "install/github-copilot-cli/TEST_FP.md",
+    "install/cursor/TEST_FP.md",
+    "install/windsurf/TEST_FP.md",
+    "install/cline/TEST_FP.md",
+    "install/roo-code/TEST_FP.md",
+    "install/opencode/TEST_FP.md",
+    "install/kiro/TEST_FP.md",
+    "install/github-copilot-editor/TEST_FP.md",
+    "install/aider/TEST_FP.md",
+    "install/universal/.fp-package/payload/TEST_FP.md"
 )
 
 function Get-RelativePath {
@@ -143,7 +171,24 @@ foreach ($targetRelative in $targets) {
     Write-Host "synced: $(Get-RelativePath -Path $target)"
 }
 
-# sync copy-paste fallback
+foreach ($targetRelative in $testTargets) {
+    $target = Join-Path $repoRoot $targetRelative
+    if ($Check) {
+        if (-not (Test-Path -LiteralPath $target)) {
+            throw "Missing generated install-pack test: $targetRelative"
+        }
+        if ((Get-Sha256 -Path $testSource) -ne (Get-Sha256 -Path $target)) {
+            throw "Generated install-pack test is out of sync: $targetRelative"
+        }
+        Write-Host "ok: $targetRelative"
+        continue
+    }
+
+    New-Item -ItemType Directory -Path (Split-Path -Parent $target) -Force | Out-Null
+    Copy-Item -LiteralPath $testSource -Destination $target -Force
+    Write-Host "synced: $targetRelative"
+}
+
 $copyPasteSource = Join-Path $repoRoot "fp-copy-paste.md"
 $copyPasteTarget = Join-Path $repoRoot "dist/fp-copy-paste.md"
 
@@ -161,7 +206,7 @@ if ($Check) {
     Write-Host "synced: dist/fp-copy-paste.md"
 }
 
-# sync no-frontmatter always-applied files from fp/CLAUDE.md
+# --- sync no-frontmatter always-applied files from fp/CLAUDE.md ---
 foreach ($targetRelative in $noFrontmatterTargets) {
     $target = Join-Path $repoRoot $targetRelative
     if ($Check) {
@@ -180,7 +225,7 @@ foreach ($targetRelative in $noFrontmatterTargets) {
     Write-Host "synced: $targetRelative"
 }
 
-# sync CLAUDE.md
+# --- sync CLAUDE.md ---
 foreach ($targetRelative in $claudeMdTargets) {
     $target = Join-Path $repoRoot $targetRelative
     if ($Check) {
