@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.4.3 — Compressed router, multi-device coordination, and batch regression
+
+- Compressed the 10-route tree into 4 behavior-based routes: Urgent/High-Stakes, Read-Only Diagnosis (debug-first + audit/survey), Build (Small/Medium/Vague/Large), and Close (pass/fail). Every original route is preserved as a sub-route or scale tier; no behavior was removed.
+- Added an Audit / Survey route under Read-Only Diagnosis: read-only per-target baseline, cross-target comparison, P0/P1/P2 triaged report. A one-target audit degenerates to a read-only survey. Targets are not mutated until the user approves specific findings.
+- Added Multi-Device Coordination: the one-writer rule applies per target, not globally. Parallel read-only probes across targets are safe. Cross-target dependencies must be mapped before writes. Every multi-device task ends with a cross-target smoke test from the consumer's perspective.
+- Added Batch Regression Verification: after multiple fixes, re-run every originally-failed check, run at least one negative control, verify cross-target dependency edges from the consumer side, and produce a single `repair-verdict` block. Missing or still-broken items remain as open items, not silent successes.
+- Added a Skill-tool loading pointer to fp/CLAUDE.md so hosts that only receive the lightweight CLAUDE.md reference know that the full router and templates require loading the FP skill via the Skill tool.
+- Synchronized the compressed router and new sections to fp/CLAUDE.md, fp/AGENTS.md, fp-copy-paste.md, dist/fp-copy-paste.md, and docs/router.md.
+
 ## v0.4.0 — FP rename and goal-matched activation
 
 - Renamed the current product, skill identifiers, canonical source path, install packs, managed entries, and release assets from ZeroToHero to FP.

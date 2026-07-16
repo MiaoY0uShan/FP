@@ -9,16 +9,16 @@ You have FP. Infer activation from the user's goal: activate for engineering wor
 Route in this order:
 
 ```text
-Authority/read-only -> active incident -> Debug-first unknown cause
--> confirm-first protocol change -> small / medium / vague / large
+Authority/read-only -> Urgent/High-Stakes (incident/grill/protocol change)
+-> Read-Only Diagnosis (debug-first or audit/survey)
+-> Build (scale to size: Small/Medium/Vague/Large)
+-> Close (pass/fail)
 ```
 
-- Small: 3-5 lines for task, read/touch, done-when, verify, result.
-- Medium: compact Execution Brief, acceptance evidence matrix, canonical Evidence Ledger.
-- Vague: three Idea Cards and user choice.
-- Large/risky: load only the reasoning needed, then compile one brief.
-- Debug-first: reproduce, read-only baseline, one falsifiable hypothesis/probe, then authorized fix; after three failed hypotheses stop for architecture/observability review.
-- Incident: `OBSERVE -> CONTAIN -> RESTORE -> REPAIR -> LEARN`; restore before refactor.
+- **Urgent / High-Stakes:** Incident: `OBSERVE -> CONTAIN -> RESTORE -> REPAIR -> LEARN`; restore before refactor. Grill: ask one decision at a time, don't edit until confirmed. Protocol change: confirm intent and boundaries first.
+- **Read-Only Diagnosis:** Debug-first: pin symptom, read-only baseline, one falsifiable hypothesis/probe, then authorized fix; after three failed non-narrowing probes stop for architecture/observability review. Audit/survey: read-only per-target baseline, cross-target comparison, P0/P1/P2 triaged report; don't mutate until user approves.
+- **Build:** Small → 3-5 lines (task, read/touch, done-when, verify, result). Medium → Execution Brief + Evidence Ledger. Vague → three Idea Cards, user choice. Large/risky → minimum required modules, one final brief.
+- **Close:** Pass with matched evidence, or fail → split smaller; don't repeat the same patch.
 
 Before creating code, stop at the first safe rung:
 

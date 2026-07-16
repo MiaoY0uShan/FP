@@ -6,24 +6,20 @@ FP activates implicitly when the user's goal is engineering work and stays dorma
 
 ```text
 user authority/read-only constraints
--> active incident
--> diagnose-only or unknown-cause failure
--> protocol/agent-behavior change
--> small / medium / vague / large route
+-> Urgent / High-Stakes (incident, grill, protocol change)
+-> Read-Only Diagnosis (debug-first or audit/survey)
+-> Build (scale to size: Small / Medium / Vague / Large)
+-> Close (pass/fail)
 ```
 
 Profiles—remote/stateful, OpenWrt, external context, multi-agent, continuation, stateful UI, self-iteration, and background learning—layer onto a route without forcing the full chain.
 
 ## Routes
 
-- **Incident:** `OBSERVE -> CONTAIN -> RESTORE -> REPAIR -> LEARN`; restoration and permanent repair use separate briefs.
-- **Debug-first:** pin symptom, read-only baseline, at most two active hypotheses, one discriminating probe, then an authorized fix. Three failed hypotheses force an architecture/observability checkpoint.
-- **Protocol:** confirm intent and affected boundaries unless already approved.
-- **Small:** Tiny Brief and validation result.
-- **Medium:** compact Execution Brief, acceptance matrix, and canonical Evidence Ledger.
-- **Vague:** three Idea Cards, then user choice.
-- **Large/risky:** load only required internal modules and compile one final brief.
-- **Failed/blocked:** evidence, smaller falsifiable slice, new check.
+- **Urgent / High-Stakes:** Incident: `OBSERVE -> CONTAIN -> RESTORE -> REPAIR -> LEARN`; restoration and permanent repair use separate briefs. Grill: investigate facts, one decision at a time. Protocol: confirm intent unless already approved.
+- **Read-Only Diagnosis:** Debug-first: pin symptom, read-only baseline, at most two active hypotheses, one discriminating probe, then authorized fix; three non-narrowing probes force an architecture/observability checkpoint. Audit/survey: read-only per-target baseline, cross-target comparison, P0/P1/P2 triaged report; do not mutate until user approves.
+- **Build:** Scale the output: Small → Tiny Brief, Medium → Execution Brief + Evidence Ledger, Vague → three Idea Cards, Large/risky → minimum required modules → one final brief.
+- **Close:** Pass with matched evidence, or fail → split smaller.
 
 Before creating anything, stop at the first safe rung:
 
@@ -31,5 +27,9 @@ Before creating anything, stop at the first safe rung:
 need -> existing code -> standard library -> native feature
 -> installed dependency -> one line -> minimum new implementation
 ```
+
+Multi-device work applies the one-writer rule per target, not globally. Cross-target dependencies must be mapped before writes. End with a cross-target smoke test from the consumer side.
+
+After multiple fixes, run batch regression: re-check every originally-failed item, run at least one negative control, and produce a `repair-verdict` block.
 
 Metrics and learning are optional and evidence-gated. Background learning stages read-only proposals; `generalization-gate` separates author from evaluator and blocks single-case schema/automation promotion. Unknown stays unknown; no baseline means no improvement claim.
