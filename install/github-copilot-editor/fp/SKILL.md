@@ -69,7 +69,7 @@ pin symptom -> read-only baseline -> falsifiable hypothesis
 -> original reproduction + regression + negative control
 ```
 
-Keep at most two active hypotheses and run one discriminating probe at a time. Speculative patches are never probes. Three consecutive non-narrowing probes trigger an architecture/observability checkpoint. If the third probe narrows the cause, continue from that evidence. When the user asked only for diagnosis, stop before any fix.
+Diagnosis is read-only by default. Keep at most two active hypotheses and run one discriminating probe at a time. Speculative patches are never probes. Three consecutive non-narrowing probes trigger an architecture/observability checkpoint. If the third probe narrows the cause, continue from that evidence. When the user asked only for diagnosis, stop before any fix.
 
 Load `templates/debug-incident-checklist.md` for the causal trace, shared-boundary regression set, and condition-based wait contract.
 
