@@ -55,7 +55,7 @@ request
 -> optionally evaluate a reusable learning candidate
 ```
 
-Small work stays small. Incidents restore service before polishing. Unknown causes trigger diagnosis before patches. Current external facts carry a version, source, freshness basis, and trust boundary.
+Small work stays small. Incidents restore service before polishing. Unknown causes trigger diagnosis before patches. Multi-device audits gather baseline evidence before any target is mutated. Current external facts carry a version, source, freshness basis, and trust boundary.
 
 Before adding code, FP also walks a short reuse ladder:
 
@@ -183,16 +183,18 @@ There is no decorative "42% better" chart here. The validator would ask where th
 
 ## Routes
 
-| Situation | FP response |
-| --- | --- |
-| Tiny clear edit | Five-line brief and one relevant check |
-| Unknown cause / diagnose-only | Read-only causal probes before any fix |
-| Active outage or data-loss risk | `OBSERVE -> CONTAIN -> RESTORE -> REPAIR -> LEARN` |
-| Medium implementation | Execution Brief, acceptance matrix, Evidence Ledger |
-| Vague or coupled work | Requirements/architecture only until one executable brief exists |
-| Failed attempt | Preserve evidence, change the experiment, split the slice |
+FP uses a compressed 4-route model:
 
-Live systems, external context, multi-agent work, continuation, self-iteration, and background learning layer onto these routes. They do not make every typo write a constitution.
+| Route | When | What happens |
+| --- | --- | --- |
+| **Urgent / High-Stakes** | Incidents, grills, protocol changes | Confirm intent → act within authority. Incidents restore before repairing. |
+| **Read-Only Diagnosis** | Unknown failures or proactive scans | Debug-first: hypothesis → probe → authorized fix. Audit: per-target baseline → P0/P1/P2 report. |
+| **Build** | Clear or vague implementation | Small → Tiny Brief. Medium → Execution Brief + Ledger. Vague → Idea Cards. Large → minimum modules → final brief. |
+| **Close** | Every task | Pass with matched evidence, or fail → split smaller. Batch regression: re-check all fixes + negative control. |
+
+Tiny clear edit → Five-line brief and one relevant check. Active outage → `OBSERVE → CONTAIN → RESTORE → REPAIR → LEARN`. Multi-device fleet scan → read-only per-target evidence, cross-target comparison, then authorized repair per target.
+
+Live systems, external context, multi-agent work, continuation, self-iteration, and background learning layer onto these routes.
 
 ## Develop
 
