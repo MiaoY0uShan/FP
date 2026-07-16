@@ -28,6 +28,7 @@ First apply user authority and read-only limits as a global gate over every rout
 active incident
 -> explicit "grill/challenge me" request
 -> diagnose-only or unknown-cause bug
+-> audit/survey (scan a fleet, cluster, or multi-device target for issues)
 -> protocol or agent-behavior change
 -> small / medium / vague / large route
 ```
@@ -38,9 +39,13 @@ Remote/stateful, OpenWrt/live-system, external-context, multi-agent, continuatio
 
 ## Routes
 
-### A. Active Incident
+Select the first matching route. Every route below sub-routes by scale or scenario internally.
 
-Use only for an ongoing outage, security event, data-loss risk, or unstable management path.
+### 1. Urgent / High-Stakes
+
+Use for active incidents, explicit grill/challenge requests, or protocol/behavior changes that affect the agent's own rules.
+
+**Active incident (ongoing outage, security event, data-loss risk, unstable management path):**
 
 ```text
 OBSERVE -> CONTAIN -> RESTORE -> REPAIR -> LEARN
@@ -48,9 +53,15 @@ OBSERVE -> CONTAIN -> RESTORE -> REPAIR -> LEARN
 
 Preserve evidence, access, and rollback. Restore service before long-term refactoring. Use separate briefs for restoration and permanent repair. Load `templates/debug-incident-checklist.md`.
 
-### B. Debug-First
+**Grill / challenge:** Load `question-requirements/SKILL.md` before any other routing. Investigate repository facts yourself; ask one user-owned decision at a time, with a recommendation and alternative. Do not edit until the user confirms shared understanding or explicitly accepts safe defaults.
 
-Use when a concrete failure has an unknown cause, runtime state contradicts configuration, diagnosis is requested, or a previous fix failed.
+**Protocol / agent-behavior change:** Restate the inferred goal, challenge assumptions, list affected areas, and ask for confirmation unless the user explicitly approved the discussed change.
+
+### 2. Read-Only Diagnosis
+
+Use when the target has an unknown failure, the user asked for diagnosis without a fix, or the user wants a proactive scan across multiple targets (fleet / cluster / routers / VMs / containers / repos).
+
+**Debug-first (known symptom, unknown cause):**
 
 ```text
 pin symptom -> read-only baseline -> falsifiable hypothesis
@@ -58,47 +69,42 @@ pin symptom -> read-only baseline -> falsifiable hypothesis
 -> original reproduction + regression + negative control
 ```
 
-Diagnosis is read-only by default. Keep at most two active hypotheses and run one discriminating probe at a time. Speculative patches are never probes. When three consecutive rejected/unknown probes have not narrowed the cause, perform an architecture/observability checkpoint before forming a fourth hypothesis. If the third probe narrows the cause, continue from that evidence instead of resetting mechanically. If the user asked only for diagnosis, do not implement a fix.
+Keep at most two active hypotheses and run one discriminating probe at a time. Speculative patches are never probes. Three consecutive non-narrowing probes trigger an architecture/observability checkpoint. If the third probe narrows the cause, continue from that evidence. When the user asked only for diagnosis, stop before any fix.
 
 Load `templates/debug-incident-checklist.md` for the causal trace, shared-boundary regression set, and condition-based wait contract.
 
-### C. Explicit Challenge / Grill
+**Audit / survey (no known failure, proactive discovery):**
 
-When the user explicitly asks to be grilled or challenged, load `question-requirements/SKILL.md` before size routing. Investigate repository facts yourself; ask one user-owned decision at a time, with a recommendation and alternative. Do not edit until the user confirms shared understanding or explicitly accepts safe defaults.
+```text
+read-only -> per-target baseline -> cross-target comparison -> triaged report
+```
 
-### D. Protocol Or Agent-Behavior Change
+1. Gather current state from every target in parallel (read-only probes only).
+2. Compare against known-good baselines (config, sysctl, firewall, services, logs, resources).
+3. Prioritize findings by severity: P0 (degraded/broken) -> P1 (measurable impact) -> P2 (cosmetic/idle).
+4. Report with per-target evidence before offering to fix.
+5. After user authorization, apply fixes in serial per target to avoid correlated blast radius.
 
-Restate the inferred goal, challenge assumptions, list affected areas, and ask for confirmation unless the user explicitly approved the discussed change.
+A one-target audit degenerates to a read-only survey. Do not mutate any target until the user approves specific findings for repair.
 
-### E. Small Clear Change
+### 3. Build
 
-Use a 3-5 line Tiny Brief:
+Scale the output template to task size and uncertainty. Every build route records the first safe reuse rung (Core Mandate 10) before the first edit.
 
-- Task
-- Read/touch
-- Done when
-- Verify
-- Result after execution
+| Scale | Trigger | Output |
+|-------|---------|--------|
+| **Small** | Clear, single-file, 3-5 lines of change | Tiny Brief: task, read/touch, done-when, verify, result |
+| **Medium** | Clear, multi-file, bounded scope | Execution Brief + acceptance evidence matrix + Evidence Ledger |
+| **Vague** | Underspecified, uncertain requirements | Three Idea Cards (Title, Assumption, MVP, Risk), then user choice |
+| **Large/risky** | Architectural, multi-module, breaking | Only the internal modules that reduce risk, compiled into one final brief |
 
-The `Read/touch` line also records the first safe reuse rung from Core Mandate 10.
+Do not generate a full ledger for small changes unless risk appears.
 
-Do not generate a full ledger unless risk appears.
+### 4. Close
 
-### F. Medium Clear Task
+**Pass:** Evidence weight matches route weight. All required checks passed. The original symptom no longer reproduces.
 
-Use a compact Execution Brief and Evidence Ledger. Define an acceptance evidence matrix and record the first safe reuse rung before the first edit.
-
-### G. Vague Idea
-
-Generate three Simplified Idea Cards with Title, Assumption, MVP, and Risk. Ask which path to compile.
-
-### H. Large, Architectural, Or Risky Task
-
-Load only the internal modules needed: question-requirements, delete-scope, semantic-architecture when coupling risk exists, optimize-path, and shorten-iteration when work is too large or a loop fails. Compile one final Execution Brief before editing.
-
-### I. Completion, Failure, Or Block
-
-Match evidence weight to route weight. A failed run records evidence and becomes a smaller testable slice; it is not permission to repeat the same patch. Lessons and automation are promoted only through adaptive improvement backed by evidence.
+**Fail / blocked:** Record evidence, split into a smaller testable slice. A failure is not permission to repeat the same patch. Lessons and automation are promoted only through adaptive improvement backed by evidence.
 
 ## Definition Of Done
 
@@ -109,6 +115,15 @@ requirement -> observable -> check/probe -> pass condition -> evidence location
 ```
 
 Implementation is not an observable. For a bug fix, the original reproduction must fail before or be otherwise pinned, then pass after the fix. Use `templates/acceptance-evidence-matrix.md`.
+
+### Batch Regression Verification
+
+After completing multiple fixes across a target or fleet, run a closing sweep before declaring done:
+
+1. Re-run every originally-failed check from the pre-fix baseline. Every one must pass.
+2. Run at least one negative control: a check that should still fail (or still be absent) and does. This guards against over-fixing.
+3. For cross-target work, verify each dependency edge from the consumer side (e.g., DNS resolution from a client, not just the DNS server's own `nslookup`).
+4. Produce a single `repair-verdict` block listing each fix, its post-repair observed value, and the verifying check. Missing or still-broken items stay as open items, not silent successes.
 
 ## Multi-Agent Profile
 
@@ -124,6 +139,15 @@ Use parallel agents only for independent investigation or review. The parent is 
 For distributed or resumable work, every child also receives a structured task/result envelope: task/session/parent IDs, bounded goal/context, role, authority/tool ceiling, dependency IDs, max iterations/attempts/time/depth, workspace/resources, idempotency key, terminal status, bound evidence, parent-only reserved artifact reference, touched files, checks, actual summary usage, and start/finish time. Return results in task-input order. Derive concurrency, dependency, timeout, retry, cancellation, and summary gates from envelopes. Every writer needs a holder/path/time-bound lease with observed release evidence. Distinct read-only spec and quality reviewers return separately bound commands; booleans or prose alone never close the integration gate. Leaf agents cannot delegate, promote memory, message externally, deploy, use credentials, or mutate live state.
 
 Load `templates/multi-agent-review-protocol.md` when this profile applies.
+
+### Multi-Device Coordination
+
+When a task spans multiple independent targets (routers, VMs, containers, physical hosts), the one-writer rule applies per target, not globally. Parallel read-only probes across targets are safe. Serialize writes within a single target; parallel writes to different targets are permitted when they share no dependency or blast-radius coupling.
+
+1. Document each target's identity (hostname, IP, role) before the first probe.
+2. Each target gets its own read set, touch set, and rollback point.
+3. Cross-target dependencies (e.g., DNS on A, proxy on B) must be mapped before any write.
+4. After all fixes, run a cross-target smoke test: verify each dependency pair from the consumer's perspective, not the provider's.
 
 ## Live-System Profiles
 

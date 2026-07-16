@@ -2,17 +2,18 @@
 
 FP activates automatically when the user's goal is engineering work: build, change, diagnose, review, test, operate, or plan software, repositories, infrastructure, or agent tooling. Stay dormant for casual conversation and other non-engineering goals. No keyword required; `FP:` and `$fp` remain optional explicit invocations.
 
+The FP skill must be loaded via the Skill tool for its full router and templates. This CLAUDE.md is a lightweight reference for environments where the skill bundle is not installed or cannot be loaded.
+
 ## Route Before Editing
 
 Apply user authority and read-only limits as a global gate first. Then:
 
-1. **Active incident** → `OBSERVE → CONTAIN → RESTORE → REPAIR → LEARN` within current authority.
-2. **Explicit grill/challenge** → investigate facts, ask one decision at a time.
-3. **Diagnose-only or unknown-cause** → debug-first, read-only until a cause is supported.
-4. **Protocol/agent-behavior change** → confirm intent and boundaries before editing unless already approved.
-5. **Small → Medium → Vague → Large** route.
+1. **Urgent / High-Stakes** — incidents, grills, protocol changes. Confirm intent and boundaries, then act within current authority.
+2. **Read-Only Diagnosis** — debug-first (known symptom, unknown cause) or audit/survey (proactive multi-target scan). Read-only until a cause is supported and the user authorizes a fix.
+3. **Build** — scale the output to task size: Small → Tiny Brief, Medium → Execution Brief + Ledger, Vague → Idea Cards, Large → minimum modules → final brief.
+4. **Close** — pass with matched evidence, or fail → split smaller.
 
-Layer remote/live-system, OpenWrt, stateful-UI, external-context, multi-agent, continuation, self-iteration, and background-learning as profiles on the selected route. They are not reasons to load the full chain by themselves.
+Layer remote/live-system, OpenWrt, stateful-UI, external-context, multi-agent, continuation, self-iteration, and background-learning as profiles on the selected route.
 
 ## Route Weight
 
@@ -22,6 +23,15 @@ Layer remote/live-system, OpenWrt, stateful-UI, external-context, multi-agent, c
 - **Large/risky:** only the internal modules that reduce scope or risk, compiled into one final brief.
 - **Failed:** capture evidence, split smaller. Do not repeat the same large attempt.
 - **Remote/stateful, OpenWrt, continuation, multi-agent, or background-learning tasks**: layer the matching profile onto the selected route; they are not reasons to load the full chain by themselves.
+- **Multi-device:** one-writer rule is per target, not global. Parallel read-only probes are safe. Cross-target dependencies must be mapped before writes. End with a cross-target smoke test from the consumer's perspective.
+
+## Batch Regression Verification
+
+After multiple fixes across a target or fleet:
+1. Re-run every originally-failed check. Every one must pass.
+2. Run at least one negative control to guard against over-fixing.
+3. For cross-target work, verify each dependency edge from the consumer side.
+4. Produce a single `repair-verdict` block. Missing items stay as open, not silent.
 
 ## Core Rules
 

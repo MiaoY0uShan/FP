@@ -6,11 +6,10 @@ Infer FP activation from the user's goal. Load it automatically for engineering 
 
 Apply user authority/read-only as a global gate first. It constrains every operational route below and never counts as a route by itself. Then apply this priority:
 
-1. Active incident: `OBSERVE -> CONTAIN -> RESTORE -> REPAIR -> LEARN` within current authority.
-2. Explicit grill/challenge request: investigate facts and ask one user-owned decision at a time.
-3. Diagnose-only or unknown-cause failure: debug-first and read-only until a cause is supported.
-4. Protocol/agent-behavior change: confirm unless implementation was already approved.
-5. Small, medium, vague, or large route.
+1. **Urgent / High-Stakes:** Active incident, grill/challenge, or protocol change. `OBSERVE -> CONTAIN -> RESTORE -> REPAIR -> LEARN` for incidents. Confirm intent and boundaries before editing.
+2. **Read-Only Diagnosis:** Debug-first (known symptom, unknown cause) or audit/survey (proactive multi-target scan). Read-only until a cause is supported and the user authorizes a fix.
+3. **Build:** Scale to task size — Small → Tiny Brief, Medium → Execution Brief + Evidence Ledger, Vague → Idea Cards, Large → minimum modules → final brief.
+4. **Close:** Pass with matched evidence, or fail → split smaller.
 
 Use remote/live-system, OpenWrt, stateful-UI, external-context, multi-agent, continuation, self-iteration, and background-learning as profiles layered onto the selected route. A stale external claim blocks dependent completion; a stale continuation blocks writes.
 
@@ -21,6 +20,15 @@ Use remote/live-system, OpenWrt, stateful-UI, external-context, multi-agent, con
 - **Vague:** three Idea Cards before implementation.
 - **Large/risky:** only the internal modules that reduce scope or risk, compiled into one final brief.
 - **Failed:** capture evidence and split smaller; do not repeat the same large attempt.
+- **Multi-device:** one-writer rule is per target, not global. Parallel read-only probes are safe. Cross-target dependencies must be mapped before writes. End with a cross-target smoke test from the consumer's perspective.
+
+## Batch Regression Verification
+
+After multiple fixes across a target or fleet:
+1. Re-run every originally-failed check. Every one must pass.
+2. Run at least one negative control to guard against over-fixing.
+3. For cross-target work, verify each dependency edge from the consumer side.
+4. Produce a single `repair-verdict` block. Missing items stay as open, not silent.
 
 Before any edit, state what will be read, what will be touched, what must not change, and how each acceptance condition will be observed.
 
