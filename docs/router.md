@@ -12,14 +12,14 @@ user authority/read-only constraints
 -> Close (pass/fail)
 ```
 
-Profiles—remote/stateful, OpenWrt, external context, multi-agent, continuation, stateful UI, self-iteration, and background learning—layer onto a route without forcing the full chain.
+Profiles—remote/stateful, OpenWrt, external context/MCP, multi-agent, continuation, stateful UI, self-iteration, and background learning—layer onto a route without forcing the full chain.
 
 ## Routes
 
 - **Urgent / High-Stakes:** Incident: `OBSERVE -> CONTAIN -> RESTORE -> REPAIR -> LEARN`; restoration and permanent repair use separate briefs. Grill: investigate facts, one decision at a time. Protocol: confirm intent unless already approved.
 - **Read-Only Diagnosis:** Debug-first: pin symptom, read-only baseline, at most two active hypotheses, one discriminating probe, then authorized fix; three non-narrowing probes force an architecture/observability checkpoint. Audit/survey: read-only per-target baseline, cross-target comparison, P0/P1/P2 triaged report; do not mutate until user approves.
 - **Build:** Scale the output: Small → Tiny Brief, Medium → Execution Brief + Evidence Ledger, Vague → three Idea Cards, Large/risky → minimum required modules → one final brief.
-- **Close:** Pass with matched evidence, or fail → split smaller.
+- **Close:** Pass with matched evidence, emit one verdict, and stop; fail → split smaller. Extra diagnosis after a supported cause must change a named decision or fill an acceptance row. A user stop cancels pending work without another probe.
 
 Before creating anything, stop at the first safe rung:
 
@@ -32,4 +32,8 @@ Multi-device work applies the one-writer rule per target, not globally. Cross-ta
 
 After multiple fixes, run batch regression: re-check every originally-failed item, run at least one negative control, and produce a `repair-verdict` block.
 
+Evidence reuse is state-bound: relevant mutations and declared safety checks still require fresh proof. After a timeout following a possible remote mutation, read back effective state once and classify `applied | not_applied | split | unknown` before any retry.
+
 Metrics and learning are optional and evidence-gated. Background learning stages read-only proposals; `generalization-gate` separates author from evaluator and blocks single-case schema/automation promotion. Unknown stays unknown; no baseline means no improvement claim.
+
+An available task-required MCP is called automatically within current authority. A missing MCP requires an explicit acquisition brief and user approval before download/install; installation does not grant credentials, broader mutations, or resident-process permission.

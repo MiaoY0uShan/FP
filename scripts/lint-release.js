@@ -43,6 +43,9 @@ function main() {
   for (const [name, workflow] of [['validate', validate], ['release', release]]) {
     if (/uses:\s*[^\s@]+@v\d+(?:\s|$)/m.test(workflow)) failures.push(`${name} workflow contains a mutable major action tag`);
   }
+  if (!validate.includes('node --test test/installer-integration.test.js')) {
+    failures.push('validate workflow must run cross-platform installer integration tests');
+  }
   const powershellLifecycle = workflowJob(release, 'powershell_lifecycle');
   if (powershellLifecycle) {
     if (!powershellLifecycle.includes('runs-on: windows-latest')) failures.push('PowerShell lifecycle must run on windows-latest');

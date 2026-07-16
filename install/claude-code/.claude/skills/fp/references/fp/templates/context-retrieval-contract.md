@@ -37,6 +37,34 @@ Fallback source:
 - Missing/invalid result: fall back to official docs, source, or local installed code.
 - Provider unavailable: continue the FP route itself, record the claim as unverified, and try bounded local/official fallback. Do not perform an edit or claim completion when acceptance depends on that unknown fact.
 
+## MCP Capability And Acquisition Gate
+
+1. Run the reuse ladder first. Treat an MCP as task-required only when an acceptance row depends on a capability that no safer available rung satisfies.
+2. Discover configured/available MCP capabilities read-only. Automatically call an available task-required MCP when the call remains inside the user's existing authority and declared repository/network/live-system scopes.
+3. MCP availability never grants write, credential, login, deployment, messaging, or live mutation authority. Apply the same authorization gate as if the underlying action used a native tool.
+4. If the MCP is missing, stop the dependent step before downloading or changing configuration. Acquisition brief: exact MCP name, authoritative source, pinned version or immutable reference, install scope, commands, permissions and data sent, credentials/authentication, processes/restarts, verification, rollback/uninstall, and safe alternative.
+5. Require explicit user approval for the exact acquisition brief. Silence, earlier approval to complete the task, or approval to use an installed MCP is not approval to download, install, configure, authenticate, restart, or run a resident service.
+6. After approval, acquire only the approved source/version/scope. Prefer signed or checksummed official artifacts and package-manager provenance; never pipe an unverified network response into a shell.
+7. Authentication is a separate user-owned action unless the current task authority already covers the exact account and operation. Never print, persist, or transmit secrets beyond the approved provider and scope.
+8. Verify the installed version plus one minimal semantic call, remove installer/temp artifacts, and stop task-only processes. A resident MCP process or auto-start entry needs explicit user approval.
+9. If the user declines, use a safe fallback or mark the dependent acceptance row `unverified`; continue unrelated work and do not keep asking or retry acquisition.
+
+Record:
+
+```text
+Capability / acceptance row:
+Available MCP discovery:
+Reuse-ladder decision:
+Acquisition brief and authoritative source:
+Pinned version / immutable reference:
+Approval evidence and exact scope:
+Install/config/auth commands:
+Permissions, data exposure, and resident processes:
+Semantic verification:
+Rollback/uninstall and cleanup:
+Fallback or unverified row:
+```
+
 ## Evidence
 
 Use one structured basis per evidence row:

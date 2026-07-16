@@ -38,6 +38,10 @@ Keep at most two active hypotheses. Run one cheap, discriminating probe at a tim
 
 Speculative patches are never probes. After three consecutive rejected/unknown probes without a narrowed cause, stop and record an architecture/observability checkpoint. Recheck ownership, hidden state, stale runtime, environmental assumptions, and missing observability before forming a fourth hypothesis. A third probe that narrows the cause does not trigger a mechanical reset.
 
+### Decision-Relevance Gate
+
+After a hypothesis is supported, run another diagnostic probe only if its possible outcomes can change a named decision or fill a named acceptance row; otherwise stop and reuse the bound evidence. This evidence-reuse gate never applies after a relevant mutation or staleness, and never waives original reproduction, sibling regression, negative-control, external-client, rollback, or cleanup checks.
+
 For asynchronous behavior, record the condition predicate, polling interval, deadline, and final observed state on timeout. Prefer condition-based waiting; use a fixed sleep only when elapsed time itself is the behavior under test and record that reason.
 
 For a completed debug Evidence Ledger, compile these fields into `debug_evidence.causal_chain`, `debug_evidence.first_divergence`, and `debug_evidence.wait_evidence`. If a shared boundary applies, `shared_boundary_evidence.direct_evidence_ref` and `sibling_evidence_ref` must be different pointers to observed passing command records. If waiting or a shared boundary does not apply, record `applies=false` with the concrete reason.
@@ -79,4 +83,5 @@ Use separate briefs for RESTORE and REPAIR. Before restoration, avoid long-term 
 - A probe would mutate important state without authorization.
 - The management path or evidence source becomes unstable.
 - Three consecutive rejected/unknown probes did not narrow the cause and the checkpoint is not complete.
+- The hypothesis is supported and remaining diagnostic probes cannot change a named decision or fill a named acceptance row.
 - The required next probe needs broader authority or unavailable external coordination.

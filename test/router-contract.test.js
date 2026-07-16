@@ -209,6 +209,22 @@ test('debug contract traces the first divergence and avoids blind sleeps', () =>
   assert.match(checklist, /sibling regression/i);
 });
 
+test('debug evidence is reused while changed state and safety checks still reverify', () => {
+  const router = read('fp/SKILL.md');
+  const checklist = read('fp/templates/debug-incident-checklist.md');
+  const remote = read('fp/templates/remote-stateful-system-checklist.md');
+  const agentContract = read('fp/AGENTS.md');
+
+  assert.match(router, /change a named decision|fill a named acceptance row/i);
+  assert.match(checklist, /otherwise stop and reuse the bound evidence/i);
+  assert.match(checklist, /never applies after a relevant mutation or staleness/i);
+  assert.match(checklist, /never waives.*original reproduction.*negative-control.*external-client/i);
+  assert.match(remote, /applied \| not_applied \| split \| unknown/i);
+  assert.match(remote, /do not replay/i);
+  assert.match(agentContract, /user.*stop.*cancel.*pending/i);
+  assert.match(agentContract, /without another probe/i);
+});
+
 test('external context stays untrusted and freshness needs evidence', () => {
   const contract = read('fp/templates/context-retrieval-contract.md');
   assert.match(contract, /untrusted data/i);
@@ -218,6 +234,22 @@ test('external context stays untrusted and freshness needs evidence', () => {
   assert.match(contract, /one topic per query/i);
   assert.match(contract, /at most three attempts/i);
   assert.match(contract, /freshness=current.*basis/i);
+});
+
+test('task-required MCP is automatic when available and approval-gated when missing', () => {
+  const router = read('fp/SKILL.md');
+  const contract = read('fp/templates/context-retrieval-contract.md');
+  const agentContract = read('fp/AGENTS.md');
+
+  assert.match(router, /automatically use.*task-required MCP/i);
+  assert.match(router, /explicit user approval.*before.*download|download.*only after.*explicit user approval/i);
+  assert.match(router, /MCP availability.*does not expand.*authority/i);
+  assert.match(contract, /MCP Capability And Acquisition Gate/);
+  assert.match(contract, /source.*version.*install scope.*permissions.*rollback/i);
+  assert.match(contract, /authentication.*separate user-owned action/i);
+  assert.match(contract, /declines.*safe fallback.*unverified/i);
+  assert.match(agentContract, /available.*task-required MCP.*automatically/i);
+  assert.match(agentContract, /resident.*explicit.*approval/i);
 });
 
 test('semantic architecture routes context gaps without retired modules', () => {

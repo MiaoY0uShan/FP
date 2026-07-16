@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.4.4 — Decision-relevant verification and safe remote retry
+
+- Added a decision-relevance gate: after a diagnostic hypothesis is supported, another diagnostic probe must be able to change a named decision or fill a named acceptance row; decision-neutral corroboration reuses the bound evidence and stops.
+- Kept verification safety explicit: edits, deployments, rollbacks, ambiguous writes, and freshness changes invalidate affected evidence, while original reproduction, sibling regression, negative controls, external-client, rollback, cleanup, and parent integration checks remain mandatory.
+- Added user-stop precedence: cancel pending probes and background work, reuse already-observed terminal evidence, and report unknowns without running another command merely to improve closure.
+- Added remote ambiguous-write reconciliation: never blindly replay a possibly-applied write after timeout; perform one bounded read-only reconciliation and classify `applied | not_applied | split | unknown` first.
+- Separated steady-state runtime dependencies from operator/deployment paths so a temporary workstation does not silently become a resident dependency.
+- Fixed shared-path handling in the PowerShell and POSIX ZeroToHero migration gates, and added cross-platform installer integration to the validation workflow.
+- Added automatic use of already-available task-required MCPs within existing authority and the reuse ladder.
+- Added an explicit acquisition gate for missing MCPs: exact provenance/version/scope/permissions/rollback must be shown before user-approved download or installation; authentication, credentials, configuration changes, restarts, and resident services remain separately authorized.
+- Added router contracts and pressure prompts covering evidence reuse, changed-state invalidation, ambiguous remote writes, and user-directed stop.
+
 ## v0.4.3 — Compressed router, multi-device coordination, and batch regression
 
 - Compressed the 10-route tree into 4 behavior-based routes: Urgent/High-Stakes, Read-Only Diagnosis (debug-first + audit/survey), Build (Small/Medium/Vague/Large), and Close (pass/fail). Every original route is preserved as a sub-route or scale tier; no behavior was removed.

@@ -124,7 +124,8 @@ Unverified claims:
 - Rejected findings need counter-evidence, not preference.
 - Conflicting reviews are resolved by a new discriminating check, not majority vote.
 - The parent independently reruns critical checks and performs a final integration diff/release review.
+- The parent reruns each critical check for the final integrated state, not for reassurance on unchanged state. A later edit or newly stale result invalidates the affected evidence and permits a fresh run.
 
 ## Shutdown Gate
 
-Before final response, confirm all subagents are terminal, stale tasks and descendants are cancelled, workspace leases are released, idempotent retries did not duplicate side effects, results were integrated in declared order, and no poller, temporary deployment, diagnostic helper, or background resource remains.
+Before final response, confirm all subagents are terminal, stale tasks and descendants are cancelled, workspace leases are released, idempotent retries did not duplicate side effects, results were integrated in declared order, and no poller, temporary deployment, diagnostic helper, or background resource remains. Reuse already observed terminal evidence for unchanged resources rather than polling again. If the user stops the task, cancel live children once and report any terminal or cleanup state that cannot be observed without another probe as `unknown`.

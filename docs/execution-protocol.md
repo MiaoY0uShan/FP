@@ -21,6 +21,7 @@ The top router chooses internal modules. Users should not call child skills manu
 - Parallel agents investigate independently; one writer owns shared files/live state.
 - Live-system writes preserve management access and rollback.
 - External context is version-pinned, redacted, and bounded.
+- Available task-required MCPs are used automatically within current authority; missing MCPs require an exact acquisition brief and explicit approval before download/install.
 - Long work uses structured continuation, not transcript summaries.
 
 ## Completion
@@ -34,4 +35,4 @@ Metrics run only when measurement matters. Adaptive improvement stages evidence-
 
 ## Boundary
 
-FP is a portable skill bundle. It has no database, daemon, scheduler, autonomous executor, or required network service. Maintainer validators and install scripts are not runtime dependencies.
+FP is a portable skill bundle. It has no bundled database, daemon, scheduler, autonomous executor, MCP server, or required network service. A task-specific MCP may be acquired only with explicit approval, and resident/auto-start behavior requires separate authorization. Maintainer validators and install scripts are not runtime dependencies.

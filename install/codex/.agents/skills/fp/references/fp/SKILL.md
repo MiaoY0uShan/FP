@@ -19,6 +19,8 @@ FP is a lightweight execution discipline for AI coding agents. It selects the sm
 8. **Latest Record Target Wins When It Replaces:** If the user explicitly narrows or replaces a record destination, write only to the newest target. Do not infer replacement when the user asks for an additional destination.
 9. **Challenge System Changes:** For protocol, trigger, install-boundary, memory-policy, or default-workflow changes, confirm intent and scope unless the user already approved implementation.
 10. **Reuse Before Creation:** On every coding route, including Small and Medium, stop at the first safe rung: does this need to exist -> already in this codebase -> standard library -> native platform feature -> installed dependency -> one line -> minimum new code only then. Record the winning rung in the brief; do not require the full chain merely to perform this check.
+11. **Decision-Relevant Evidence:** After a diagnostic hypothesis is supported, run another diagnostic probe only when its possible outcomes can change a named decision or fill a named acceptance row. Otherwise reuse the bound evidence and stop diagnostic expansion. A relevant mutation, staleness, or a declared post-change safety check invalidates reuse and must still be verified.
+12. **MCP Capability Gate:** Automatically use an already-available task-required MCP when it is the first safe reuse rung and the call stays within task authority. If it is missing, obtain explicit user approval before any download, installation, configuration, authentication, or service start. MCP availability does not expand read, write, network, credential, deployment, messaging, or live-system authority.
 
 ## Routing Priority
 
@@ -35,7 +37,7 @@ active incident
 
 A read-only incident may OBSERVE and recommend reversible containment/restoration, but it may not mutate the target. Route priority never expands authority.
 
-Remote/stateful, OpenWrt/live-system, external-context, multi-agent, continuation, stateful-UI, self-iteration, and background-learning are profiles layered onto a route. They are not reasons to load the full chain by themselves.
+Remote/stateful, OpenWrt/live-system, external-context/MCP, multi-agent, continuation, stateful-UI, self-iteration, and background-learning are profiles layered onto a route. They are not reasons to load the full chain by themselves.
 
 ## Routes
 
@@ -69,7 +71,7 @@ pin symptom -> read-only baseline -> falsifiable hypothesis
 -> original reproduction + regression + negative control
 ```
 
-Diagnosis is read-only by default. Keep at most two active hypotheses and run one discriminating probe at a time. Speculative patches are never probes. Three consecutive non-narrowing probes trigger an architecture/observability checkpoint. If the third probe narrows the cause, continue from that evidence. When the user asked only for diagnosis, stop before any fix.
+Diagnosis is read-only by default. Keep at most two active hypotheses and run one discriminating probe at a time. Speculative patches are never probes. Three consecutive non-narrowing probes trigger an architecture/observability checkpoint. If the third probe narrows the cause, continue from that evidence. Once a hypothesis is supported, extra corroboration must change a named decision or fill a named acceptance row; otherwise stop and reuse the evidence. When the user asked only for diagnosis, stop before any fix.
 
 Load `templates/debug-incident-checklist.md` for the causal trace, shared-boundary regression set, and condition-based wait contract.
 
@@ -102,9 +104,11 @@ Do not generate a full ledger for small changes unless risk appears.
 
 ### 4. Close
 
-**Pass:** Evidence weight matches route weight. All required checks passed. The original symptom no longer reproduces.
+**Pass:** Evidence weight matches route weight. All required checks passed. The original symptom no longer reproduces. Emit one verdict and stop; do not add optional corroboration after the declared evidence passes.
 
 **Fail / blocked:** Record evidence, split into a smaller testable slice. A failure is not permission to repeat the same patch. Lessons and automation are promoted only through adaptive improvement backed by evidence.
+
+A user direction to stop or accept current completion cancels pending probes and background work immediately. Report the last observed evidence and remaining unknowns without running another command merely to improve closure.
 
 ## Definition Of Done
 
@@ -115,6 +119,8 @@ requirement -> observable -> check/probe -> pass condition -> evidence location
 ```
 
 Implementation is not an observable. For a bug fix, the original reproduction must fail before or be otherwise pinned, then pass after the fix. Use `templates/acceptance-evidence-matrix.md`.
+
+Evidence reuse is bound to the observed state. A relevant edit, deployment, rollback, timeout with possible mutation, or freshness change invalidates affected evidence and requires the declared checks again. This gate never waives original reproduction, sibling regression, negative controls, external-client checks, rollback, cleanup, or parent integration verification.
 
 ### Batch Regression Verification
 
@@ -160,6 +166,12 @@ Capability claims must be proved on the target. A successful restart or `ready` 
 ## External Context Profile
 
 When a task depends on a current/versioned library or API, retrieve only the exact topic and installed version needed. Prefer authoritative sources, redact external queries, bound retries, record freshness, and keep unknown claims unverified. Provider failure never disables the FP router, but a fact required for acceptance blocks dependent edits and completion until local or official evidence verifies it. External providers are optional; FP still works without network, API keys, MCP, or a CLI. Load `templates/context-retrieval-contract.md`.
+
+## MCP Capability Profile
+
+Use the reuse ladder before acquisition. When a task-required MCP is already installed, configured, and available, call it automatically within the user's existing authority and the task's read/write/network scope; do not ask merely because the capability is an MCP. A mutating MCP call still needs the same authorization as the underlying action.
+
+When the required MCP is absent, stop only the dependent step and present one acquisition brief: exact MCP and authoritative source, pinned version or immutable reference, why it is needed, safe alternatives, install scope, commands, permissions/data exposure, credentials/authentication, processes/restarts, verification, and rollback/uninstall. Download or install only after explicit user approval, and only the approved item and scope. Installation approval does not imply credential disclosure, login, configuration mutation, a resident service, or broader task authority; obtain separate approval when those are not already covered. If the user declines or the source cannot be verified, use a safe fallback or leave the dependent acceptance row `unverified` while continuing unrelated work. Record acquisition and minimal semantic-call evidence in `templates/context-retrieval-contract.md`.
 
 ## Continuation Profile
 

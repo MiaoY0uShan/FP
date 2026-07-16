@@ -147,7 +147,7 @@ They bind claims to observed commands, enforce separate repository/network/write
 scope -> acceptance rows -> bounded execution -> observed checks -> verified claims
 ```
 
-A green process, service restart, child summary, or implementation diff is not completion evidence by itself.
+A green process, service restart, child summary, or implementation diff is not completion evidence by itself. Once the declared evidence passes, FP emits one verdict and stops instead of adding decision-neutral checks on unchanged state.
 
 ## Install
 
@@ -190,11 +190,13 @@ FP uses a compressed 4-route model:
 | **Urgent / High-Stakes** | Incidents, grills, protocol changes | Confirm intent → act within authority. Incidents restore before repairing. |
 | **Read-Only Diagnosis** | Unknown failures or proactive scans | Debug-first: hypothesis → probe → authorized fix. Audit: per-target baseline → P0/P1/P2 report. |
 | **Build** | Clear or vague implementation | Small → Tiny Brief. Medium → Execution Brief + Ledger. Vague → Idea Cards. Large → minimum modules → final brief. |
-| **Close** | Every task | Pass with matched evidence, or fail → split smaller. Batch regression: re-check all fixes + negative control. |
+| **Close** | Every task | Pass with matched evidence → one verdict → stop. Extra diagnosis must change a decision or fill an acceptance row; changed state still triggers required regression and negative controls. |
 
 Tiny clear edit → Five-line brief and one relevant check. Active outage → `OBSERVE → CONTAIN → RESTORE → REPAIR → LEARN`. Multi-device fleet scan → read-only per-target evidence, cross-target comparison, then authorized repair per target.
 
 Live systems, external context, multi-agent work, continuation, self-iteration, and background learning layer onto these routes.
+
+When an installed MCP is genuinely required for an acceptance row, FP uses it automatically inside the task's existing authority. If it is missing, FP first shows the exact source, version, install scope, permissions/data exposure, authentication needs, verification, and rollback; nothing is downloaded or installed until the user explicitly approves that brief.
 
 ## Develop
 
@@ -231,6 +233,10 @@ No. Background agents can propose frozen candidates. Independent evaluators test
 ### Does it need Hermes, Context7, or another service running?
 
 No. Their useful protocol ideas were adapted into a portable local contract. Their daemons, databases, MCP services, private backends, and crawlers are not dependencies.
+
+### Will FP install a missing MCP automatically?
+
+Only after explicit approval. FP automatically calls a task-required MCP that is already available, but a missing MCP gets a bounded acquisition brief first. Approval to install does not silently authorize login, secrets, configuration mutation, restarts, resident services, or broader task actions.
 
 ### Does it promise fewer tokens or faster delivery?
 

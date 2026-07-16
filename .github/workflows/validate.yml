@@ -75,6 +75,9 @@ jobs:
         shell: sh
         run: sh ./test/posix-installer-smoke.sh
 
+      - name: Run cross-platform installer integration
+        run: node --test test/installer-integration.test.js
+
       - name: Check generated install packs
         if: runner.os == 'Linux' || runner.os == 'macOS'
         shell: bash

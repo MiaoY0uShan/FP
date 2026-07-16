@@ -67,6 +67,15 @@ Use this as the final writable contract. Delete optional profile sections that d
 
 - ...
 
+## Evidence Reuse And Closure
+
+- Supported diagnostic evidence to reuse:
+- Named decision or acceptance row any additional diagnostic probe could change:
+- Events that invalidate existing evidence (mutation, rollback, ambiguous write, freshness change):
+- Bounded read-only reconciliation after a possible remote mutation:
+- User-stop action: cancel pending work and report verified/unverified state without another probe
+- Terminal condition: all declared rows pass -> emit one verdict and stop
+
 ## Evidence Required
 
 - ...
@@ -101,6 +110,16 @@ Use this as the final writable contract. Delete optional profile sections that d
 - Forbidden data:
 - Freshness evidence:
 - Fallback if unavailable:
+
+## MCP Capability Contract
+
+- Acceptance row requiring the MCP:
+- Available/configured MCP discovery:
+- First safe reuse rung and why native/local alternatives are insufficient:
+- Automatic call scope under existing authority:
+- If missing: exact source, pinned version/reference, install scope/commands, permissions/data, credentials/auth, processes/restarts, verification, rollback/uninstall:
+- Explicit acquisition approval evidence:
+- Fallback or dependent row left `unverified`:
 
 ## Multi-Agent Ownership
 

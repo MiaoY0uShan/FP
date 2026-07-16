@@ -234,12 +234,12 @@ function Read-ZeroToHeroLegacyManifest {
 }
 
 function Get-ZeroToHeroLegacyPaths {
-    param([string[]] $ExpectedOwnedPaths, $Manifest)
+    param([string[]] $ExpectedOwnedPaths, $Manifest, [string[]] $CurrentOwnedPaths)
 
     $candidates = if ($null -ne $Manifest) {
         @($Manifest.owned_files) + "zerotohero/.install-manifest.json"
     } else {
-        $ExpectedOwnedPaths
+        @($ExpectedOwnedPaths | Where-Object { $_ -notin $CurrentOwnedPaths })
     }
     return @($candidates | Sort-Object -Unique | Where-Object {
         Test-Path -LiteralPath (Join-Path $script:targetRoot $_)
@@ -291,6 +291,10 @@ function Assert-InstallPreflight {
     if ($null -eq $script:previousManifest) {
         foreach ($relative in $script:reservedOwnedPaths) {
             if (Test-Path -LiteralPath (Join-Path $script:targetRoot $relative) -PathType Leaf) {
+                $validatedLegacyOwned = $MigrateLegacy -and
+                    $null -ne $script:legacyZeroToHeroManifest -and
+                    $relative -in $script:legacyZeroToHeroPaths
+                if ($validatedLegacyOwned) { continue }
                 throw "FP-owned path already exists without a valid install manifest: $relative. Move it aside before installing; no installation files were changed."
             }
         }
@@ -588,7 +592,7 @@ $expectedOwnedPaths = @(Get-ChildItem -LiteralPath $payloadRoot -Recurse -File -
 $reservedOwnedPaths = @($expectedOwnedPaths) + "fp/.install-manifest.json"
 $expectedLegacyZeroToHeroOwnedPaths = @(Get-ExpectedZeroToHeroOwnedPaths)
 $legacyZeroToHeroManifest = Read-ZeroToHeroLegacyManifest -ExpectedOwnedPaths $expectedLegacyZeroToHeroOwnedPaths
-$legacyZeroToHeroPaths = @(Get-ZeroToHeroLegacyPaths -ExpectedOwnedPaths $expectedLegacyZeroToHeroOwnedPaths -Manifest $legacyZeroToHeroManifest)
+$legacyZeroToHeroPaths = @(Get-ZeroToHeroLegacyPaths -ExpectedOwnedPaths $expectedLegacyZeroToHeroOwnedPaths -Manifest $legacyZeroToHeroManifest -CurrentOwnedPaths $expectedOwnedPaths)
 $legacyZeroToHeroHasMarkers = $false
 $legacyZeroToHeroRemoveAider = $false
 $legacyZeroToHeroDetected = $false

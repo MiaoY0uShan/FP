@@ -45,6 +45,14 @@ For medium, risky, or multi-agent work, first capture the repository root, branc
 - Implement only when the user authorized a fix.
 - Rerun the original symptom, regression checks, and a negative control.
 
+## Evidence Reuse And Stop
+
+- Once a diagnostic hypothesis is supported, another diagnostic probe must be able to change a named decision or fill a named acceptance row. Otherwise stop and reuse the bound evidence.
+- Reuse never crosses a relevant mutation, deployment, rollback, ambiguous write, or freshness change, and never waives the original reproduction, sibling regression, negative control, external-client, rollback, cleanup, or parent integration checks.
+- After all declared acceptance rows pass, emit one verdict and stop. Do not add corroboration on unchanged state merely for reassurance.
+- If the user says to stop or accepts completion, cancel pending work and report current verified and unverified state without another probe.
+- After a timeout or transport failure following a possible live mutation, do not replay the write. Run one bounded read-only reconciliation and continue only from the observed `applied | not_applied | split | unknown` state.
+
 ## Multi-Agent Contract
 
 The parent is the integrator, default writer, and final verifier.
@@ -76,6 +84,14 @@ Use a durable progress ledger for long tasks or likely context compaction. Recor
 - A service restart, process, or `ready` label is not proof of function.
 - Track resource ownership and prove stop/restart/reload do not leak processes, interfaces, files, locks, sockets, or workers.
 - Redact secrets from logs, examples, handoffs, and final answers.
+
+## MCP Capability Gate
+
+- Use an available task-required MCP automatically when it is the first safe reuse rung and the call stays inside the user's current authority and declared scopes.
+- Availability is capability, not authorization. Mutating, credentialed, deployment, messaging, and live-system calls retain their normal gates.
+- If the MCP is missing, present its exact source/version, need, safe alternative, install scope/commands, permissions/data exposure, credentials, processes/restarts, verification, and rollback; download or install only after explicit user approval.
+- Installation permission does not authorize authentication, secret disclosure, configuration mutation, or a resident service. Resident or auto-start behavior requires explicit user approval.
+- If approval is declined or provenance is unverified, use a safe fallback or mark only the dependent acceptance row `unverified`; continue unrelated work without repeated prompts.
 
 ## Learning And Records
 

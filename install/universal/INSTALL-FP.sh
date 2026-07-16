@@ -381,6 +381,10 @@ preflight() {
   if [ "$PREVIOUS_INSTALL_VALID" -eq 0 ]; then
     reserved_owned_paths | while IFS= read -r relative; do
       [ ! -f "$TARGET/$relative" ] || {
+        if [ "$MIGRATE_LEGACY" -eq 1 ] && [ "$LEGACY_ZTH_MANIFEST_VALID" -eq 1 ] &&
+          printf '%s\n' "$LEGACY_ZTH_PATHS" | grep -Fqx "$relative"; then
+          continue
+        fi
         echo "FP-owned path already exists without a valid install manifest: $relative. Move it aside before installing; no installation files were changed." >&2
         exit 1
       }
