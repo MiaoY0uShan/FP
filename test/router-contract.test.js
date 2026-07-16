@@ -33,10 +33,10 @@ function filesUnder(relativePath) {
 
 test('router keeps small work light and unknown causes debug-first', () => {
   const router = read('fp/SKILL.md');
-  assert.match(router, /Small Clear Change/);
-  assert.match(router, /Do not generate a full ledger unless risk appears/);
+  assert.match(router, /Tiny Brief/);
+  assert.match(router, /Do not generate a full ledger for small changes unless risk appears/);
   assert.match(router, /Diagnosis is read-only by default/);
-  assert.match(router, /three consecutive rejected\/unknown probes have not narrowed the cause/);
+  assert.match(router, /three consecutive non-narrowing probes/i);
 });
 
 test('router activation is implicit for engineering goals and dormant otherwise', () => {
@@ -92,8 +92,7 @@ test('reuse ladder preserves all seven rungs in order', () => {
     assert.ok(current > rootPrevious, `${marker} must be discoverable in order from the root router`);
     rootPrevious = current;
   }
-  assert.match(markdownSection(router, 'E. Small Clear Change'), /first safe reuse rung/i);
-  assert.match(markdownSection(router, 'F. Medium Clear Task'), /first safe reuse rung/i);
+  assert.match(markdownSection(router, '3. Build'), /first safe reuse rung/i);
 });
 
 test('multi-agent protocol is single-writer and re-review gated', () => {
