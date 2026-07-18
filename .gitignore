@@ -3,3 +3,4 @@
 # Ignore accidental root-level Codex skill installs in this repo.
 # The install/codex/.agents template is intentionally tracked.
 /.agents/skills/
+未完成.md
