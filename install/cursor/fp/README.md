@@ -22,6 +22,9 @@ metrics/                 conservative observed metrics
 adaptive-improvement/    staged evidence-backed learning
 generalization-gate/     blind holdout and negative-control promotion gate
 schema-memory/           promoted patterns, not raw context
+delegated-execution/     fresh implement/review/fix/re-review task chains
+dispatch-parallel-domains/ explicit independent-domain fan-out/fan-in
+provider-compatibility/  host/proxy/provider retry, spend, cache, and UTF-8 gates
 ```
 
 ## Route-Selected Resources
@@ -30,6 +33,8 @@ schema-memory/           promoted patterns, not raw context
 acceptance-evidence-matrix.md
 debug-incident-checklist.md
 multi-agent-review-protocol.md
+agent-runtime-adapters.md
+provider-compatibility-and-spend-guard.md
 remote-stateful-system-checklist.md
 openwrt-live-system-verification-profile.md
 context-retrieval-contract.md

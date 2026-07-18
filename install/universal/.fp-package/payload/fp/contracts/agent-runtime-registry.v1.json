@@ -1,0 +1,579 @@
+{
+  "schema_version": "1.0.0",
+  "last_updated": "2026-07-18",
+  "coverage_policy": "Cover FP install targets, widely used coding-agent hosts, and explicitly requested model providers. This registry is an official-source routing hint, not an exhaustive market claim or proof of installed capability.",
+  "status_meanings": {
+    "native": "Official host documentation exposes a model-callable or host-managed subagent primitive.",
+    "extension": "Official extension or example adds subagents only when installed and enabled.",
+    "not_verified": "No stable official model-callable subagent primitive sufficient for delegated execution was verified.",
+    "not_applicable_model_api": "The surface is a model or inference API, not an agent host runtime.",
+    "retired": "The official product or surface has been discontinued and must not be selected for new execution."
+  },
+  "hosts": [
+    {
+      "id": "codex",
+      "surface": "OpenAI Codex",
+      "kind": "agent_host",
+      "delegation_status": "native",
+      "capabilities": { "fresh": true, "parallel": true, "writer": true, "persistent_handle": true, "nested": "bounded" },
+      "primitives": {
+        "spawn": ["spawn_agent"],
+        "join": ["wait_agent"],
+        "status": ["list_agents"],
+        "follow_up": ["followup_task", "send_message"],
+        "interrupt": ["interrupt_agent"],
+        "terminal": ["terminal status", "close operation when exposed"]
+      },
+      "fallback": "Use only primitives exposed in the current Codex tool catalog; otherwise do not claim delegated execution.",
+      "official_sources": [
+        "https://developers.openai.com/codex/subagents",
+        "https://developers.openai.com/codex/config-reference/"
+      ],
+      "last_verified": "2026-07-18"
+    },
+    {
+      "id": "claude-code",
+      "surface": "Anthropic Claude Code",
+      "kind": "agent_host",
+      "delegation_status": "native",
+      "capabilities": { "fresh": true, "parallel": true, "writer": true, "persistent_handle": true, "nested": "bounded_by_installed_release" },
+      "primitives": {
+        "spawn": ["Agent", "Task alias on compatible releases"],
+        "join": ["foreground Agent result", "task completion notification"],
+        "status": ["TaskList", "/tasks when exposed"],
+        "follow_up": ["SendMessage", "same-agent resume"],
+        "interrupt": ["TaskStop"],
+        "terminal": ["completed or stopped task"]
+      },
+      "fallback": "Detect the initialization tool list and installed limits; FP leaves still receive no Agent tool even when the release supports nested subagents. Do not assume experimental Workflows or Agent Teams.",
+      "official_sources": [
+        "https://code.claude.com/docs/en/sub-agents",
+        "https://code.claude.com/docs/en/tools-reference",
+        "https://code.claude.com/docs/en/workflows"
+      ],
+      "last_verified": "2026-07-18"
+    },
+    {
+      "id": "gemini-cli",
+      "surface": "Google Gemini CLI",
+      "kind": "agent_host",
+      "delegation_status": "native",
+      "capabilities": { "fresh": true, "parallel": true, "writer": "agent-dependent", "persistent_handle": false, "nested": "not_verified" },
+      "primitives": {
+        "spawn": ["invoke_agent"],
+        "join": ["blocking invocation result"],
+        "status": [],
+        "follow_up": [],
+        "interrupt": [],
+        "terminal": ["invocation return"]
+      },
+      "fallback": "Use fresh blocking invocations only; lack of observed status/cancel controls prevents a full delegated-execution claim when those gates are required.",
+      "official_sources": [
+        "https://geminicli.com/docs/core/subagents/",
+        "https://geminicli.com/docs/reference/policy-engine/"
+      ],
+      "last_verified": "2026-07-18"
+    },
+    {
+      "id": "github-copilot",
+      "surface": "GitHub Copilot CLI and editor agent surfaces",
+      "kind": "product_family",
+      "delegation_status": "native",
+      "capabilities": { "fresh": true, "parallel": true, "writer": "surface-dependent", "persistent_handle": "surface-dependent", "nested": "bounded" },
+      "primitives": {
+        "spawn": ["task (Copilot CLI)", "runSubagent (editor)"],
+        "join": ["task result", "synchronous runSubagent result"],
+        "status": ["list_agents (Copilot CLI)"],
+        "follow_up": ["read_agent", "write_agent"],
+        "interrupt": [],
+        "terminal": ["returned task result"]
+      },
+      "fallback": "Detect CLI and editor surfaces separately; /fleet is high-level parallel decomposition and does not prove per-agent cancellation.",
+      "official_sources": [
+        "https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-command-reference",
+        "https://docs.github.com/en/copilot/concepts/agents/copilot-cli/fleet",
+        "https://code.visualstudio.com/docs/copilot/chat/chat-agent-mode"
+      ],
+      "last_verified": "2026-07-18"
+    },
+    {
+      "id": "cursor",
+      "surface": "Cursor",
+      "kind": "agent_host",
+      "delegation_status": "not_verified",
+      "capabilities": { "fresh": "ui_only", "parallel": "ui_only", "writer": true, "persistent_handle": "ui_only", "nested": "not_verified" },
+      "primitives": { "spawn": [], "join": [], "status": [], "follow_up": [], "interrupt": [], "terminal": [] },
+      "fallback": "Treat /multitask and worktree fleets as user-facing orchestration until a stable model-callable spawn/join schema is exposed.",
+      "official_sources": ["https://cursor.com/changelog/04-24-26"],
+      "last_verified": "2026-07-18"
+    },
+    {
+      "id": "opencode",
+      "surface": "OpenCode",
+      "kind": "agent_host",
+      "delegation_status": "native",
+      "capabilities": { "fresh": true, "parallel": "experimental", "writer": true, "persistent_handle": "experimental", "nested": "not_verified" },
+      "primitives": {
+        "spawn": ["task"],
+        "join": ["blocking task result"],
+        "status": ["experimental background task state when exposed"],
+        "follow_up": ["experimental task_id resume when exposed"],
+        "interrupt": [],
+        "terminal": ["blocking return"]
+      },
+      "fallback": "Use blocking fresh task calls unless the current schema exposes documented background handles; never enable experimental flags implicitly.",
+      "official_sources": [
+        "https://opencode.ai/docs/agents/",
+        "https://github.com/anomalyco/opencode/blob/dev/packages/opencode/src/tool/task.ts"
+      ],
+      "last_verified": "2026-07-18"
+    },
+    {
+      "id": "cline",
+      "surface": "Cline",
+      "kind": "agent_host",
+      "delegation_status": "native",
+      "capabilities": { "fresh": true, "parallel": true, "writer": false, "persistent_handle": false, "nested": false },
+      "primitives": {
+        "spawn": ["use_subagents"],
+        "join": ["aggregated subagent results"],
+        "status": [],
+        "follow_up": [],
+        "interrupt": [],
+        "terminal": ["result return"]
+      },
+      "fallback": "Cline subagents are read-only research workers; use ordinary investigation/review, not full delegated implementation or fixing.",
+      "official_sources": ["https://docs.cline.bot/features/subagents"],
+      "last_verified": "2026-07-18"
+    },
+    {
+      "id": "roo-code",
+      "surface": "Roo Code",
+      "kind": "agent_host",
+      "delegation_status": "native",
+      "capabilities": { "fresh": true, "parallel": false, "writer": true, "persistent_handle": false, "nested": "parent_child" },
+      "primitives": {
+        "spawn": ["new_task"],
+        "join": ["attempt_completion return to parent"],
+        "status": [],
+        "follow_up": [],
+        "interrupt": [],
+        "terminal": ["child completion"]
+      },
+      "fallback": "Use fresh sequential boomerang tasks; do not claim parallel, resume, or cancellation without observed controls.",
+      "official_sources": [
+        "https://docs.roocode.com/features/boomerang-tasks",
+        "https://docs.roocode.com/advanced-usage/available-tools/new-task"
+      ],
+      "last_verified": "2026-07-18"
+    },
+    {
+      "id": "kiro",
+      "surface": "Kiro CLI and IDE",
+      "kind": "agent_host",
+      "delegation_status": "native",
+      "capabilities": { "fresh": true, "parallel": true, "writer": true, "persistent_handle": "host_managed", "nested": "not_verified" },
+      "primitives": {
+        "spawn": ["subagent", "use_subagent alias"],
+        "join": ["subagent result", "host-native review loop"],
+        "status": [],
+        "follow_up": ["host-native reviewer-to-implementer loop"],
+        "interrupt": [],
+        "terminal": ["subagent result"]
+      },
+      "fallback": "Respect the documented four-active-subagent ceiling; treat low-level cancellation as unavailable unless exposed.",
+      "official_sources": [
+        "https://kiro.dev/docs/cli/chat/subagents/",
+        "https://kiro.dev/changelog/cli/2-5/"
+      ],
+      "last_verified": "2026-07-18"
+    },
+    {
+      "id": "windsurf",
+      "surface": "Windsurf Cascade",
+      "kind": "agent_host",
+      "delegation_status": "not_verified",
+      "capabilities": { "fresh": "ui_only", "parallel": "ui_only", "writer": true, "persistent_handle": "ui_only", "nested": "not_verified" },
+      "primitives": { "spawn": [], "join": [], "status": [], "follow_up": [], "interrupt": [], "terminal": [] },
+      "fallback": "Concurrent user-facing Cascade sessions do not prove that a parent model can spawn and join fresh children.",
+      "official_sources": ["https://docs.windsurf.com/windsurf/cascade/overview"],
+      "last_verified": "2026-07-18"
+    },
+    {
+      "id": "aider",
+      "surface": "Aider",
+      "kind": "agent_host",
+      "delegation_status": "not_verified",
+      "capabilities": { "fresh": false, "parallel": false, "writer": true, "persistent_handle": false, "nested": false },
+      "primitives": { "spawn": [], "join": [], "status": [], "follow_up": [], "interrupt": [], "terminal": [] },
+      "fallback": "Run FP serially in the parent; no stable official native subagent interface was verified.",
+      "official_sources": ["https://aider.chat/docs/usage.html"],
+      "last_verified": "2026-07-18"
+    },
+    {
+      "id": "factory-droid",
+      "surface": "Factory Droid",
+      "kind": "agent_host",
+      "delegation_status": "native",
+      "capabilities": { "fresh": true, "parallel": true, "writer": true, "persistent_handle": true, "nested": "not_verified" },
+      "primitives": {
+        "spawn": ["Task"],
+        "join": ["TaskOutput with block=true"],
+        "status": ["TaskOutput with block=false"],
+        "follow_up": ["Task resume"],
+        "interrupt": ["TaskStop"],
+        "terminal": ["TaskOutput terminal result"]
+      },
+      "fallback": "Use only Task controls exposed by the installed Droid surface.",
+      "official_sources": ["https://docs.factory.ai/cli/configuration/custom-droids"],
+      "last_verified": "2026-07-18"
+    },
+    {
+      "id": "antigravity-cli",
+      "surface": "Google Antigravity CLI",
+      "kind": "agent_host",
+      "delegation_status": "not_verified",
+      "capabilities": { "fresh": true, "parallel": true, "writer": true, "persistent_handle": "host_managed", "nested": "not_verified" },
+      "primitives": { "spawn": [], "join": [], "status": ["/agents", "/tasks"], "follow_up": [], "interrupt": ["Ctrl+C"], "terminal": ["host task completion"] },
+      "fallback": "Official examples show subagent-driven development, but use a high-level host workflow only after the installed tool catalog exposes dispatch; do not guess a low-level primitive name.",
+      "official_sources": [
+        "https://github.com/google-antigravity/antigravity-cli",
+        "https://codelabs.developers.google.com/sdd-agy-cli"
+      ],
+      "last_verified": "2026-07-18"
+    },
+    {
+      "id": "pi",
+      "surface": "Pi coding agent",
+      "kind": "agent_host",
+      "delegation_status": "extension",
+      "capabilities": { "fresh": true, "parallel": true, "writer": "extension-dependent", "persistent_handle": false, "nested": "extension-dependent" },
+      "primitives": {
+        "spawn": ["subagent extension tool"],
+        "join": ["blocking extension result"],
+        "status": [],
+        "follow_up": [],
+        "interrupt": [],
+        "terminal": ["extension return"]
+      },
+      "fallback": "Enable only when the official example-derived extension is actually loaded; otherwise parent-serial execution.",
+      "official_sources": ["https://github.com/badlogic/pi-mono/blob/main/packages/coding-agent/examples/extensions/subagent/index.ts"],
+      "last_verified": "2026-07-18"
+    },
+    {
+      "id": "qwen-code",
+      "surface": "Qwen Code",
+      "kind": "agent_host",
+      "delegation_status": "native",
+      "capabilities": { "fresh": true, "parallel": true, "writer": true, "persistent_handle": "background", "nested": "bounded" },
+      "primitives": {
+        "spawn": ["agent"],
+        "join": ["foreground final result", "background completion notification"],
+        "status": ["real-time agent progress", "/agents"],
+        "follow_up": [],
+        "interrupt": ["host cancellation control when exposed"],
+        "terminal": ["stateless single-use result"]
+      },
+      "fallback": "Use a new stateless agent invocation for every stage; keep nesting disabled for FP leaves even if the host supports a higher depth.",
+      "official_sources": [
+        "https://qwenlm.github.io/qwen-code-docs/en/developers/tools/task/",
+        "https://qwenlm.github.io/qwen-code-docs/en/users/features/sub-agents/"
+      ],
+      "last_verified": "2026-07-18"
+    },
+    {
+      "id": "kimi-cli",
+      "surface": "Moonshot Kimi Code and Kimi Code CLI",
+      "kind": "agent_host",
+      "delegation_status": "native",
+      "capabilities": { "fresh": true, "parallel": true, "writer": true, "persistent_handle": true, "nested": "bounded" },
+      "primitives": {
+        "spawn": ["Agent", "AgentSwarm"],
+        "join": ["foreground Agent result", "AgentSwarm aggregate", "TaskOutput with block=true"],
+        "status": ["TaskList", "TaskOutput", "automatic terminal notification"],
+        "follow_up": ["Agent resume", "AgentSwarm resume_agent_ids"],
+        "interrupt": ["TaskStop"],
+        "terminal": ["completed, failed, or stopped background task"]
+      },
+      "fallback": "Detect the installed Kimi Code generation and cap KIMI_CODE_AGENT_SWARM_MAX_CONCURRENCY before any swarm; omit resume for a fresh stage and keep FP leaves non-delegating.",
+      "official_sources": [
+        "https://www.kimi.com/code/docs/en/kimi-code-cli/reference/tools.html",
+        "https://www.kimi.com/code/docs/en/kimi-code-cli/customization/agents.html"
+      ],
+      "last_verified": "2026-07-18"
+    },
+    {
+      "id": "deepseek-api",
+      "surface": "DeepSeek API",
+      "kind": "model_api",
+      "delegation_status": "not_applicable_model_api",
+      "capabilities": { "fresh": false, "parallel": false, "writer": false, "persistent_handle": false, "nested": false },
+      "primitives": { "spawn": [], "join": [], "status": [], "follow_up": [], "interrupt": [], "terminal": [] },
+      "fallback": "Use DeepSeek as a model behind an independently verified agent host; the API itself is not a subagent runtime.",
+      "official_sources": ["https://api-docs.deepseek.com/"],
+      "last_verified": "2026-07-18"
+    },
+    {
+      "id": "codebuddy",
+      "surface": "Tencent Cloud CodeBuddy Code",
+      "kind": "agent_host",
+      "delegation_status": "native",
+      "capabilities": { "fresh": true, "parallel": true, "writer": true, "persistent_handle": true, "nested": "host_managed" },
+      "primitives": {
+        "spawn": ["AgentTool/Task", "Workflow"],
+        "join": ["foreground agent result", "TaskOutput"],
+        "status": ["TaskGet", "TaskList", "TaskOutput"],
+        "follow_up": ["AgentTool resume"],
+        "interrupt": ["TaskStop"],
+        "terminal": ["completed, failed, cancelled, or killed task"]
+      },
+      "fallback": "Use a new AgentTool/Task invocation for every FP stage. Dynamic Workflows and Agent Teams require separate observed capability and the same budgets; resume never proves freshness.",
+      "official_sources": [
+        "https://www.codebuddy.ai/docs/cli/sub-agents",
+        "https://www.codebuddy.ai/docs/cli/tools-reference",
+        "https://www.codebuddy.ai/docs/cli/workflows"
+      ],
+      "last_verified": "2026-07-18"
+    },
+    {
+      "id": "zcode",
+      "surface": "Z.ai ZCode",
+      "kind": "agent_host",
+      "delegation_status": "native",
+      "capabilities": { "fresh": true, "parallel": true, "writer": true, "persistent_handle": false, "nested": "not_verified" },
+      "primitives": {
+        "spawn": ["Agent tool"],
+        "join": ["foreground subagent result"],
+        "status": ["foreground UI status"],
+        "follow_up": [],
+        "interrupt": [],
+        "terminal": ["foreground return"]
+      },
+      "fallback": "Use foreground fresh subagents only. Custom subagents are beta and background execution is not enabled; observe the installed Agent tool before dispatch.",
+      "official_sources": [
+        "https://zcode.z.ai/en/docs/subagents",
+        "https://zcode.z.ai/en/docs/agents"
+      ],
+      "last_verified": "2026-07-18"
+    },
+    {
+      "id": "baidu-comate",
+      "surface": "Baidu Comate",
+      "kind": "agent_host",
+      "delegation_status": "native",
+      "capabilities": { "fresh": true, "parallel": true, "writer": "agent-dependent", "persistent_handle": true, "nested": "not_verified" },
+      "primitives": {
+        "spawn": ["Subagent tool", "explicit /subagent-name invocation"],
+        "join": ["subagent final message"],
+        "status": ["asynchronous Subagent task panel when exposed"],
+        "follow_up": ["historical Subagent ID reuse"],
+        "interrupt": [],
+        "terminal": ["subagent final message"]
+      },
+      "fallback": "Use only the Subagent controls exposed in the installed Comate surface. Historical reuse is same-envelope continuation and never a fresh FP stage; missing cancellation keeps full delegated execution unavailable.",
+      "official_sources": [
+        "https://cloud.baidu.com/doc/COMATE/s/Rmfb62bhj",
+        "https://cloud.baidu.com/doc/COMATE/s/4mfbxqbmd"
+      ],
+      "last_verified": "2026-07-18"
+    },
+    {
+      "id": "huawei-codearts",
+      "surface": "Huawei Cloud CodeArts Doer CLI",
+      "kind": "agent_host",
+      "delegation_status": "native",
+      "capabilities": { "fresh": true, "parallel": "not_verified", "writer": "agent-dependent", "persistent_handle": "not_verified", "nested": "not_verified" },
+      "primitives": {
+        "spawn": ["subagent mode dispatch"],
+        "join": ["host-managed subagent return"],
+        "status": [],
+        "follow_up": [],
+        "interrupt": [],
+        "terminal": ["host-managed completion"]
+      },
+      "fallback": "Official configuration proves a subagent mode but not a stable low-level lifecycle schema. Require installed tool discovery; otherwise use ordinary parent-serial execution.",
+      "official_sources": [
+        "https://support.huaweicloud.com/usermanual-cli/%E5%8D%8E%E4%B8%BA%E4%BA%91%E7%A0%81%E9%81%93%EF%BC%88CodeArts%EF%BC%89%E4%BB%A3%E7%A0%81%E6%99%BA%E8%83%BD%E4%BD%93%20%E7%94%A8%E6%88%B7%E6%8C%87%E5%8D%97-pdf.pdf"
+      ],
+      "last_verified": "2026-07-18"
+    },
+    {
+      "id": "kimi-api",
+      "surface": "Moonshot Kimi API",
+      "kind": "model_api",
+      "delegation_status": "not_applicable_model_api",
+      "capabilities": { "fresh": false, "parallel": false, "writer": false, "persistent_handle": false, "nested": false },
+      "primitives": { "spawn": [], "join": [], "status": [], "follow_up": [], "interrupt": [], "terminal": [] },
+      "fallback": "Select the adapter for the actual Kimi Code/CLI or other agent host; the model API is not the runtime.",
+      "official_sources": ["https://platform.moonshot.cn/docs/intro"],
+      "last_verified": "2026-07-18"
+    },
+    {
+      "id": "qwen-api",
+      "surface": "Alibaba Cloud Model Studio Qwen API",
+      "kind": "model_api",
+      "delegation_status": "not_applicable_model_api",
+      "capabilities": { "fresh": false, "parallel": false, "writer": false, "persistent_handle": false, "nested": false },
+      "primitives": { "spawn": [], "join": [], "status": [], "follow_up": [], "interrupt": [], "terminal": [] },
+      "fallback": "Select Qwen Code or the actual agent host adapter; the inference API does not provide FP thread lifecycle.",
+      "official_sources": ["https://help.aliyun.com/zh/model-studio/"],
+      "last_verified": "2026-07-18"
+    },
+    {
+      "id": "zhipu-glm-api",
+      "surface": "Z.ai/BigModel GLM API",
+      "kind": "model_api",
+      "delegation_status": "not_applicable_model_api",
+      "capabilities": { "fresh": false, "parallel": false, "writer": false, "persistent_handle": false, "nested": false },
+      "primitives": { "spawn": [], "join": [], "status": [], "follow_up": [], "interrupt": [], "terminal": [] },
+      "fallback": "Select ZCode or the actual coding-agent host; a GLM model endpoint alone is not a subagent runtime.",
+      "official_sources": ["https://docs.bigmodel.cn/cn/guide/start/introduction"],
+      "last_verified": "2026-07-18"
+    },
+    {
+      "id": "minimax-api",
+      "surface": "MiniMax API",
+      "kind": "model_api",
+      "delegation_status": "not_applicable_model_api",
+      "capabilities": { "fresh": false, "parallel": false, "writer": false, "persistent_handle": false, "nested": false },
+      "primitives": { "spawn": [], "join": [], "status": [], "follow_up": [], "interrupt": [], "terminal": [] },
+      "fallback": "Select the actual agent host adapter; the model API does not own fresh agent threads or their lifecycle.",
+      "official_sources": ["https://platform.minimaxi.com/document/"],
+      "last_verified": "2026-07-18"
+    },
+    {
+      "id": "iflow-cli",
+      "surface": "iFlow CLI",
+      "kind": "agent_host",
+      "delegation_status": "retired",
+      "capabilities": { "fresh": false, "parallel": false, "writer": false, "persistent_handle": false, "nested": false },
+      "primitives": { "spawn": [], "join": [], "status": [], "follow_up": [], "interrupt": [], "terminal": [] },
+      "fallback": "Do not select for new runs; migrate to a currently supported host and re-run capability detection.",
+      "official_sources": ["https://platform.iflow.cn/"],
+      "last_verified": "2026-07-18"
+    },
+    {
+      "id": "warp",
+      "surface": "Warp Agent Platform",
+      "kind": "agent_host",
+      "delegation_status": "not_verified",
+      "capabilities": { "fresh": "cloud_orchestration", "parallel": true, "writer": true, "persistent_handle": "cloud_orchestration", "nested": "not_verified" },
+      "primitives": { "spawn": [], "join": [], "status": ["/orchestrate UI"], "follow_up": [], "interrupt": [], "terminal": [] },
+      "fallback": "Treat cloud/UI orchestration as an external action with its own authority; do not claim a model-callable local runtime.",
+      "official_sources": ["https://docs.warp.dev/agent-platform"],
+      "last_verified": "2026-07-18"
+    },
+    {
+      "id": "replit-agent",
+      "surface": "Replit Agent task system",
+      "kind": "agent_host",
+      "delegation_status": "native",
+      "capabilities": { "fresh": true, "parallel": "plan_tier_dependent", "writer": true, "persistent_handle": true, "nested": "host_managed" },
+      "primitives": {
+        "spawn": ["host task creation"],
+        "join": ["review/apply task result"],
+        "status": ["Drafts, Active, Ready, Done board", "thread status"],
+        "follow_up": ["task thread feedback"],
+        "interrupt": ["Pause task"],
+        "terminal": ["Ready or Done task"]
+      },
+      "fallback": "Treat task creation, review, and apply as high-level external orchestration. Do not assume a model-callable low-level schema or auto-apply changes; observe plan-tier concurrency and user authority.",
+      "official_sources": [
+        "https://docs.replit.com/core-concepts/agent/task-system",
+        "https://docs.replit.com/references/agent/message-queue"
+      ],
+      "last_verified": "2026-07-18"
+    },
+    {
+      "id": "amazon-q-developer",
+      "surface": "Amazon Q Developer",
+      "kind": "agent_host",
+      "delegation_status": "not_verified",
+      "capabilities": { "fresh": "not_verified", "parallel": "not_verified", "writer": true, "persistent_handle": "session", "nested": "not_verified" },
+      "primitives": { "spawn": [], "join": [], "status": [], "follow_up": [], "interrupt": [], "terminal": [] },
+      "fallback": "Use the parent serially. Official agent sessions and named agents do not by themselves prove a parent-callable fresh subagent lifecycle.",
+      "official_sources": [
+        "https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/what-is.html",
+        "https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/doc-history.html"
+      ],
+      "last_verified": "2026-07-18"
+    },
+    {
+      "id": "jetbrains-junie",
+      "surface": "JetBrains Junie",
+      "kind": "agent_host",
+      "delegation_status": "not_verified",
+      "capabilities": { "fresh": "not_verified", "parallel": "not_verified", "writer": true, "persistent_handle": "host_session", "nested": "not_verified" },
+      "primitives": { "spawn": [], "join": [], "status": [], "follow_up": [], "interrupt": [], "terminal": [] },
+      "fallback": "Run FP in the current Junie agent until the installed tool catalog exposes a documented parent-callable subagent lifecycle.",
+      "official_sources": ["https://www.jetbrains.com/help/junie/get-started-with-junie.html"],
+      "last_verified": "2026-07-18"
+    },
+    {
+      "id": "devin",
+      "surface": "Cognition Devin",
+      "kind": "agent_host",
+      "delegation_status": "not_verified",
+      "capabilities": { "fresh": "api_session", "parallel": "external_sessions", "writer": true, "persistent_handle": true, "nested": "not_verified" },
+      "primitives": { "spawn": [], "join": [], "status": [], "follow_up": [], "interrupt": [], "terminal": [] },
+      "fallback": "Devin API sessions are external actions, not proof that the active parent model can spawn/join fresh children. Require explicit external authority and a documented current lifecycle before adapting.",
+      "official_sources": ["https://docs.devin.ai/api-reference/overview"],
+      "last_verified": "2026-07-18"
+    },
+    {
+      "id": "continue",
+      "surface": "Continue",
+      "kind": "agent_host",
+      "delegation_status": "not_verified",
+      "capabilities": { "fresh": false, "parallel": false, "writer": true, "persistent_handle": false, "nested": false },
+      "primitives": { "spawn": [], "join": [], "status": [], "follow_up": [], "interrupt": [], "terminal": [] },
+      "fallback": "Use the current Agent mode serially; no stable official model-callable subagent lifecycle was verified.",
+      "official_sources": ["https://docs.continue.dev/ide-extensions/agent/overview"],
+      "last_verified": "2026-07-18"
+    },
+    {
+      "id": "google-jules",
+      "surface": "Google Jules",
+      "kind": "agent_host",
+      "delegation_status": "not_verified",
+      "capabilities": { "fresh": "external_task", "parallel": "external_tasks", "writer": true, "persistent_handle": true, "nested": "not_verified" },
+      "primitives": { "spawn": [], "join": [], "status": [], "follow_up": [], "interrupt": [], "terminal": [] },
+      "fallback": "Treat Jules tasks as separately authorized external work; do not infer a parent-model subagent primitive from parallel task UI.",
+      "official_sources": ["https://jules.google/docs/"],
+      "last_verified": "2026-07-18"
+    },
+    {
+      "id": "trae",
+      "surface": "Trae",
+      "kind": "agent_host",
+      "delegation_status": "not_verified",
+      "capabilities": { "fresh": "claimed", "parallel": "claimed", "writer": true, "persistent_handle": "not_verified", "nested": "claimed" },
+      "primitives": { "spawn": [], "join": [], "status": [], "follow_up": [], "interrupt": [], "terminal": [] },
+      "fallback": "Marketing references to agents, subagents, or teams do not qualify without a stable official callable schema in the active host.",
+      "official_sources": ["https://www.trae.ai/"],
+      "last_verified": "2026-07-18"
+    },
+    {
+      "id": "qoder",
+      "surface": "Qoder CLI and Agent SDK",
+      "kind": "agent_host",
+      "delegation_status": "native",
+      "capabilities": { "fresh": true, "parallel": "foreground_host_managed", "writer": true, "persistent_handle": false, "nested": "tool_allowlist_controlled" },
+      "primitives": {
+        "spawn": ["Agent tool", "AgentInput/AgentOutput"],
+        "join": ["blocking AgentOutput"],
+        "status": ["supportedAgents discovery"],
+        "follow_up": [],
+        "interrupt": ["TaskStop when a background task handle is exposed"],
+        "terminal": ["AgentOutput return"]
+      },
+      "fallback": "Discover supportedAgents and require Agent in the current tool/allowedTools set. Use fresh blocking Agent calls; do not infer a resumable handle or background lifecycle.",
+      "official_sources": [
+        "https://docs.qoder.com/en/cli/sdk/agents",
+        "https://docs.qoder.com/en/cli/sdk/references",
+        "https://docs.qoder.com/en/cli/subagent"
+      ],
+      "last_verified": "2026-07-18"
+    }
+  ]
+}

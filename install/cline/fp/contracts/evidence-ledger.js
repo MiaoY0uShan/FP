@@ -589,6 +589,24 @@ function directedCycle(ids, edgesFor) {
   return [...ids].some(visit);
 }
 
+function dependencyReaches(byId, fromId, targetId, seen = new Set()) {
+  if (fromId === targetId) return true;
+  if (seen.has(fromId)) return false;
+  seen.add(fromId);
+  const entry = byId.get(fromId);
+  return (entry?.depends_on || []).some((dependencyId) => dependencyId === targetId
+    || dependencyReaches(byId, dependencyId, targetId, seen));
+}
+
+function halfOpenWindowsOverlap(leftStart, leftEnd, rightStart, rightEnd) {
+  const leftStartMs = Date.parse(leftStart);
+  const leftEndMs = Date.parse(leftEnd);
+  const rightStartMs = Date.parse(rightStart);
+  const rightEndMs = Date.parse(rightEnd);
+  if (![leftStartMs, leftEndMs, rightStartMs, rightEndMs].every(Number.isFinite)) return true;
+  return leftStartMs < rightEndMs && rightStartMs < leftEndMs;
+}
+
 function literalGlobPrefix(pattern) {
   const normalized = normalizePath(pattern);
   const wildcard = normalized.search(/[*?]/);
@@ -645,7 +663,7 @@ function resourceWithinAny(resource, parents, caseSensitive) {
 
 function validateDelegations(ledger, errors, runtime = {}) {
   const profiles = new Set(ledger.profiles);
-  const applicable = profiles.has('multi_agent') || profiles.has('background_learning');
+  const applicable = profiles.has('multi_agent') || profiles.has('background_learning') || profiles.has('delegated_execution');
   const delegations = Array.isArray(ledger.delegations) ? ledger.delegations : [];
   const parentAuthority = Array.isArray(ledger.parent_authority) ? ledger.parent_authority : [];
   const completing = ledger.decision === 'complete';
@@ -949,7 +967,22 @@ function validateDelegations(ledger, errors, runtime = {}) {
       for (const a of writers[left].owned_paths || []) {
         for (const b of writers[right].owned_paths || []) {
           if (pathPatternsMayOverlap(a, b, ledger.scope.case_sensitive)) {
-            errors.push(issue('E_DELEGATION_WRITER_COLLISION', '$.delegations', `${writers[left].id} and ${writers[right].id} have overlapping writer ownership`));
+            const ordered = dependencyReaches(byId, writers[left].id, writers[right].id)
+              || dependencyReaches(byId, writers[right].id, writers[left].id);
+            const executionOverlap = halfOpenWindowsOverlap(
+              writers[left].started_at, writers[left].finished_at,
+              writers[right].started_at, writers[right].finished_at
+            );
+            const leftLease = writers[left].mutation_lease;
+            const rightLease = writers[right].mutation_lease;
+            const leaseOverlap = !leftLease || !rightLease || halfOpenWindowsOverlap(
+              leftLease.acquired_at, leftLease.released_at || leftLease.expires_at,
+              rightLease.acquired_at, rightLease.released_at || rightLease.expires_at
+            );
+            const serialDelegatedHandoff = profiles.has('delegated_execution') && ordered && !executionOverlap && !leaseOverlap;
+            if (!serialDelegatedHandoff) {
+              errors.push(issue('E_DELEGATION_WRITER_COLLISION', '$.delegations', `${writers[left].id} and ${writers[right].id} have overlapping writer ownership without a dependency-ordered, non-overlapping delegated handoff`));
+            }
           }
         }
       }
@@ -1038,6 +1071,257 @@ function validateDelegations(ledger, errors, runtime = {}) {
         errors.push(issue('E_DELEGATION_CONCURRENCY_LIMIT', '$.multi_agent_evidence.max_concurrency', `observed concurrency ${observedMaxConcurrency} exceeds the declared limit`));
       }
     }
+  }
+}
+
+function validateDelegatedExecution(ledger, errors) {
+  const profiles = new Set(ledger.profiles || []);
+  const applicable = profiles.has('delegated_execution');
+  const completing = ledger.decision === 'complete';
+  const evidence = ledger.delegated_execution_evidence;
+  const delegations = Array.isArray(ledger.delegations) ? ledger.delegations : [];
+
+  if (!applicable && evidence) {
+    errors.push(issue('E_PROFILE_MISSING', '$.profiles', 'delegated execution evidence requires the delegated_execution profile'));
+  }
+  if (!applicable) return;
+  if (!profiles.has('multi_agent')) {
+    errors.push(issue('E_DELEGATED_MULTI_AGENT_PROFILE', '$.profiles', 'delegated_execution must be layered with multi_agent'));
+  }
+  if (completing && !evidence) {
+    errors.push(issue('E_DELEGATED_EXECUTION_EVIDENCE', '$.delegated_execution_evidence', 'completed delegated execution requires runtime, task-chain, review, and parent-integration evidence'));
+    return;
+  }
+  if (!evidence) return;
+
+  const byId = new Map(delegations.filter((entry) => entry && typeof entry.id === 'string').map((entry) => [entry.id, entry]));
+  const allTaskIds = delegations.map((entry) => entry.task_id);
+  const runtime = evidence.runtime || {};
+  const requiredPrimitives = ['spawn_primitive', 'join_primitive', 'status_primitive', 'cancel_primitive'];
+  if (completing && (runtime.capability_status !== 'available'
+      || !['native', 'extension'].includes(runtime.delegation_status)
+      || requiredPrimitives.some((field) => typeof runtime[field] !== 'string' || !runtime[field].trim()))) {
+    errors.push(issue('E_DELEGATED_RUNTIME', '$.delegated_execution_evidence.runtime', 'completion requires an observed available host runtime with spawn, join, status, and cancel primitives; model APIs and invented primitives do not qualify'));
+  }
+  if (evidence.run_id !== ledger.multi_agent_evidence?.run_id) {
+    errors.push(issue('E_DELEGATED_RUN_BINDING', '$.delegated_execution_evidence.run_id', 'delegated execution and multi-agent evidence must identify the same run'));
+  }
+  validateMultiAgentBoundRef(
+    ledger, runtime.capability_evidence_ref, '$.delegated_execution_evidence.runtime.capability_evidence_ref', errors,
+    { runId: evidence.run_id, gate: 'runtime_detection', producerId: 'parent', taskIds: allTaskIds }
+  );
+
+  if (delegations.length > evidence.max_total_threads) {
+    errors.push(issue('E_DELEGATED_THREAD_BUDGET', '$.delegated_execution_evidence.max_total_threads', `observed ${delegations.length} threads exceeds the declared cumulative thread budget`));
+  }
+  if (completing && !evidence.agents_terminal) {
+    errors.push(issue('E_DELEGATED_AGENTS_TERMINAL', '$.delegated_execution_evidence.agents_terminal', 'completion requires every active delegated thread to reach a terminal state; retained history may remain visible'));
+  }
+
+  const sessionOwners = new Map();
+  for (const entry of delegations) {
+    const owner = sessionOwners.get(entry.session_id);
+    if (owner && owner !== entry.id) {
+      errors.push(issue('E_DELEGATED_FRESH_SESSION', '$.delegations', `${owner} and ${entry.id} reuse session ${entry.session_id}; every delegated stage requires a fresh agent thread`));
+    }
+    sessionOwners.set(entry.session_id, entry.id);
+  }
+
+  const domains = new Set(evidence.domain_ids || []);
+  const planTasks = new Set();
+  const usedDelegationIds = new Set();
+  const includeStage = (id, at) => {
+    if (usedDelegationIds.has(id)) {
+      errors.push(issue('E_DELEGATED_STAGE_REUSE', at, `${id} is reused across delegated stages`));
+    }
+    usedDelegationIds.add(id);
+    return byId.get(id);
+  };
+  const validateStageRef = (ref, at, gate, entry) => {
+    if (!entry) return;
+    validateMultiAgentBoundRef(
+      ledger, ref, at, errors,
+      { runId: evidence.run_id, gate, producerId: entry.id, taskIds: [entry.task_id] }
+    );
+    if (!(entry.check_evidence_refs || []).includes(ref)) {
+      errors.push(issue('E_DELEGATED_STAGE_EVIDENCE', at, `${gate} evidence must be returned by ${entry.id}`));
+    }
+  };
+
+  (evidence.task_chains || []).forEach((chain, chainIndex) => {
+    const at = `$.delegated_execution_evidence.task_chains[${chainIndex}]`;
+    if (planTasks.has(chain.plan_task_id)) {
+      errors.push(issue('E_DELEGATED_TASK_DUPLICATE', `${at}.plan_task_id`, 'each planned work item has exactly one delegated execution chain'));
+    }
+    planTasks.add(chain.plan_task_id);
+    if (!domains.has(chain.domain_id)) {
+      errors.push(issue('E_DELEGATED_DOMAIN', `${at}.domain_id`, 'task-chain domain must be declared in domain_ids'));
+    }
+
+    const reviewerIds = chain.reviewer_delegation_ids || [];
+    const fixerIds = chain.fixer_delegation_ids || [];
+    const reviewRefs = chain.review_evidence_refs || [];
+    const fixRefs = chain.fix_evidence_refs || [];
+    if (reviewerIds.length !== fixerIds.length + 1
+        || reviewRefs.length !== reviewerIds.length
+        || fixRefs.length !== fixerIds.length) {
+      errors.push(issue('E_DELEGATED_REVIEW_CHAIN', at, 'every implementation needs one fresh review and every fixer needs one additional fresh re-review with matching evidence'));
+    }
+
+    const implementer = includeStage(chain.implementer_delegation_id, `${at}.implementer_delegation_id`);
+    if (!implementer || implementer.role !== 'leaf' || implementer.read_only
+        || !(implementer.granted_authority || []).includes('write') || implementer.status !== 'completed') {
+      errors.push(issue('E_DELEGATED_IMPLEMENTER', `${at}.implementer_delegation_id`, 'implementer must be a completed writing leaf with an explicit lease'));
+    }
+    validateStageRef(chain.implementation_evidence_ref, `${at}.implementation_evidence_ref`, 'implementation', implementer);
+
+    let previousStage = implementer;
+    reviewerIds.forEach((reviewerId, reviewIndex) => {
+      const reviewer = includeStage(reviewerId, `${at}.reviewer_delegation_ids[${reviewIndex}]`);
+      if (!reviewer || reviewer.role !== 'evidence_reviewer' || !reviewer.read_only || reviewer.status !== 'completed') {
+        errors.push(issue('E_DELEGATED_REVIEWER', `${at}.reviewer_delegation_ids[${reviewIndex}]`, 'task review and re-review require fresh completed read-only evidence reviewers'));
+      }
+      if (reviewer && previousStage && !dependencyReaches(byId, reviewer.id, previousStage.id)) {
+        errors.push(issue('E_DELEGATED_STAGE_ORDER', `${at}.reviewer_delegation_ids[${reviewIndex}]`, `${reviewer.id} must depend on the preceding delegated stage`));
+      }
+      validateStageRef(reviewRefs[reviewIndex], `${at}.review_evidence_refs[${reviewIndex}]`, 'task_review', reviewer);
+      previousStage = reviewer;
+
+      if (reviewIndex < fixerIds.length) {
+        const fixer = includeStage(fixerIds[reviewIndex], `${at}.fixer_delegation_ids[${reviewIndex}]`);
+        if (!fixer || fixer.role !== 'leaf' || fixer.read_only
+            || !(fixer.granted_authority || []).includes('write') || fixer.status !== 'completed') {
+          errors.push(issue('E_DELEGATED_FIXER', `${at}.fixer_delegation_ids[${reviewIndex}]`, 'fixer must be a fresh completed writing leaf with an explicit lease'));
+        }
+        if (fixer && previousStage && !dependencyReaches(byId, fixer.id, previousStage.id)) {
+          errors.push(issue('E_DELEGATED_STAGE_ORDER', `${at}.fixer_delegation_ids[${reviewIndex}]`, `${fixer.id} must depend on the review that requested fixes`));
+        }
+        validateStageRef(fixRefs[reviewIndex], `${at}.fix_evidence_refs[${reviewIndex}]`, 'fix', fixer);
+        previousStage = fixer;
+      }
+    });
+    if (completing && chain.verdict !== 'pass') {
+      errors.push(issue('E_DELEGATED_TASK_VERDICT', `${at}.verdict`, 'every delegated task chain must pass before final integration'));
+    }
+  });
+
+  const finalReviewer = includeStage(
+    evidence.final_reviewer_delegation_id,
+    '$.delegated_execution_evidence.final_reviewer_delegation_id'
+  );
+  if (!finalReviewer || finalReviewer.role !== 'integration_reviewer' || !finalReviewer.read_only || finalReviewer.status !== 'completed') {
+    errors.push(issue('E_DELEGATED_FINAL_REVIEW', '$.delegated_execution_evidence.final_reviewer_delegation_id', 'final integration review requires a fresh completed read-only integration reviewer'));
+  }
+  for (const chain of evidence.task_chains || []) {
+    const lastReviewerId = (chain.reviewer_delegation_ids || []).at(-1);
+    if (finalReviewer && lastReviewerId && !dependencyReaches(byId, finalReviewer.id, lastReviewerId)) {
+      errors.push(issue('E_DELEGATED_FINAL_REVIEW', '$.delegated_execution_evidence.final_reviewer_delegation_id', 'final integration review must depend on the passing review of every task chain'));
+    }
+  }
+  validateStageRef(
+    evidence.final_review_evidence_ref,
+    '$.delegated_execution_evidence.final_review_evidence_ref',
+    'final_review',
+    finalReviewer
+  );
+  if (completing && evidence.final_review_verdict !== 'pass') {
+    errors.push(issue('E_DELEGATED_FINAL_REVIEW', '$.delegated_execution_evidence.final_review_verdict', 'final integration review must pass'));
+  }
+  (evidence.parent_integration_evidence_refs || []).forEach((ref, index) => validateMultiAgentBoundRef(
+    ledger, ref, `$.delegated_execution_evidence.parent_integration_evidence_refs[${index}]`, errors,
+    { runId: evidence.run_id, gate: 'delegated_integration', producerId: 'parent', taskIds: allTaskIds }
+  ));
+}
+
+function validateProviderCompatibility(ledger, errors) {
+  const profiles = new Set(ledger.profiles || []);
+  const applicable = profiles.has('provider_compatibility');
+  const evidence = ledger.provider_compatibility_evidence;
+  const completing = ledger.decision === 'complete' && ledger.result === 'pass';
+  const executingCompletion = completing && ledger.mode === 'execute';
+
+  if (!applicable && evidence) {
+    errors.push(issue('E_PROFILE_MISSING', '$.profiles', 'provider compatibility evidence requires the provider_compatibility profile'));
+    return;
+  }
+  if (!applicable) return;
+  if (!evidence || typeof evidence !== 'object') {
+    if (completing) {
+      errors.push(issue('E_PROVIDER_COMPATIBILITY_EVIDENCE', '$.provider_compatibility_evidence', 'provider compatibility completion requires chain, retry, spend, loop, accounting, encoding, and semantic evidence'));
+    }
+    return;
+  }
+
+  const evidenceRefPaths = [
+    ['chain', evidence.chain?.evidence_ref],
+    ['retry_budget', evidence.retry_budget?.evidence_ref],
+    ['spend_budget', evidence.spend_budget?.evidence_ref],
+    ['loop_guard', evidence.loop_guard?.evidence_ref],
+    ['accounting', evidence.accounting?.evidence_ref],
+    ['encoding', evidence.encoding?.evidence_ref],
+    ['semantic_completion', evidence.semantic_completion?.evidence_ref]
+  ];
+  evidenceRefPaths.forEach(([field, ref]) => validateObservedRef(
+    ledger,
+    ref,
+    `$.provider_compatibility_evidence.${field}.evidence_ref`,
+    errors
+  ));
+
+  const retry = evidence.retry_budget || {};
+  const layers = Array.isArray(retry.layers) ? retry.layers : [];
+  const derivedWorstCase = layers.reduce((attempts, layer) => attempts * ((layer?.max_retries ?? -1) + 1), 1);
+  if (!Number.isSafeInteger(derivedWorstCase) || retry.computed_worst_case_attempts !== derivedWorstCase) {
+    errors.push(issue('E_PROVIDER_RETRY_MULTIPLIER', '$.provider_compatibility_evidence.retry_budget.computed_worst_case_attempts', 'worst-case attempts must equal the product of max_retries + 1 across every nested retry owner'));
+  }
+  if (executingCompletion && derivedWorstCase > retry.max_physical_attempts_per_logical_request) {
+    errors.push(issue('E_PROVIDER_RETRY_BUDGET', '$.provider_compatibility_evidence.retry_budget', 'nested retry multiplication exceeds the declared physical-attempt ceiling'));
+  }
+
+  const spend = evidence.spend_budget || {};
+  const budgetPairs = [
+    ['logical_requests', spend.observed_logical_requests, spend.max_logical_requests],
+    ['physical_attempts', spend.observed_physical_attempts, spend.max_physical_attempts],
+    ['input_tokens', spend.observed_input_tokens, spend.max_input_tokens],
+    ['output_tokens', spend.observed_output_tokens, spend.max_output_tokens],
+    ['subagent_threads', spend.observed_subagent_threads, spend.max_subagent_threads]
+  ];
+  if (executingCompletion && budgetPairs.some(([, observed, maximum]) => observed > maximum)) {
+    errors.push(issue('E_PROVIDER_SPEND_BUDGET', '$.provider_compatibility_evidence.spend_budget', 'observed requests, tokens, or subagent threads exceed the frozen spend budget'));
+  }
+
+  const loop = evidence.loop_guard || {};
+  if (executingCompletion && (
+    loop.triggered
+    || loop.observed_identical_semantic_actions > loop.max_identical_semantic_actions
+    || loop.observed_non_narrowing_iterations > loop.max_non_narrowing_iterations
+  )) {
+    errors.push(issue('E_PROVIDER_LOOP_GUARD', '$.provider_compatibility_evidence.loop_guard', 'a triggered or exceeded semantic loop guard forbids successful execution completion'));
+  }
+
+  const accounting = evidence.accounting || {};
+  if (executingCompletion && !['reconciled', 'partially_reconciled'].includes(accounting.reconciliation_status)) {
+    errors.push(issue('E_PROVIDER_ACCOUNTING', '$.provider_compatibility_evidence.accounting.reconciliation_status', 'execution completion requires reconciled or explicitly partially reconciled host, proxy, and provider accounting'));
+  }
+
+  const encoding = evidence.encoding || {};
+  if (executingCompletion && (
+    encoding.strict_utf8_checked !== true
+    || encoding.model_replacement_char_count > 0
+    || ['model_output', 'proxy_stream', 'unresolved'].includes(encoding.classification)
+  )) {
+    errors.push(issue('E_PROVIDER_ENCODING', '$.provider_compatibility_evidence.encoding', 'execution completion requires strict UTF-8 evidence with no unresolved model or proxy-stream corruption'));
+  }
+
+  const semantic = evidence.semantic_completion || {};
+  if (executingCompletion && (
+    semantic.http_success_not_sufficient !== true
+    || semantic.terminal_stop_reason_verified !== true
+    || semantic.stream_utf8_verified !== true
+    || semantic.tool_round_trip_verified !== true
+    || ['unverified', 'incompatible'].includes(evidence.chain?.compatibility_status)
+  )) {
+    errors.push(issue('E_PROVIDER_SEMANTIC_COMPLETION', '$.provider_compatibility_evidence.semantic_completion', 'HTTP success alone is insufficient; completion requires verified stop reason, UTF-8 stream, tool round trip, and a usable compatibility status'));
   }
 }
 
@@ -1689,6 +1973,8 @@ function validateLedger(ledger, options = {}) {
   });
   validateDeferredItems(ledger, errors);
   validateDelegations(ledger, errors, options);
+  validateDelegatedExecution(ledger, errors);
+  validateProviderCompatibility(ledger, errors);
   validateLearning(ledger, errors, options);
   validateIterationEvidence(ledger, errors);
 
@@ -1790,7 +2076,7 @@ function briefNeedsWorkspaceBaseline(brief) {
   const routes = new Set(['medium', 'debug', 'large_risky', 'incident']);
   const profiles = new Set(Array.isArray(brief.profiles) ? brief.profiles : []);
   return routes.has(brief.route)
-    || ['multi_agent', 'background_learning', 'remote_stateful', 'openwrt'].some((profile) => profiles.has(profile));
+    || ['multi_agent', 'delegated_execution', 'provider_compatibility', 'background_learning', 'remote_stateful', 'openwrt'].some((profile) => profiles.has(profile));
 }
 
 function validateBriefWorkspaceBaseline(brief) {
@@ -1858,6 +2144,7 @@ function validateBriefDelegationPlan(ledger, brief) {
   const errors = [];
   const profiles = new Set(Array.isArray(brief.profiles) ? brief.profiles : []);
   if (!profiles.has('multi_agent') && !profiles.has('background_learning')) return errors;
+  const delegatedExecution = profiles.has('delegated_execution');
   const at = '$.brief';
   if (!Array.isArray(brief.parent_authority) || !Array.isArray(brief.delegations)) {
     errors.push(issue('E_BRIEF_DELEGATION_PLAN', at, 'delegated work requires parent_authority and a structured delegation plan before execution'));
@@ -1897,8 +2184,90 @@ function validateBriefDelegationPlan(ledger, brief) {
       }
     }
   }
-  if (actual.size !== planned.length) {
+  if (!delegatedExecution && actual.size !== planned.length) {
     errors.push(issue('E_BRIEF_DELEGATION_UNPLANNED', `${at}.delegations`, 'ledger contains an unplanned or missing delegation'));
+  }
+
+  if (delegatedExecution) {
+    const plan = brief.delegated_execution_plan;
+    const execution = ledger.delegated_execution_evidence;
+    const validPlan = plan && typeof plan === 'object' && !Array.isArray(plan)
+      && typeof plan.runtime_host_id === 'string' && plan.runtime_host_id.trim()
+      && plan.spawn_strategy === 'parent_only'
+      && Number.isInteger(plan.max_active_concurrency) && plan.max_active_concurrency >= 1
+      && Number.isInteger(plan.max_total_threads) && plan.max_total_threads >= 1
+      && plan.final_review_required === true
+      && Array.isArray(plan.work_items) && plan.work_items.length > 0;
+    if (!validPlan) {
+      errors.push(issue('E_BRIEF_DELEGATED_PLAN', `${at}.delegated_execution_plan`, 'delegated execution requires a parent-only runtime plan with bounded concurrency, cumulative threads, work items, and final review'));
+    } else if (execution) {
+      if (execution.runtime?.host_id !== plan.runtime_host_id) {
+        errors.push(issue('E_BRIEF_DELEGATED_RUNTIME', `${at}.delegated_execution_plan.runtime_host_id`, 'observed delegated runtime differs from the frozen brief'));
+      }
+      if (execution.max_total_threads > plan.max_total_threads || actual.size > plan.max_total_threads) {
+        errors.push(issue('E_BRIEF_DELEGATED_THREAD_BUDGET', `${at}.delegated_execution_plan.max_total_threads`, 'observed or declared cumulative thread count exceeds the frozen brief'));
+      }
+      if ((ledger.multi_agent_evidence?.max_concurrency || 0) > plan.max_active_concurrency) {
+        errors.push(issue('E_BRIEF_DELEGATED_CONCURRENCY', `${at}.delegated_execution_plan.max_active_concurrency`, 'declared active concurrency exceeds the frozen brief'));
+      }
+
+      const itemById = new Map();
+      plan.work_items.forEach((item, index) => {
+        const itemAt = `${at}.delegated_execution_plan.work_items[${index}]`;
+        if (!item || typeof item !== 'object' || Array.isArray(item)
+            || typeof item.id !== 'string' || !item.id.trim()
+            || typeof item.domain_id !== 'string' || !item.domain_id.trim()
+            || !Array.isArray(item.allowed_resources) || item.allowed_resources.length === 0
+            || !Array.isArray(item.owned_paths)
+            || !Number.isInteger(item.max_fix_cycles) || item.max_fix_cycles < 0) {
+          errors.push(issue('E_BRIEF_DELEGATED_PLAN', itemAt, 'each work item requires id, domain, allowed resources, owned paths, and a non-negative fix-cycle budget'));
+          return;
+        }
+        if (itemById.has(item.id)) {
+          errors.push(issue('E_BRIEF_DELEGATED_PLAN', `${itemAt}.id`, `duplicate work item ${item.id}`));
+        }
+        itemById.set(item.id, item);
+      });
+
+      const dynamicIds = new Set();
+      (execution.task_chains || []).forEach((chain, chainIndex) => {
+        const chainAt = `${at}.delegated_execution_plan.work_items`;
+        const item = itemById.get(chain.plan_task_id);
+        if (!item) {
+          errors.push(issue('E_BRIEF_DELEGATED_UNPLANNED_TASK', chainAt, `delegated chain ${chain.plan_task_id} was not frozen in the brief`));
+          return;
+        }
+        if (chain.domain_id !== item.domain_id) {
+          errors.push(issue('E_BRIEF_DELEGATED_DOMAIN', `${chainAt}[${chainIndex}].domain_id`, 'delegated task domain differs from the frozen brief'));
+        }
+        if ((chain.fixer_delegation_ids || []).length > item.max_fix_cycles) {
+          errors.push(issue('E_BRIEF_DELEGATED_FIX_BUDGET', `${chainAt}[${chainIndex}].max_fix_cycles`, 'fresh fixer count exceeds the frozen work-item budget'));
+        }
+        const stageIds = [
+          chain.implementer_delegation_id,
+          ...(chain.reviewer_delegation_ids || []),
+          ...(chain.fixer_delegation_ids || [])
+        ];
+        stageIds.forEach((id) => dynamicIds.add(id));
+        [chain.implementer_delegation_id, ...(chain.fixer_delegation_ids || [])].forEach((id) => {
+          const writer = actual.get(id);
+          if (!writer) return;
+          if ((writer.owned_paths || []).some((resource) => !pathMatchesAny(resource, item.owned_paths, ledger.scope.case_sensitive))) {
+            errors.push(issue('E_BRIEF_DELEGATED_WRITER_SCOPE', chainAt, `${id} owns paths outside work item ${item.id}`));
+          }
+          if ((writer.allowed_resources || []).some((resource) => !pathMatchesAny(resource, item.allowed_resources, ledger.scope.case_sensitive))) {
+            errors.push(issue('E_BRIEF_DELEGATED_RESOURCE_SCOPE', chainAt, `${id} received resources outside work item ${item.id}`));
+          }
+        });
+      });
+      dynamicIds.add(execution.final_reviewer_delegation_id);
+      const plannedIds = new Set(planned.map((entry) => entry?.id).filter(Boolean));
+      for (const id of actual.keys()) {
+        if (!plannedIds.has(id) && !dynamicIds.has(id)) {
+          errors.push(issue('E_BRIEF_DELEGATION_UNPLANNED', `${at}.delegations`, `delegation ${id} is neither frozen nor a bounded delegated-execution stage`));
+        }
+      }
+    }
   }
 
   if (profiles.has('background_learning')) {
@@ -1941,10 +2310,90 @@ function validateBriefDelegationPlan(ledger, brief) {
   return errors;
 }
 
+function validateBriefProviderCompatibilityPlan(ledger, brief) {
+  const errors = [];
+  const profiles = new Set(Array.isArray(brief.profiles) ? brief.profiles : []);
+  if (!profiles.has('provider_compatibility')) return errors;
+
+  const at = '$.brief.provider_compatibility_plan';
+  const plan = brief.provider_compatibility_plan;
+  const evidence = ledger.provider_compatibility_evidence;
+  const validPlan = plan && typeof plan === 'object' && !Array.isArray(plan)
+    && typeof plan.host_id === 'string' && plan.host_id.trim()
+    && Array.isArray(plan.intermediaries)
+    && typeof plan.provider_id === 'string' && plan.provider_id.trim()
+    && typeof plan.protocol === 'string' && plan.protocol.trim()
+    && typeof plan.requested_model === 'string' && plan.requested_model.trim()
+    && Array.isArray(plan.accepted_effective_models) && plan.accepted_effective_models.length > 0
+    && Array.isArray(plan.retry_layers) && plan.retry_layers.length > 0
+    && Number.isInteger(plan.max_physical_attempts_per_logical_request) && plan.max_physical_attempts_per_logical_request >= 1
+    && ['max_logical_requests', 'max_physical_attempts', 'max_input_tokens', 'max_output_tokens', 'max_subagent_threads',
+      'max_identical_semantic_actions', 'max_non_narrowing_iterations']
+      .every((field) => Number.isInteger(plan[field]) && plan[field] >= (field.startsWith('max_') && field.includes('semantic') || field.includes('narrowing') ? 1 : 0))
+    && typeof plan.paid_probe_authorized === 'boolean';
+  if (!validPlan) {
+    errors.push(issue('E_BRIEF_PROVIDER_PLAN', at, 'provider compatibility requires a frozen chain, retry layers, spend/loop ceilings, accepted wire models, and paid-probe authority'));
+    return errors;
+  }
+  if (!evidence) return errors;
+
+  const chain = evidence.chain || {};
+  if (chain.host_id !== plan.host_id || chain.provider_id !== plan.provider_id
+      || chain.protocol !== plan.protocol || chain.requested_model !== plan.requested_model) {
+    errors.push(issue('E_BRIEF_PROVIDER_CHAIN', at, 'observed host, provider, protocol, or requested model differs from the frozen brief'));
+  }
+  if (!plan.accepted_effective_models.includes(chain.effective_model)) {
+    errors.push(issue('E_BRIEF_PROVIDER_MODEL', `${at}.accepted_effective_models`, 'effective wire model was not accepted by the frozen brief'));
+  }
+  if (!arraysEqual(plan.intermediaries, chain.intermediaries || [], canonicalJson)) {
+    errors.push(issue('E_BRIEF_PROVIDER_CHAIN', `${at}.intermediaries`, 'observed intermediary identity, version, or retry ceiling differs from the frozen brief'));
+  }
+
+  const retry = evidence.retry_budget || {};
+  if (!arraysEqual(plan.retry_layers, retry.layers || [], canonicalJson)) {
+    errors.push(issue('E_BRIEF_PROVIDER_RETRY_LAYERS', `${at}.retry_layers`, 'observed retry owners or ceilings differ from the frozen brief'));
+  }
+  const plannedWorstCase = plan.retry_layers.reduce((attempts, layer) => attempts * ((layer?.max_retries ?? -1) + 1), 1);
+  if (!Number.isSafeInteger(plannedWorstCase)
+      || plannedWorstCase > plan.max_physical_attempts_per_logical_request
+      || retry.computed_worst_case_attempts > plan.max_physical_attempts_per_logical_request
+      || retry.max_physical_attempts_per_logical_request > plan.max_physical_attempts_per_logical_request) {
+    errors.push(issue('E_BRIEF_PROVIDER_RETRY_BUDGET', `${at}.max_physical_attempts_per_logical_request`, 'planned or observed nested retry multiplication exceeds the frozen physical-attempt ceiling'));
+  }
+
+  const spend = evidence.spend_budget || {};
+  const budgetFields = [
+    ['logical_requests', 'max_logical_requests', 'observed_logical_requests'],
+    ['physical_attempts', 'max_physical_attempts', 'observed_physical_attempts'],
+    ['input_tokens', 'max_input_tokens', 'observed_input_tokens'],
+    ['output_tokens', 'max_output_tokens', 'observed_output_tokens'],
+    ['subagent_threads', 'max_subagent_threads', 'observed_subagent_threads']
+  ];
+  if (budgetFields.some(([, maximum, observed]) => spend[maximum] > plan[maximum] || spend[observed] > plan[maximum])) {
+    errors.push(issue('E_BRIEF_PROVIDER_BUDGET', at, 'observed or ledger-declared request, token, or subagent budget exceeds the frozen brief'));
+  }
+
+  const loop = evidence.loop_guard || {};
+  if (loop.max_identical_semantic_actions > plan.max_identical_semantic_actions
+      || loop.observed_identical_semantic_actions > plan.max_identical_semantic_actions
+      || loop.max_non_narrowing_iterations > plan.max_non_narrowing_iterations
+      || loop.observed_non_narrowing_iterations > plan.max_non_narrowing_iterations) {
+    errors.push(issue('E_BRIEF_PROVIDER_LOOP_BUDGET', at, 'observed or ledger-declared loop ceiling exceeds the frozen brief'));
+  }
+
+  if (ledger.mode === 'execute' && ledger.decision === 'complete'
+      && (spend.observed_logical_requests || spend.observed_physical_attempts) > 0
+      && plan.paid_probe_authorized !== true) {
+    errors.push(issue('E_BRIEF_PROVIDER_PAID_AUTHORITY', `${at}.paid_probe_authorized`, 'observed provider requests require paid-probe or paid-execution authority frozen in the brief'));
+  }
+  return errors;
+}
+
 function validateAgainstBrief(ledger, brief) {
   const errors = [];
   errors.push(...validateBriefWorkspaceBaseline(brief));
   errors.push(...validateBriefDelegationPlan(ledger, brief));
+  errors.push(...validateBriefProviderCompatibilityPlan(ledger, brief));
   const budget = brief.context_budget_contract || {};
   const extracted = extractBriefChecks(brief);
   errors.push(...extracted.errors);

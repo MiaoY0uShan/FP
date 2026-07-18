@@ -11,7 +11,7 @@ Apply user authority/read-only as a global gate first. It constrains every opera
 3. **Build:** Scale to task size — Small → Tiny Brief, Medium → Execution Brief + Evidence Ledger, Vague → Idea Cards, Large → minimum modules → final brief.
 4. **Close:** Pass with matched evidence, or fail → split smaller.
 
-Use remote/live-system, OpenWrt, stateful-UI, external-context, multi-agent, continuation, self-iteration, and background-learning as profiles layered onto the selected route. A stale external claim blocks dependent completion; a stale continuation blocks writes.
+Use remote/live-system, OpenWrt, stateful-UI, external-context, provider-compatibility, multi-agent, delegated-execution, continuation, self-iteration, and background-learning as profiles layered onto the selected route. A stale external claim blocks dependent completion; a stale continuation blocks writes.
 
 ## Route Weight
 
@@ -57,8 +57,8 @@ For medium, risky, or multi-agent work, first capture the repository root, branc
 
 The parent is the integrator, default writer, and final verifier.
 
-1. Parallelize only independent investigation or review.
-2. Assign one writer per shared file set; never allow parallel writes to the same live resource.
+1. Parallelize ordinary agents only for independent investigation or review. Writing children require the explicit delegated-execution profile and a verified host runtime.
+2. Assign one active writer per shared file set; never allow parallel writes to the same live resource. A fresh fixer may receive a serial lease handoff after its predecessor is terminal and the prior lease is released.
 3. Only the parent may hold a live-system mutation lease.
 4. Every subagent gets a bounded envelope: goal, exact scope, invariants, checks, forbidden actions, and output path/format.
 5. Subagents may not deploy, expand scope, or declare the overall task complete.
@@ -69,9 +69,13 @@ The parent is the integrator, default writer, and final verifier.
 10. If user direction changes, stop stale agents and pending writes.
 11. Before final response, verify that all agents and background resources are terminal.
 
+For delegated execution, freeze work-item and fix-cycle budgets rather than pretending every future child ID is known before review. Every work item uses a fresh implementer and fresh task reviewer; every blocking fix uses a fresh fixer and fresh re-reviewer; final integration uses a fresh reviewer. Unique task/session IDs prove freshness. Completed threads may remain as host history, but active concurrency and cumulative thread creation stay bounded. Load `delegated-execution/SKILL.md`, and load `dispatch-parallel-domains/SKILL.md` only after proving independent domains.
+
+Detect runtime capabilities from the current host tools, then consult `contracts/agent-runtime-registry.v1.json`. Model APIs are not subagent runtimes. Do not invent a primitive, shell out to another AI CLI, enable an extension, or install a runtime without separate authority.
+
 For auditable work, the Evidence Ledger records `parent_authority`, a reserved parent-owned artifact root, and one `delegations` envelope per child, including the root/direct-parent authority and resource intersection, read-only status, actual summary budget, parent-only artifact path, and bound proposal/check evidence. A child never receives a live-system mutation lease.
 
-For distributed work, each logical task envelope also records task/session/parent/dependency IDs, bounded goal, leaf/orchestrator role, iteration/attempt/time/depth limits, `attempts_used`, idempotency key, terminal result, touched files, checks, and timestamps. Enforce observed concurrency, stored task-input result order, successful dependency timing, ancestor cancellation propagation, bounded idempotent retry evidence, unique writer ownership, and holder/path/time-bound lease release evidence. Distinct read-only spec and integration reviewers must use distinct task/session identities and separately bound commands. Leaves cannot delegate, promote memory, deploy, message externally, use credentials, or mutate live state.
+For distributed work, each logical task envelope also records task/session/parent/dependency IDs, bounded goal, leaf/orchestrator role, iteration/attempt/time/depth limits, `attempts_used`, idempotency key, terminal result, touched files, checks, and timestamps. Enforce observed concurrency, stored task-input result order, successful dependency timing, ancestor cancellation propagation, bounded idempotent retry evidence, one active writer per path set, and holder/path/time-bound lease release evidence. Distinct read-only spec and integration reviewers must use distinct task/session identities and separately bound commands. Leaves cannot delegate, promote memory, deploy, message externally, use credentials, or mutate live state.
 
 Use a durable progress ledger for long tasks or likely context compaction. Record only decisions, ownership, evidence, open risks, and the next exact action.
 
@@ -92,6 +96,10 @@ Use a durable progress ledger for long tasks or likely context compaction. Recor
 - If the MCP is missing, present its exact source/version, need, safe alternative, install scope/commands, permissions/data exposure, credentials, processes/restarts, verification, and rollback; download or install only after explicit user approval.
 - Installation permission does not authorize authentication, secret disclosure, configuration mutation, or a resident service. Resident or auto-start behavior requires explicit user approval.
 - If approval is declined or provenance is unverified, use a safe fallback or mark only the dependent acceptance row `unverified`; continue unrelated work without repeated prompts.
+
+## Provider Compatibility And Spend
+
+When an agent host uses a third-party/API-compatible model, gateway, or local proxy, load `provider-compatibility/SKILL.md`. Resolve the effective host/proxy/provider chain and health before paid work. Freeze logical-request, physical-attempt, input/output-token, turn, time, and subagent budgets. Multiply nested retry ceilings, stop before a third identical semantic action or after three non-narrowing turns, and never treat HTTP 200 or a proxy dashboard as proof of semantic completion or billing. Paid probes and external configuration changes require their own authority.
 
 ## Learning And Records
 

@@ -18,7 +18,9 @@ The top router chooses internal modules. Users should not call child skills manu
 
 - Unknown-cause diagnosis stays read-only.
 - One experiment changes one decision.
-- Parallel agents investigate independently; one writer owns shared files/live state.
+- Ordinary parallel agents investigate/review independently. Delegated writing uses fresh implementer/reviewer/fixer chains and one writer owns each shared file set.
+- Fan out only explicitly independent problem domains; integrate in frozen task-input order.
+- Third-party provider/proxy work checks the effective chain and health, nested retry multiplier, request/token/subagent budgets, semantic loop guard, cache accounting, and strict UTF-8 boundaries.
 - Live-system writes preserve management access and rollback.
 - External context is version-pinned, redacted, and bounded.
 - Available task-required MCPs are used automatically within current authority; missing MCPs require an exact acquisition brief and explicit approval before download/install.
@@ -30,6 +32,8 @@ The top router chooses internal modules. Users should not call child skills manu
 - Medium: canonical Evidence Ledger v1.
 - Debug/live/risky: original reproduction, regression, negative control, and profile evidence.
 - Multi-agent: spec/quality verdicts, blocking-finding re-review, parent rerun, all agents terminal.
+- Delegated execution: every work-item chain passes, fresh final integration review passes, and the parent reruns the integrated checks.
+- Provider compatibility: budgets remain within bounds, no loop guard is active, stream/tool semantics and UTF-8 pass, and accounting is reconciled or explicitly partial.
 
 Metrics run only when measurement matters. Adaptive improvement stages evidence-backed observations; it does not silently rewrite the protocol.
 

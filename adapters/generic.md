@@ -12,7 +12,13 @@ Infer FP from the user's goal. Activate it automatically for engineering work an
 - **Failed task:** Split smaller instead of retrying the same large task.
 - **Protocol or agent-behavior change:** Confirm intent and boundaries before editing.
 - **Debug-first:** Gather read-only, discriminating evidence before editing an unknown-cause failure.
-- **Multi-agent:** Parallelize independent work, keep a single writer per shared file set, and have the parent verify.
+- **Multi-agent:** Ordinary children handle independent investigation/review. Writing children require delegated execution, one writer per shared file set, and parent verification.
+
+## Delegated execution runtime
+
+Inspect the current host's actual tools, then consult `fp/contracts/agent-runtime-registry.v1.json`. A model API is not an agent runtime. Full delegated execution requires observed fresh spawn, join/result, status, and safe cancellation plus the fresh implementer -> reviewer -> fixer/re-review -> final-review chain. Missing capabilities degrade explicitly; never shell out to another AI CLI, install an extension, or invent a primitive.
+
+If the host uses an API-compatible provider, gateway, or local proxy, also apply `fp/provider-compatibility/SKILL.md` and its retry/spend/loop/encoding gates.
 
 ## Rules
 

@@ -23,7 +23,11 @@ Expected behavior:
 - failed task -> Failure-to-Smaller-Task Protocol and a smaller brief
 - protocol or agent-behavior change -> confirm intent and boundaries before editing
 - unknown cause or diagnose-only -> debug-first, read-only evidence before edits
-- multi-agent -> independent review, one shared-file writer, parent verification
+- multi-agent -> ordinary children for independent investigation/review; delegated execution for bounded writing agents; one shared-file writer; parent verification
+
+Runtime selection is capability-driven. [`../fp/contracts/agent-runtime-registry.v1.json`](../fp/contracts/agent-runtime-registry.v1.json) indexes current official evidence across native, extension, unverified, model-API-only, and retired surfaces. [`../fp/templates/agent-runtime-adapters.md`](../fp/templates/agent-runtime-adapters.md) maps portable spawn/join/status/follow-up/cancel semantics. Installed tools always win over the registry hint.
+
+When a host uses a third-party model, compatible endpoint, gateway, or proxy, apply the provider-compatibility profile as a separate layer. The model provider never selects the subagent runtime; the host does.
 
 Adapters stay thin and point to the canonical router. The only normative native/standard/manual coverage matrix is in [`../INSTALL.md`](../INSTALL.md); do not infer support merely from a file existing in a package.
 

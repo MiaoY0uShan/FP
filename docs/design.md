@@ -35,9 +35,13 @@ FP trigger
 - Large, vague, architectural, or risky task -> Idea Cards or full chain, then compact Execution Brief and Evidence Ledger.
 - Protocol or agent-behavior change -> confirm intent and boundaries before editing.
 
-Profiles for live systems, OpenWrt, external context, multi-agent work, continuation, stateful UI, self-iteration, and background learning are layered on demand.
+Profiles for live systems, OpenWrt, external context, provider compatibility, multi-agent work, delegated execution, continuation, stateful UI, self-iteration, and background learning are layered on demand.
 
-Distributed work is a protocol, not a bundled scheduler. The host may run bounded children concurrently, but the parent keeps one integration authority, freezes task envelopes, requires idempotent retries and cancellation cleanup, and validates the resulting DAG/evidence before completion.
+Distributed work is a protocol, not a bundled scheduler. Ordinary children investigate or review. Explicit delegated execution uses a fresh implementer -> fresh task reviewer -> conditional fresh fixer -> fresh re-reviewer per work item, followed by a fresh final integration reviewer and parent verification. The host may run proven-independent domains concurrently, but the parent keeps one integration authority, freezes work items and budgets, requires serial writer-lease handoff, idempotent retries and cancellation cleanup, and validates the resulting DAG/evidence before completion.
+
+Runtime adaptation is capability-driven. A versioned official-source registry distinguishes native hosts, extension-provided runtimes, unverified surfaces, retired tools, and model-only APIs. The active host tool catalog wins; FP never launches another AI CLI through a shell to manufacture missing capabilities.
+
+Provider compatibility is orthogonal to agent delegation. A host using a third-party model or local proxy records the effective chain, nested retry multiplier, spend/loop budgets, semantic stream completion, strict UTF-8 boundaries, cache semantics, and host/proxy/provider accounting. This bounds failure and cost without claiming that API-format compatibility is full behavioral equivalence.
 
 Background learning is also bounded host work, not a resident service. A read-only candidate agent sees training evidence, separate read-only evaluators see the frozen hash plus registered hidden cases, and only the parent can approve a reversible shadow/active policy change. Promotion evidence is bound to producer/stage/subject/hash; fold improvement is derived from same-unit measurements and an independent oracle, then confirmed by distinct future shadow observations.
 

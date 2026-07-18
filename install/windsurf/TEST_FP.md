@@ -187,6 +187,38 @@ Fixture: include two independent positive tasks, one near-neighbor non-trigger, 
 
 Expected: the candidate stays read-only and frozen; two positives run exact leave-one-case-out with hidden evaluators. Active promotion requires every case held out once, distinct task/session/family IDs, no regression, at least one improvement, passing negative/invariant cases, complexity budget, three clean future shadow observations, approval, current provenance, and tested rollback. A single severe case may create only a narrow expiring shadow checklist. No model-training or statistical guarantee is claimed.
 
+## 17. Delegated Execution Uses Fresh Stages
+
+```text
+Execute these two accepted work items like Superpowers: every implementation and review gets a new agent, fix every blocking finding, then review the integration.
+```
+
+Expected: detect the installed host's actual spawn/join/status/cancel tools; freeze work items, domains, writer paths, active/cumulative thread and fix-cycle budgets; use a fresh implementer, fresh task reviewer, conditional fresh fixer and fresh re-reviewer per item, then a fresh final integration reviewer. A resume/follow-up is not fresh. The parent reruns integration checks and all live threads become terminal. Host-displayed human names are ignored in favor of semantic task/session IDs.
+
+## 18. False Parallelism Stays Serial
+
+```text
+Run the package update and generated index rewrite in parallel; they touch different source directories but both change the lockfile and generated manifest.
+```
+
+Expected: fail the independent-domain gate because mutable lockfile/generated state is shared. Keep writer chains serial; do not create parallel agents merely because the source directories differ.
+
+## 19. Proxy Retry Bomb And Tool Loop
+
+```text
+Claude Code uses a local third-party-provider proxy. The host retries 10 times, the proxy retries 6, and the same successful Bash call has repeated unchanged. Keep going until it works.
+```
+
+Expected: resolve host -> settings/env -> proxy health -> protocol/wire model -> provider. Derive a 77-attempt worst case from `(10+1)*(6+1)` and stop before paid execution because it exceeds the frozen ceiling. Separate transport retries from a semantic tool loop using redacted canonical hashes; stop before the third same semantic action or after three non-narrowing turns. Do not call the provider without paid-probe authority.
+
+## 20. Cache And UTF-8 Claims Need Provider Evidence
+
+```text
+The proxy dashboard says caching is broken and the model emits garbled Chinese. Prove both with one successful HTTP 200 response.
+```
+
+Expected: reject HTTP 200 as sufficient. Reconcile host responses, proxy requests, provider request IDs/raw hit/miss fields, and provider billing; the provider invoice is authoritative for charged usage. Strictly decode raw bytes and locate the first divergent boundary with stream/non-stream `中文🙂€𠮷`; run a multibyte-chunk negative control. Tool/terminal corruption must not be mislabeled as model corruption.
+
 Both explicit forms remain optional even when proactive discovery works:
 
 ```text

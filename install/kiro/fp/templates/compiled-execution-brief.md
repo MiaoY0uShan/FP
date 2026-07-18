@@ -28,6 +28,10 @@ Only include this if Idea Cards were used.
 
 ## Delegation Plan
 
+## Delegated Execution Plan
+
+## Provider Compatibility And Spend Plan
+
 ## Learning Evaluation Plan
 
 ## Files To Read
@@ -84,6 +88,8 @@ Keep the stop/must-not boundary on the read/touch line so the form stays five li
   "write_authorized": true,
   "parent_authority": [],
   "delegations": [],
+  "delegated_execution_plan": null,
+  "provider_compatibility_plan": null,
   "learning_plan": null,
   "real_goal": "",
   "mvp_scope": "",
@@ -147,6 +153,54 @@ Keep the stop/must-not boundary on the read/touch line so the form stays five li
 ```
 
 For `multi_agent`, replace the empty delegation fields with the pre-edit parent ceiling, a reserved `delegation_artifact_root` under `.fp/artifacts`, and one task-local envelope per child. Each planned child records `id`, `parent_id`, `task_id`, `session_id`, `task_input_index`, `role`, `read_only`, `granted_authority`, `toolsets`, `context_refs`, `allowed_resources`, `owned_paths`, `depends_on`, `max_iterations`, `max_attempts`, `timeout_seconds`, `max_spawn_depth`, `workspace`, and `idempotency_key`. The Evidence Ledger must preserve these stable fields and add observed result, lease, parent-only artifact, and bound evidence fields.
+
+For `delegated_execution`, freeze work items rather than guessing runtime-created child IDs:
+
+```json
+{
+  "delegated_execution_plan": {
+    "runtime_host_id": "",
+    "spawn_strategy": "parent_only",
+    "max_active_concurrency": 1,
+    "max_total_threads": 5,
+    "final_review_required": true,
+    "work_items": [
+      {
+        "id": "T001",
+        "domain_id": "",
+        "allowed_resources": [],
+        "owned_paths": [],
+        "max_fix_cycles": 1
+      }
+    ]
+  }
+}
+```
+
+For `provider_compatibility`, freeze the effective chain and fail-closed budgets before any paid or delegated execution:
+
+```json
+{
+  "provider_compatibility_plan": {
+    "host_id": "",
+    "intermediaries": [],
+    "provider_id": "",
+    "protocol": "",
+    "requested_model": "",
+    "accepted_effective_models": [],
+    "retry_layers": [],
+    "max_physical_attempts_per_logical_request": 1,
+    "max_logical_requests": 0,
+    "max_physical_attempts": 0,
+    "max_input_tokens": 0,
+    "max_output_tokens": 0,
+    "max_subagent_threads": 0,
+    "max_identical_semantic_actions": 2,
+    "max_non_narrowing_iterations": 3,
+    "paid_probe_authorized": false
+  }
+}
+```
 
 For `background_learning`, also set:
 

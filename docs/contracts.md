@@ -20,7 +20,7 @@ The normative machine contract is `fp/contracts/evidence-ledger.v1.schema.json` 
 - hypothesis/probe/result/decision experiments;
 - verified and unverified claims;
 - scope/context violations and remaining risk;
-- remote/live and external-context evidence when applicable;
+- remote/live, external-context, delegated-execution, and provider-compatibility evidence when applicable;
 - optional continuation, deferred items, distributed delegation envelopes, and finite-sample learning evidence;
 - decision and next action.
 
@@ -51,6 +51,12 @@ External documentation is optional and version-pinned. Queries are single-topic,
 ## Distributed Delegation
 
 The parent records its authority ceiling and one task/result envelope per child: parent/dependency IDs, stable input order, bounded goal/context, role, granted authority, tools/resources, writer ownership, time/iteration/depth limits, idempotency key, result evidence, and terminal cleanup. The semantic validator rejects privilege escalation, cycles, overlapping writers, live mutation in children, unplanned envelope changes, stale leases, and non-terminal descendants.
+
+`delegated_execution_evidence` additionally binds the observed host runtime and fresh implementer/reviewer/fixer/re-review/final-review chain to frozen work items. Serial, dependency-ordered writer lease transfer is allowed; parallel overlapping writers remain invalid. Completed host threads may remain as history, while active concurrency and cumulative thread creation remain independently bounded.
+
+## Provider Compatibility And Spend
+
+`provider_compatibility_evidence` records the effective host/proxy/provider chain, exact nested retry multiplier, frozen and observed request/token/subagent budgets, semantic-action loop guard, host/proxy/provider usage reconciliation, strict UTF-8 classification, and semantic stream/tool completion. The validator derives `(max_retries + 1)` multiplication and blocks successful execution completion on retry/spend/loop overruns, unexplained accounting, unresolved model/proxy encoding corruption, or transport-only success.
 
 ## Generalization
 

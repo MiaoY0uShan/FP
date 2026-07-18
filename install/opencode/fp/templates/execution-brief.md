@@ -121,6 +121,19 @@ Use this as the final writable contract. Delete optional profile sections that d
 - Explicit acquisition approval evidence:
 - Fallback or dependent row left `unverified`:
 
+## Provider Compatibility And Spend Contract
+
+- Effective host/version -> settings/env -> proxy/gateway/version/health -> protocol -> requested/effective wire model -> provider:
+- Ignored, remapped, partial, and unsupported protocol fields:
+- Retry owners and product of every `(max_retries + 1)`:
+- Maximum logical requests / physical attempts / input tokens / output tokens / turns / time:
+- Maximum active and cumulative subagents:
+- Same-semantic-action and non-narrowing loop ceilings:
+- Canonical-body/stable-prefix hash and provider-native cache fields:
+- Strict UTF-8 stream/non-stream probe and negative control:
+- Host/proxy/provider billing reconciliation:
+- Paid-probe authority and stop condition:
+
 ## Multi-Agent Ownership
 
 - Parent/integrator and mutation lease:
@@ -128,6 +141,15 @@ Use this as the final writable contract. Delete optional profile sections that d
 - Disjoint writer scopes, if any:
 - Durable progress ledger:
 - Re-review gate:
+
+## Delegated Execution Plan
+
+- Observed host runtime and spawn/join/status/cancel primitives:
+- Frozen work items and independent domain IDs:
+- Fresh implementer -> task reviewer -> conditional fixer/re-review chain:
+- Maximum active concurrency, cumulative threads, and fix cycles:
+- Serial writer lease handoff:
+- Fresh final integration review and parent rerun:
 
 ## Max Scope And Stop Condition
 

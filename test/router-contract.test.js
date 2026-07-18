@@ -110,6 +110,97 @@ test('multi-agent protocol is single-writer and re-review gated', () => {
   assert.match(protocol, /parent.*dependency.*cycles/i);
 });
 
+test('delegated execution dispatches fresh task chains through verified host runtimes', () => {
+  const router = read('fp/SKILL.md');
+  const delegated = read('fp/delegated-execution/SKILL.md');
+  const parallel = read('fp/dispatch-parallel-domains/SKILL.md');
+  const runtimeGuide = read('fp/templates/agent-runtime-adapters.md');
+  const registry = JSON.parse(read('fp/contracts/agent-runtime-registry.v1.json'));
+
+  assert.match(router, /Delegated-Execution Profile/);
+  assert.match(router, /delegated-execution\/SKILL\.md/);
+  assert.match(router, /dispatch-parallel-domains\/SKILL\.md/);
+
+  const chain = [
+    'fresh implementer',
+    'fresh task reviewer',
+    'fresh fixer',
+    'fresh re-reviewer',
+    'fresh final integration reviewer'
+  ];
+  let previous = -1;
+  for (const marker of chain) {
+    const current = delegated.toLowerCase().indexOf(marker);
+    assert.ok(current > previous, `${marker} must appear after the previous delegated-execution stage`);
+    previous = current;
+  }
+  assert.match(delegated, /completed (?:agent )?threads.*accumulate|retain.*completed.*thread/i);
+  assert.match(delegated, /active concurrency.*bounded|bounded active concurrency/i);
+  assert.match(delegated, /capability detection|detect.*runtime/i);
+  assert.match(delegated, /do not.*invent.*(?:tool|primitive)|never.*invent.*(?:tool|primitive)/i);
+
+  assert.match(parallel, /independent problem domains/i);
+  assert.match(parallel, /shared (?:state|files|generated output).*serial|serial.*shared (?:state|files|generated output)/i);
+  assert.match(parallel, /fan[- ]out/i);
+  assert.match(parallel, /fan[- ]in/i);
+  assert.match(parallel, /one writer/i);
+
+  assert.match(runtimeGuide, /capability detection/i);
+  assert.match(runtimeGuide, /model API.*not.*subagent runtime|not.*subagent runtime.*model API/i);
+  assert.match(runtimeGuide, /fallback/i);
+
+  const requiredHosts = [
+    'codex', 'claude-code', 'gemini-cli', 'github-copilot', 'cursor', 'opencode',
+    'cline', 'roo-code', 'kiro', 'windsurf', 'aider', 'deepseek-api', 'kimi-cli', 'qwen-code',
+    'codebuddy', 'zcode', 'qoder', 'baidu-comate', 'huawei-codearts',
+    'kimi-api', 'qwen-api', 'zhipu-glm-api', 'minimax-api', 'iflow-cli',
+    'replit-agent', 'amazon-q-developer', 'jetbrains-junie', 'devin', 'continue', 'google-jules'
+  ];
+  const byId = new Map(registry.hosts.map((entry) => [entry.id, entry]));
+  for (const id of requiredHosts) {
+    const entry = byId.get(id);
+    assert.ok(entry, `runtime registry must cover ${id}`);
+    assert.ok(['native', 'extension', 'not_verified', 'not_applicable_model_api', 'retired'].includes(entry.delegation_status));
+    assert.ok(Array.isArray(entry.official_sources) && entry.official_sources.length > 0, `${id} needs official evidence`);
+    assert.match(entry.last_verified, /^\d{4}-\d{2}-\d{2}$/);
+    if (entry.delegation_status === 'native') {
+      assert.ok(Array.isArray(entry.primitives?.spawn) && entry.primitives.spawn.length > 0, `${id} native runtime needs a spawn primitive`);
+    }
+  }
+  assert.equal(byId.get('deepseek-api').delegation_status, 'not_applicable_model_api');
+  assert.equal(byId.get('qoder').delegation_status, 'native');
+  assert.equal(byId.get('iflow-cli').delegation_status, 'retired');
+});
+
+test('provider compatibility profile bounds paid retries, loops, cache claims, and encoding', () => {
+  const router = read('fp/SKILL.md');
+  const skill = read('fp/provider-compatibility/SKILL.md');
+  const guard = read('fp/templates/provider-compatibility-and-spend-guard.md');
+  const pressureTests = read('TEST_FP.md');
+
+  assert.match(router, /Provider-Compatibility Profile/);
+  assert.match(router, /provider-compatibility\/SKILL\.md/);
+  assert.match(skill, /host.*proxy.*provider/i);
+  assert.match(skill, /product of.*max_retries.*\+\s*1|retry multiplication/i);
+  assert.match(skill, /single retry owner/i);
+  assert.match(skill, /same semantic (?:tool )?action/i);
+  assert.match(skill, /three non-narrowing/i);
+  assert.match(skill, /request.*token.*subagent.*budget/i);
+  assert.match(skill, /HTTP 200.*not.*semantic completion|semantic completion.*not.*HTTP 200/i);
+  assert.match(skill, /strict UTF-8/i);
+
+  assert.match(guard, /canonical body hash/i);
+  assert.match(guard, /stable-prefix hash/i);
+  assert.match(guard, /prompt_cache_hit_tokens/i);
+  assert.match(guard, /prompt_cache_miss_tokens/i);
+  assert.match(guard, /provider (?:invoice|billing).*authoritative|authoritative.*provider (?:invoice|billing)/i);
+  assert.match(guard, /negative control/i);
+  assert.match(guard, /中文🙂€𠮷/);
+  assert.match(guard, /no paid probe|paid probe.*authority/i);
+  assert.match(pressureTests, /Proxy Retry Bomb And Tool Loop/);
+  assert.match(pressureTests, /Cache And UTF-8 Claims Need Provider Evidence/);
+});
+
 test('background learning uses blind finite-case generalization rather than self-rewrite', () => {
   const router = read('fp/SKILL.md');
   const gate = read('fp/generalization-gate/SKILL.md');

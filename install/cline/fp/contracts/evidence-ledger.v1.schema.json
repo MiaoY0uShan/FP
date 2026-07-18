@@ -48,6 +48,8 @@
           "stateful_ui",
           "external_context",
           "multi_agent",
+          "delegated_execution",
+          "provider_compatibility",
           "continuation",
           "self_iteration",
           "background_learning"
@@ -104,6 +106,8 @@
       "items": { "$ref": "#/$defs/delegation" }
     },
     "multi_agent_evidence": { "$ref": "#/$defs/multiAgentEvidence" },
+    "delegated_execution_evidence": { "$ref": "#/$defs/delegatedExecutionEvidence" },
+    "provider_compatibility_evidence": { "$ref": "#/$defs/providerCompatibilityEvidence" },
     "external_context_evidence": {
       "type": "array",
       "items": { "$ref": "#/$defs/externalContextEvidence" }
@@ -627,6 +631,279 @@
         "quality_reviewer_delegation_id": { "$ref": "#/$defs/nonPlaceholderString" }
       }
     },
+    "delegatedExecutionRuntime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "host_id",
+        "registry_version",
+        "delegation_status",
+        "capability_status",
+        "spawn_primitive",
+        "join_primitive",
+        "status_primitive",
+        "cancel_primitive",
+        "capability_evidence_ref"
+      ],
+      "properties": {
+        "host_id": { "$ref": "#/$defs/nonPlaceholderString" },
+        "registry_version": { "$ref": "#/$defs/nonPlaceholderString" },
+        "delegation_status": { "enum": ["native", "extension", "not_verified", "not_applicable_model_api", "retired"] },
+        "capability_status": { "enum": ["available", "unavailable", "unverified"] },
+        "spawn_primitive": { "type": ["string", "null"], "minLength": 1 },
+        "join_primitive": { "type": ["string", "null"], "minLength": 1 },
+        "status_primitive": { "type": ["string", "null"], "minLength": 1 },
+        "cancel_primitive": { "type": ["string", "null"], "minLength": 1 },
+        "capability_evidence_ref": { "type": "string", "pattern": "^/commands_run/[0-9]+$" }
+      }
+    },
+    "delegatedExecutionTaskChain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "plan_task_id",
+        "domain_id",
+        "implementer_delegation_id",
+        "reviewer_delegation_ids",
+        "fixer_delegation_ids",
+        "implementation_evidence_ref",
+        "review_evidence_refs",
+        "fix_evidence_refs",
+        "verdict"
+      ],
+      "properties": {
+        "plan_task_id": { "$ref": "#/$defs/nonPlaceholderString" },
+        "domain_id": { "$ref": "#/$defs/nonPlaceholderString" },
+        "implementer_delegation_id": { "$ref": "#/$defs/nonPlaceholderString" },
+        "reviewer_delegation_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nonPlaceholderString" }
+        },
+        "fixer_delegation_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nonPlaceholderString" }
+        },
+        "implementation_evidence_ref": { "type": "string", "pattern": "^/commands_run/[0-9]+$" },
+        "review_evidence_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^/commands_run/[0-9]+$" }
+        },
+        "fix_evidence_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^/commands_run/[0-9]+$" }
+        },
+        "verdict": { "enum": ["pass", "fail", "insufficient_evidence"] }
+      }
+    },
+    "delegatedExecutionEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "run_id",
+        "runtime",
+        "max_total_threads",
+        "completed_thread_policy",
+        "domain_ids",
+        "task_chains",
+        "final_reviewer_delegation_id",
+        "final_review_verdict",
+        "final_review_evidence_ref",
+        "parent_integration_evidence_refs",
+        "agents_terminal"
+      ],
+      "properties": {
+        "run_id": { "$ref": "#/$defs/nonPlaceholderString" },
+        "runtime": { "$ref": "#/$defs/delegatedExecutionRuntime" },
+        "max_total_threads": { "type": "integer", "minimum": 1 },
+        "completed_thread_policy": { "enum": ["retain_history", "close_if_supported", "host_managed"] },
+        "domain_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nonPlaceholderString" }
+        },
+        "task_chains": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/delegatedExecutionTaskChain" }
+        },
+        "final_reviewer_delegation_id": { "$ref": "#/$defs/nonPlaceholderString" },
+        "final_review_verdict": { "enum": ["pass", "fail", "insufficient_evidence"] },
+        "final_review_evidence_ref": { "type": "string", "pattern": "^/commands_run/[0-9]+$" },
+        "parent_integration_evidence_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^/commands_run/[0-9]+$" }
+        },
+        "agents_terminal": { "type": "boolean" }
+      }
+    },
+    "providerRetryLayer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "max_retries"],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonPlaceholderString" },
+        "max_retries": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "providerCompatibilityEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "chain",
+        "retry_budget",
+        "spend_budget",
+        "loop_guard",
+        "accounting",
+        "encoding",
+        "semantic_completion"
+      ],
+      "properties": {
+        "chain": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "host_id", "host_version", "protocol", "intermediaries", "provider_id",
+            "requested_model", "effective_model", "compatibility_status", "evidence_ref"
+          ],
+          "properties": {
+            "host_id": { "$ref": "#/$defs/nonPlaceholderString" },
+            "host_version": { "$ref": "#/$defs/nonPlaceholderString" },
+            "protocol": { "$ref": "#/$defs/nonPlaceholderString" },
+            "intermediaries": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["id", "version", "max_retries"],
+                "properties": {
+                  "id": { "$ref": "#/$defs/nonPlaceholderString" },
+                  "version": { "$ref": "#/$defs/nonPlaceholderString" },
+                  "max_retries": { "type": "integer", "minimum": 0 }
+                }
+              }
+            },
+            "provider_id": { "$ref": "#/$defs/nonPlaceholderString" },
+            "requested_model": { "$ref": "#/$defs/nonPlaceholderString" },
+            "effective_model": { "$ref": "#/$defs/nonPlaceholderString" },
+            "compatibility_status": { "enum": ["full", "partial", "unverified", "incompatible"] },
+            "evidence_ref": { "type": "string", "pattern": "^/commands_run/[0-9]+$" }
+          }
+        },
+        "retry_budget": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["layers", "computed_worst_case_attempts", "max_physical_attempts_per_logical_request", "evidence_ref"],
+          "properties": {
+            "layers": {
+              "type": "array",
+              "minItems": 1,
+              "items": { "$ref": "#/$defs/providerRetryLayer" }
+            },
+            "computed_worst_case_attempts": { "type": "integer", "minimum": 1 },
+            "max_physical_attempts_per_logical_request": { "type": "integer", "minimum": 1 },
+            "evidence_ref": { "type": "string", "pattern": "^/commands_run/[0-9]+$" }
+          }
+        },
+        "spend_budget": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "max_logical_requests", "max_physical_attempts", "max_input_tokens", "max_output_tokens",
+            "max_subagent_threads", "observed_logical_requests", "observed_physical_attempts",
+            "observed_input_tokens", "observed_output_tokens", "observed_subagent_threads", "evidence_ref"
+          ],
+          "properties": {
+            "max_logical_requests": { "type": "integer", "minimum": 0 },
+            "max_physical_attempts": { "type": "integer", "minimum": 0 },
+            "max_input_tokens": { "type": "integer", "minimum": 0 },
+            "max_output_tokens": { "type": "integer", "minimum": 0 },
+            "max_subagent_threads": { "type": "integer", "minimum": 0 },
+            "observed_logical_requests": { "type": "integer", "minimum": 0 },
+            "observed_physical_attempts": { "type": "integer", "minimum": 0 },
+            "observed_input_tokens": { "type": "integer", "minimum": 0 },
+            "observed_output_tokens": { "type": "integer", "minimum": 0 },
+            "observed_subagent_threads": { "type": "integer", "minimum": 0 },
+            "evidence_ref": { "type": "string", "pattern": "^/commands_run/[0-9]+$" }
+          }
+        },
+        "loop_guard": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "max_identical_semantic_actions", "max_non_narrowing_iterations",
+            "observed_identical_semantic_actions", "observed_non_narrowing_iterations",
+            "fingerprint_strategy", "triggered", "evidence_ref"
+          ],
+          "properties": {
+            "max_identical_semantic_actions": { "type": "integer", "minimum": 1 },
+            "max_non_narrowing_iterations": { "type": "integer", "minimum": 1 },
+            "observed_identical_semantic_actions": { "type": "integer", "minimum": 0 },
+            "observed_non_narrowing_iterations": { "type": "integer", "minimum": 0 },
+            "fingerprint_strategy": { "$ref": "#/$defs/nonPlaceholderString" },
+            "triggered": { "type": "boolean" },
+            "evidence_ref": { "type": "string", "pattern": "^/commands_run/[0-9]+$" }
+          }
+        },
+        "accounting": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "transcript_responses", "proxy_requests", "provider_billed_requests", "cache_hit_tokens",
+            "cache_miss_tokens", "cache_semantics", "reconciliation_status", "discrepancy", "evidence_ref"
+          ],
+          "properties": {
+            "transcript_responses": { "type": "integer", "minimum": 0 },
+            "proxy_requests": { "type": "integer", "minimum": 0 },
+            "provider_billed_requests": { "type": ["integer", "null"], "minimum": 0 },
+            "cache_hit_tokens": { "type": "integer", "minimum": 0 },
+            "cache_miss_tokens": { "type": "integer", "minimum": 0 },
+            "cache_semantics": { "$ref": "#/$defs/nonPlaceholderString" },
+            "reconciliation_status": { "enum": ["reconciled", "partially_reconciled", "unexplained", "unavailable"] },
+            "discrepancy": { "$ref": "#/$defs/nonPlaceholderString" },
+            "evidence_ref": { "type": "string", "pattern": "^/commands_run/[0-9]+$" }
+          }
+        },
+        "encoding": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "strict_utf8_checked", "model_replacement_char_count", "tool_output_replacement_char_count",
+            "classification", "evidence_ref"
+          ],
+          "properties": {
+            "strict_utf8_checked": { "type": "boolean" },
+            "model_replacement_char_count": { "type": "integer", "minimum": 0 },
+            "tool_output_replacement_char_count": { "type": "integer", "minimum": 0 },
+            "classification": { "enum": ["clean", "tool_output_only", "model_output", "proxy_stream", "terminal_rendering", "unresolved"] },
+            "evidence_ref": { "type": "string", "pattern": "^/commands_run/[0-9]+$" }
+          }
+        },
+        "semantic_completion": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "http_success_not_sufficient", "terminal_stop_reason_verified", "stream_utf8_verified",
+            "tool_round_trip_verified", "evidence_ref"
+          ],
+          "properties": {
+            "http_success_not_sufficient": { "type": "boolean" },
+            "terminal_stop_reason_verified": { "type": "boolean" },
+            "stream_utf8_verified": { "type": "boolean" },
+            "tool_round_trip_verified": { "type": "boolean" },
+            "evidence_ref": { "type": "string", "pattern": "^/commands_run/[0-9]+$" }
+          }
+        }
+      }
+    },
     "externalContextEvidence": {
       "type": "object",
       "additionalProperties": false,
@@ -792,7 +1069,7 @@
           "type": "array",
           "minItems": 1,
           "uniqueItems": true,
-          "items": { "enum": ["spec", "quality", "cancellation", "idempotency", "lease_cleanup", "context_isolation", "integration"] }
+          "items": { "enum": ["spec", "quality", "cancellation", "idempotency", "lease_cleanup", "context_isolation", "integration", "runtime_detection", "implementation", "task_review", "fix", "final_review", "delegated_integration"] }
         },
         "task_ids": { "$ref": "#/$defs/stringArray" }
       }

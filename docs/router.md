@@ -12,7 +12,7 @@ user authority/read-only constraints
 -> Close (pass/fail)
 ```
 
-Profiles—remote/stateful, OpenWrt, external context/MCP, multi-agent, continuation, stateful UI, self-iteration, and background learning—layer onto a route without forcing the full chain.
+Profiles—remote/stateful, OpenWrt, external context/MCP, provider compatibility, multi-agent, delegated execution, continuation, stateful UI, self-iteration, and background learning—layer onto a route without forcing the full chain.
 
 ## Routes
 
@@ -35,5 +35,9 @@ After multiple fixes, run batch regression: re-check every originally-failed ite
 Evidence reuse is state-bound: relevant mutations and declared safety checks still require fresh proof. After a timeout following a possible remote mutation, read back effective state once and classify `applied | not_applied | split | unknown` before any retry.
 
 Metrics and learning are optional and evidence-gated. Background learning stages read-only proposals; `generalization-gate` separates author from evaluator and blocks single-case schema/automation promotion. Unknown stays unknown; no baseline means no improvement claim.
+
+Delegated execution activates only for a frozen executable plan and an observed host-native subagent runtime. It creates fresh implementer/reviewer/fixer/re-review/final-review threads within active and cumulative limits. Independent-domain fan-out requires disjoint mutable resources; otherwise task chains stay serial.
+
+Provider compatibility activates for third-party model endpoints, gateways, local proxies, or suspected loops/spend/cache/encoding faults. It resolves the effective chain, checks local proxy health, multiplies nested retry limits, freezes request/token/subagent budgets, and fails closed on semantic loops or incomplete stream/tool evidence. A paid diagnostic request needs explicit authority.
 
 An available task-required MCP is called automatically within current authority. A missing MCP requires an explicit acquisition brief and user approval before download/install; installation does not grant credentials, broader mutations, or resident-process permission.

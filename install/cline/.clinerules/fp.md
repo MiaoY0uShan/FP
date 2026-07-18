@@ -13,7 +13,7 @@ Apply user authority and read-only limits as a global gate first. Then:
 3. **Build** — scale the output to task size: Small → Tiny Brief, Medium → Execution Brief + Ledger, Vague → Idea Cards, Large → minimum modules → final brief.
 4. **Close** — pass with matched evidence, or fail → split smaller.
 
-Layer remote/live-system, OpenWrt, stateful-UI, external-context, multi-agent, continuation, self-iteration, and background-learning as profiles on the selected route.
+Layer remote/live-system, OpenWrt, stateful-UI, external-context, provider-compatibility, multi-agent, delegated-execution, continuation, self-iteration, and background-learning as profiles on the selected route.
 
 ## Route Weight
 
@@ -40,7 +40,7 @@ After multiple fixes across a target or fleet:
 3. **Reuse before creation:** need to exist? → already in codebase? → stdlib? → native platform? → installed dep? → one line? → only then add minimum new code.
 4. **State read set, touch set, verify method** before the first edit.
 5. **Rerun original symptom + regression + negative control** after a fix.
-6. **One writer per shared file set.** Parallelize only independent investigation or review.
+6. **One active writer per shared file set.** Ordinary parallelism is for independent investigation or review. Writing children require delegated execution, and a later fresh fixer receives paths only after a serial lease handoff.
 7. **Live systems**: preserve management path, create rollback point, inspect desired/generated/effective state, verify with real client path. A service restart or `ready` label is not proof of function.
 8. **Redact secrets** from logs, examples, handoffs, and final answers.
 9. **Reuse supported evidence**: another diagnostic probe must change a named decision or fill a named acceptance row; otherwise stop. Relevant mutations and declared safety checks still require fresh evidence.
@@ -55,9 +55,15 @@ MCP availability never expands write, credential, deployment, messaging, or live
 
 Parent is integrator, default writer, and final verifier. Subagents get bounded envelopes (goal, scope, invariants, forbidden actions, output). Leaves cannot delegate, deploy, promote memory, message externally, use credentials, or mutate live state. Parent reruns critical checks rather than trusting summaries.
 
+When the full skill routes to delegated execution, load `delegated-execution/SKILL.md`: freeze work-item and thread budgets, detect the current host's real subagent tools, then use a fresh implementer, fresh task reviewer, fresh fixer/re-reviewer when needed, and fresh final integration reviewer. Completed threads may remain visible, but active concurrency is bounded and all live threads must become terminal. Load `dispatch-parallel-domains/SKILL.md` only for proved independent domains. A model API alone is not a subagent runtime; never invent tools or shell out to another AI CLI.
+
 ## External Context
 
 Retrieve only the exact topic and installed version needed. Prefer authoritative sources. A stale external claim blocks dependent completion; a stale continuation blocks writes. Provider failure never disables routing.
+
+## Provider Compatibility
+
+When an agent host uses a third-party/API-compatible model, gateway, or local proxy, load `provider-compatibility/SKILL.md`. Resolve the effective host/proxy/provider chain, verify proxy health, multiply nested retry ceilings, and freeze request/token/subagent budgets before paid execution. Stop before a third identical semantic action or after three non-narrowing turns. HTTP 200 and proxy estimates are not semantic-completion or billing proof; verify strict UTF-8, stop reason, tool round trip, and provider-native usage. Paid probes and external configuration changes need their own authority.
 
 ## Learning
 

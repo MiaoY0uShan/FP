@@ -22,5 +22,10 @@ Expected behavior:
 - large, vague, architectural, or risky task -> full chain
 - failed task -> Failure-to-Smaller-Task Protocol and a smaller brief
 - protocol or agent-behavior change -> confirm intent and boundaries before editing
+- multi-agent UI -> treat worktree fleets and multitask UI as user-facing orchestration; do not claim fresh model-callable subagents without an observed spawn/join schema
+
+## Delegated execution runtime
+
+No stable model-callable Cursor subagent lifecycle is assumed. Consult `fp/contracts/agent-runtime-registry.v1.json` and the active tool catalog. If spawn/join/status/cancel are not observed, execute serially in the parent or use only user-authorized external/UI orchestration; never invent tools.
 
 This adapter does not add a runtime, CLI, npm package, npx installer, pip package, or database.

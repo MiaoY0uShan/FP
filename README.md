@@ -194,7 +194,11 @@ FP uses a compressed 4-route model:
 
 Tiny clear edit → Five-line brief and one relevant check. Active outage → `OBSERVE → CONTAIN → RESTORE → REPAIR → LEARN`. Multi-device fleet scan → read-only per-target evidence, cross-target comparison, then authorized repair per target.
 
-Live systems, external context, multi-agent work, continuation, self-iteration, and background learning layer onto these routes.
+Live systems, external context, provider compatibility/spend control, multi-agent and delegated execution, continuation, self-iteration, and background learning layer onto these routes.
+
+Delegated execution is now explicit: each work item gets a fresh implementer, fresh task reviewer, conditional fresh fixer and fresh re-reviewer, then a fresh final integration reviewer before the parent reruns integration checks. Independent problem domains fan out only after shared state, files, generated outputs, and dependencies are proven disjoint. FP chooses the installed host's observed native runtime—such as Codex `spawn_agent`, Claude Code `Agent`, Kimi Code `Agent`/`AgentSwarm`, or Qwen Code `agent`—rather than guessing from the model name. Human names shown by a host UI are cosmetic; FP uses deterministic task IDs.
+
+For third-party providers and local gateways, the provider-compatibility profile resolves the effective host -> proxy -> wire model -> provider chain, checks proxy health, multiplies nested retry ceilings, freezes request/token/subagent budgets, stops repeated semantic actions, and reconciles provider-native usage. It can prevent unbounded spend and pinpoint a broken boundary; it cannot add protocol features that a provider does not implement.
 
 When an installed MCP is genuinely required for an acceptance row, FP uses it automatically inside the task's existing authority. If it is missing, FP first shows the exact source, version, install scope, permissions/data exposure, authentication needs, verification, and rollback; nothing is downloaded or installed until the user explicitly approves that brief.
 
@@ -221,6 +225,14 @@ No. A one-line fix should not need a constitution.
 ### Can a subagent declare the whole task complete?
 
 It can return evidence and a verdict. The parent still reruns critical checks and owns the final claim.
+
+### Why do some tools show foreign human names for agents?
+
+That is host UI labeling, not an FP requirement. FP records semantic IDs such as `T03-implementer` and `T03-reviewer`; the runtime may render any nickname without changing identity, ownership, freshness, or evidence.
+
+### Does DeepSeek, Kimi, or Qwen API itself provide subagents?
+
+No. Those are model providers. Kimi Code and Qwen Code are agent hosts with their own subagent tools; a model API used behind Claude Code still uses Claude Code's runtime. The official-source registry distinguishes hosts from model-only APIs and fails closed when the installed capability is missing.
 
 ### Does it learn from one successful run?
 

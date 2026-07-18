@@ -12,7 +12,13 @@ Infer FP from the user's goal. Activate it automatically for engineering work an
 - **Failed task:** Split smaller instead of retrying the same large task.
 - **Protocol or agent-behavior change:** Confirm intent and boundaries before editing.
 - **Debug-first:** Gather read-only, discriminating evidence before editing an unknown-cause failure.
-- **Multi-agent:** Parallelize independent work, keep a single writer per shared file set, and have the parent verify.
+- **Multi-agent:** Ordinary children handle independent investigation/review. Writing children use delegated execution, a single writer per shared file set, and parent verification.
+
+## Delegated execution runtime
+
+Detect `Agent` (or the compatible `Task` alias) in the active tool list. A new call is a fresh stage; foreground return or task notification is join, `TaskList` is status, and `TaskStop` is cancellation when exposed. `SendMessage`/resume continues the same child and is never fresh. Even when the installed release supports nested children, FP removes `Agent` from leaves and the parent dispatches every implement/review/fix/re-review stage.
+
+When `ANTHROPIC_BASE_URL` points to a third-party provider or local proxy, also load `fp/provider-compatibility/SKILL.md`: verify proxy health, calculate nested retry multiplication, and freeze request/token/subagent budgets before execution.
 
 ## Rules
 

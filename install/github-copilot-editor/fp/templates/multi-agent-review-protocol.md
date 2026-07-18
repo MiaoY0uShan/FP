@@ -1,6 +1,6 @@
 # Multi-Agent Review Protocol
 
-Use only when independent investigation or review materially reduces risk or elapsed time.
+Use for independent investigation or review, and as the common safety contract under explicit delegated execution. Writing children are forbidden unless `delegated_execution` is active and the host runtime passed capability detection.
 
 ## Ownership
 
@@ -8,8 +8,9 @@ Use only when independent investigation or review materially reduces risk or ela
 - Evidence reviewer: read-only; attempts to falsify the acceptance and completion evidence.
 - Integration reviewer: read-only; checks cross-file, packaging, runtime, rollback, and cleanup consistency.
 - Specialist: replaces or supplements a reviewer only for a distinct bounded risk.
+- Delegated implementer/fixer: writing leaf with one bounded work item, owned paths, covering checks, and a time-bound mutation lease.
 
-Default to parent plus at most two reviewers and a concurrency ceiling of three. One writer owns each shared file set. Parallel writers must have disjoint files and no shared generated output. A live target has exactly one mutation lease, held by the parent. Exceeding a declared concurrency, depth, iteration, or time limit fails explicitly rather than silently dropping work.
+For ordinary review, default to parent plus at most two reviewers and a concurrency ceiling of three. Delegated execution may retain many completed agent threads, but the brief separately bounds active concurrency, cumulative thread creation, and fix cycles. The one writer rule means one active writer owns each shared file set. Parallel writers must have disjoint files and no shared generated output. An implementer may hand the same paths to a later fresh fixer only through a dependency-ordered terminal handoff with non-overlapping execution and released leases. A live target has exactly one mutation lease, held by the parent. Exceeding a declared concurrency, depth, iteration, thread, fix-cycle, or time limit fails explicitly rather than silently dropping work.
 
 Child authority and capabilities must be a subset of the parent authority intersected with the task envelope. A child cannot gain write, deploy, credential, messaging, memory, delegation, or live-system rights that the parent did not explicitly possess and pass down. Read-only reviewers remain read-only even if their tools could technically mutate.
 
@@ -60,9 +61,11 @@ For canonical Evidence Ledger v1, record the authority ceiling and every child t
 }
 ```
 
-Direct children use `parent_id=null`. Only an `orchestrator` may own descendants or receive `delegate`; leaves and reviewers use `max_spawn_depth=0`. The validator rejects parent/dependency cycles, unsuccessful or late dependencies, authority/resources/depth outside either the root or direct-parent ceiling, leaf or read-only mutation, any delegated live-system mutation, overlapping writer paths, artifact paths outside the reserved parent-owned root, non-contiguous or out-of-order task results, observed concurrency/iteration/attempt/time overruns, actual summary overflow, stale or unbound leases, broken cancellation cascade, non-terminal children, and dangling or unbound evidence. Children return long output for parent persistence at the declared logical artifact path; they do not write that path themselves.
+Direct children use `parent_id=null`. Only an `orchestrator` may own descendants or receive `delegate`; leaves and reviewers use `max_spawn_depth=0`. The validator rejects parent/dependency cycles, unsuccessful or late dependencies, authority/resources/depth outside either the root or direct-parent ceiling, leaf or read-only mutation, any delegated live-system mutation, parallel or unordered overlapping writer paths, artifact paths outside the reserved parent-owned root, non-contiguous or out-of-order task results, observed concurrency/iteration/attempt/time overruns, actual summary overflow, stale or unbound leases, broken cancellation cascade, non-terminal children, and dangling or unbound evidence. Children return long output for parent persistence at the declared logical artifact path; they do not write that path themselves.
 
 One logical task has one result envelope. `attempts_used` records how many idempotent attempts ran and cannot exceed `max_attempts`; the separately bound idempotency command proves retry behavior. Results are stored and integrated in `task_input_index` order, not completion order. Parent cancellation recursively cancels descendants. `multi_agent_evidence` names distinct read-only spec and quality reviewers and points to separate observed commands for spec, quality, cancellation, idempotency, lease cleanup, context isolation, and parent integration. Each command carries a `multi_agent_binding` for the run, producer, gates, and covered task IDs; booleans or prose alone never close a gate.
+
+Under delegated execution, the compiled brief freezes work items, domains, resources, ownership, active and cumulative thread limits, and `max_fix_cycles`; it does not guess future runtime instance IDs. `delegated_execution_evidence` binds the fresh implementer, task reviewer, conditional fixer, fresh re-reviewer, final integration reviewer, runtime detection, and parent integration to those frozen work items. Every stage uses a unique task and session identity. A follow-up or resumed turn within one envelope never proves a fresh stage.
 
 ## Task-Local Context Envelope
 

@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.4.5 — Delegated execution and provider spend safety
+
+- Added host-capability-driven delegated execution: fresh implementer, task reviewer, conditional fixer/re-reviewer, final integration reviewer, and parent verification.
+- Added an explicit independent-problem-domain fan-out/fan-in skill with one-writer leases and bounded active/cumulative threads.
+- Added an official-source runtime registry covering native, extension, unverified, model-API-only, and retired surfaces across Codex, Claude Code, Gemini CLI, Copilot, Kimi/Qwen/CodeBuddy/Qoder/ZCode/Comate/CodeArts, and other mainstream tools.
+- Added provider compatibility and spend gates for host/proxy/provider health, nested retry multiplication, request/token/subagent budgets, semantic loop breaking, provider-native cache accounting, strict UTF-8 boundaries, and stream/tool completion.
+- Added machine-contract and negative-control tests for fresh sessions, review/fix chains, serial writer handoff, retry bombs, budget overruns, loops, and encoding failures.
+
 ## v0.4.4 — Decision-relevant verification and safe remote retry
 
 - Added a decision-relevance gate: after a diagnostic hypothesis is supported, another diagnostic probe must be able to change a named decision or fill a named acceptance row; decision-neutral corroboration reuses the bound evidence and stops.

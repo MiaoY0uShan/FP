@@ -37,7 +37,7 @@ active incident
 
 A read-only incident may OBSERVE and recommend reversible containment/restoration, but it may not mutate the target. Route priority never expands authority.
 
-Remote/stateful, OpenWrt/live-system, external-context/MCP, multi-agent, continuation, stateful-UI, self-iteration, and background-learning are profiles layered onto a route. They are not reasons to load the full chain by themselves.
+Remote/stateful, OpenWrt/live-system, external-context/MCP, provider-compatibility, multi-agent, delegated-execution, continuation, stateful-UI, self-iteration, and background-learning are profiles layered onto a route. They are not reasons to load the full chain by themselves. Independent-domain parallelism is an explicit multi-agent sub-route, never an inference from task count alone.
 
 ## Routes
 
@@ -133,10 +133,10 @@ After completing multiple fixes across a target or fleet, run a closing sweep be
 
 ## Multi-Agent Profile
 
-Use parallel agents only for independent investigation or review. The parent is the integrator and independently verifies every completion claim.
+Use ordinary parallel agents for independent investigation or review. Use writing subagents only through the Delegated-Execution Profile or another explicitly bounded protocol. The parent is the integrator and independently verifies every completion claim.
 
-- Default to one parent plus at most two reviewers; add a specialist only for a distinct, bounded risk.
-- One writer owns each shared file set. Only the parent holds a live-system mutation lease.
+- For ordinary multi-agent work, default to one parent plus at most two reviewers; add a specialist only for a distinct, bounded risk. Delegated execution may accumulate more terminal threads while keeping active concurrency and total thread creation within the frozen brief.
+- One active writer owns each shared file set. A delegated implementer may transfer the same paths to a later fresh fixer only after a dependency-ordered terminal handoff and observed lease release. Only the parent holds a live-system mutation lease.
 - Give every subagent a task-local envelope: goal, exact files/resources, invariants, verification, forbidden actions, and output location.
 - Keep first-pass reviewers independent. Resolve disagreement with evidence, not a vote.
 - Record spec and quality verdicts. Important fixes must be re-reviewed.
@@ -145,6 +145,16 @@ Use parallel agents only for independent investigation or review. The parent is 
 For distributed or resumable work, every child also receives a structured task/result envelope: task/session/parent IDs, bounded goal/context, role, authority/tool ceiling, dependency IDs, max iterations/attempts/time/depth, workspace/resources, idempotency key, terminal status, bound evidence, parent-only reserved artifact reference, touched files, checks, actual summary usage, and start/finish time. Return results in task-input order. Derive concurrency, dependency, timeout, retry, cancellation, and summary gates from envelopes. Every writer needs a holder/path/time-bound lease with observed release evidence. Distinct read-only spec and quality reviewers return separately bound commands; booleans or prose alone never close the integration gate. Leaf agents cannot delegate, promote memory, message externally, deploy, use credentials, or mutate live state.
 
 Load `templates/multi-agent-review-protocol.md` when this profile applies.
+
+## Delegated-Execution Profile
+
+Use when an accepted executable plan should be carried out by fresh task-local agents and the current host exposes a verified subagent runtime. Do not use it merely because a tiny task could be delegated, and do not infer it from a model name.
+
+Freeze work items, independent domain IDs, authority, path ownership, active-concurrency and cumulative-thread limits, fix-cycle budgets, final review, and parent checks before dispatch. Then load `delegated-execution/SKILL.md`. It requires a fresh implementer for every work item, a fresh task reviewer carrying both spec and quality verdicts, a fresh fixer plus fresh re-reviewer for blocking findings, a fresh final integration reviewer, and parent-side integration verification.
+
+Before the first spawn, load `templates/agent-runtime-adapters.md`, inspect the host's actual tool catalog, and consult `contracts/agent-runtime-registry.v1.json`. Use host-native primitives only when observed. Capability absence falls back explicitly; never invent tools or launch another AI CLI from a shell.
+
+When two or more domains are claimed independent, also load `dispatch-parallel-domains/SKILL.md`. Fan out only after proving disjoint mutable state, writer paths, generated outputs, dependencies, rollback, and acceptance evidence. Otherwise keep the chains serial.
 
 ### Multi-Device Coordination
 
@@ -166,6 +176,14 @@ Capability claims must be proved on the target. A successful restart or `ready` 
 ## External Context Profile
 
 When a task depends on a current/versioned library or API, retrieve only the exact topic and installed version needed. Prefer authoritative sources, redact external queries, bound retries, record freshness, and keep unknown claims unverified. Provider failure never disables the FP router, but a fact required for acceptance blocks dependent edits and completion until local or official evidence verifies it. External providers are optional; FP still works without network, API keys, MCP, or a CLI. Load `templates/context-retrieval-contract.md`.
+
+## Provider-Compatibility Profile
+
+Use when an agent host runs through a third-party model provider, API-compatible endpoint, gateway, or local proxy, or when retries, loops, token spend, cache accounting, streaming, tool calls, or encoding are suspect. Layer it over debug-first while the cause is unknown and keep external configuration read-only unless the user authorized that exact change.
+
+Load `provider-compatibility/SKILL.md` and `templates/provider-compatibility-and-spend-guard.md`. Resolve the effective host -> environment/settings -> proxy/gateway -> wire model -> provider chain, check proxy health before paid work, and compare the installed versions with official compatibility limits. Freeze request, physical-attempt, token, turn, time, and subagent budgets before execution. Nested retry owners are multiplicative; a budget breach, third identical semantic action, or three non-narrowing iterations stops new work.
+
+HTTP success alone never proves semantic completion. Verify the terminal stop reason, incremental strict UTF-8 stream, tool round trip, provider-native usage fields, and reconciled host/proxy/provider accounting. A model API does not become a subagent runtime merely because an agent host uses it.
 
 ## MCP Capability Profile
 

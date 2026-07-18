@@ -253,6 +253,219 @@ function multiAgentEvidenceFixture(ledger, runId = 'multi-run-fixture') {
   };
 }
 
+function delegatedExecutionFixture() {
+  const ledger = fixture();
+  const runId = 'delegated-run-fixture';
+  ledger.profiles = ['multi_agent', 'delegated_execution'];
+  ledger.created_at = '2026-07-14T01:00:00Z';
+  ledger.delegation_artifact_root = '.fp/artifacts';
+  ledger.parent_authority = ['read', 'write', 'execute_checks', 'delegate'];
+  ledger.scope.allowed_read.push('fp/**', 'test/**');
+
+  const implementer = delegationFixture('implementer-reset', 0, 'leaf', {
+    task_id: 'task-implement-reset',
+    session_id: 'session-implement-reset',
+    read_only: false,
+    granted_authority: ['read', 'write', 'execute_checks'],
+    toolsets: ['filesystem-read', 'filesystem-write', 'test-runner'],
+    allowed_resources: ['src/auth/reset.ts', 'tests/auth/test_reset.py'],
+    owned_paths: ['src/auth/reset.ts'],
+    files_touched: ['src/auth/reset.ts'],
+    started_at: '2026-07-14T00:00:00Z',
+    finished_at: '2026-07-14T00:01:00Z'
+  });
+  const reviewer = delegationFixture('review-reset', 1, 'evidence_reviewer', {
+    task_id: 'task-review-reset',
+    session_id: 'session-review-reset',
+    depends_on: [implementer.id],
+    started_at: '2026-07-14T00:01:00Z',
+    finished_at: '2026-07-14T00:02:00Z'
+  });
+  const fixer = delegationFixture('fix-reset', 2, 'leaf', {
+    task_id: 'task-fix-reset',
+    session_id: 'session-fix-reset',
+    read_only: false,
+    granted_authority: ['read', 'write', 'execute_checks'],
+    toolsets: ['filesystem-read', 'filesystem-write', 'test-runner'],
+    allowed_resources: ['src/auth/reset.ts', 'tests/auth/test_reset.py'],
+    owned_paths: ['src/auth/reset.ts'],
+    files_touched: ['src/auth/reset.ts'],
+    depends_on: [reviewer.id],
+    started_at: '2026-07-14T00:02:00Z',
+    finished_at: '2026-07-14T00:03:00Z'
+  });
+  const rereviewer = delegationFixture('rereview-reset', 3, 'evidence_reviewer', {
+    task_id: 'task-rereview-reset',
+    session_id: 'session-rereview-reset',
+    depends_on: [fixer.id],
+    started_at: '2026-07-14T00:03:00Z',
+    finished_at: '2026-07-14T00:04:00Z'
+  });
+  const finalReviewer = delegationFixture('final-integration-review', 4, 'integration_reviewer', {
+    task_id: 'task-final-integration-review',
+    session_id: 'session-final-integration-review',
+    depends_on: [rereviewer.id],
+    started_at: '2026-07-14T00:04:00Z',
+    finished_at: '2026-07-14T00:05:00Z'
+  });
+  ledger.delegations = [implementer, reviewer, fixer, rereviewer, finalReviewer];
+
+  for (const writer of [implementer, fixer]) {
+    const releaseRef = addPassCommand(ledger, `${writer.id}-lease-release`, {
+      lease_binding: {
+        lease_id: `lease-${writer.id}`,
+        holder_delegation_id: writer.id,
+        action: 'release'
+      }
+    });
+    writer.mutation_lease = {
+      lease_id: `lease-${writer.id}`,
+      kind: 'workspace',
+      holder_delegation_id: writer.id,
+      paths: [...writer.owned_paths],
+      acquired_at: writer.started_at,
+      expires_at: writer.finished_at,
+      released: true,
+      released_at: writer.finished_at,
+      release_evidence_ref: releaseRef
+    };
+  }
+
+  ledger.multi_agent_evidence = multiAgentEvidenceFixture(ledger, runId);
+  ledger.multi_agent_evidence.max_concurrency = 2;
+  const allTaskIds = ledger.delegations.map((entry) => entry.task_id);
+  const boundRef = (id, gate, producer, taskIds) => addPassCommand(ledger, `${runId}-${id}`, {
+    multi_agent_binding: {
+      run_id: runId,
+      producer_delegation_id: producer,
+      gates: [gate],
+      task_ids: taskIds
+    }
+  });
+  const runtimeRef = boundRef('runtime-detection', 'runtime_detection', 'parent', allTaskIds);
+  const implementationRef = boundRef('implementation', 'implementation', implementer.id, [implementer.task_id]);
+  const firstReviewRef = boundRef('task-review', 'task_review', reviewer.id, [reviewer.task_id]);
+  const fixRef = boundRef('fix', 'fix', fixer.id, [fixer.task_id]);
+  const rereviewRef = boundRef('task-rereview', 'task_review', rereviewer.id, [rereviewer.task_id]);
+  const finalReviewRef = boundRef('final-review', 'final_review', finalReviewer.id, [finalReviewer.task_id]);
+  const parentIntegrationRef = boundRef('parent-integration', 'delegated_integration', 'parent', allTaskIds);
+
+  implementer.check_evidence_refs.push(implementationRef);
+  reviewer.check_evidence_refs.push(firstReviewRef);
+  fixer.check_evidence_refs.push(fixRef);
+  rereviewer.check_evidence_refs.push(rereviewRef);
+  finalReviewer.check_evidence_refs.push(finalReviewRef);
+  ledger.delegated_execution_evidence = {
+    run_id: runId,
+    runtime: {
+      host_id: 'codex',
+      registry_version: '1.0.0',
+      delegation_status: 'native',
+      capability_status: 'available',
+      spawn_primitive: 'spawn_agent',
+      join_primitive: 'wait_agent',
+      status_primitive: 'list_agents',
+      cancel_primitive: 'interrupt_agent',
+      capability_evidence_ref: runtimeRef
+    },
+    max_total_threads: 6,
+    completed_thread_policy: 'retain_history',
+    domain_ids: ['auth-reset'],
+    task_chains: [{
+      plan_task_id: 'T001',
+      domain_id: 'auth-reset',
+      implementer_delegation_id: implementer.id,
+      reviewer_delegation_ids: [reviewer.id, rereviewer.id],
+      fixer_delegation_ids: [fixer.id],
+      implementation_evidence_ref: implementationRef,
+      review_evidence_refs: [firstReviewRef, rereviewRef],
+      fix_evidence_refs: [fixRef],
+      verdict: 'pass'
+    }],
+    final_reviewer_delegation_id: finalReviewer.id,
+    final_review_verdict: 'pass',
+    final_review_evidence_ref: finalReviewRef,
+    parent_integration_evidence_refs: [parentIntegrationRef],
+    agents_terminal: true
+  };
+  return ledger;
+}
+
+function providerCompatibilityFixture() {
+  const ledger = fixture();
+  ledger.profiles = ['provider_compatibility'];
+  ledger.provider_compatibility_evidence = {
+    chain: {
+      host_id: 'claude-code',
+      host_version: '2.1.212',
+      protocol: 'anthropic-messages',
+      intermediaries: [{ id: 'cc-switch', version: '3.17.0', max_retries: 1 }],
+      provider_id: 'deepseek-api',
+      requested_model: 'claude-sonnet-4-6',
+      effective_model: 'deepseek-v4-pro',
+      compatibility_status: 'partial',
+      evidence_ref: '/commands_run/0'
+    },
+    retry_budget: {
+      layers: [
+        { id: 'claude-code', max_retries: 2 },
+        { id: 'cc-switch', max_retries: 1 }
+      ],
+      computed_worst_case_attempts: 6,
+      max_physical_attempts_per_logical_request: 6,
+      evidence_ref: '/commands_run/0'
+    },
+    spend_budget: {
+      max_logical_requests: 250,
+      max_physical_attempts: 500,
+      max_input_tokens: 2000000,
+      max_output_tokens: 250000,
+      max_subagent_threads: 12,
+      observed_logical_requests: 126,
+      observed_physical_attempts: 223,
+      observed_input_tokens: 453592,
+      observed_output_tokens: 120585,
+      observed_subagent_threads: 4,
+      evidence_ref: '/commands_run/0'
+    },
+    loop_guard: {
+      max_identical_semantic_actions: 2,
+      max_non_narrowing_iterations: 3,
+      observed_identical_semantic_actions: 2,
+      observed_non_narrowing_iterations: 1,
+      fingerprint_strategy: 'canonical tool name plus redacted normalized arguments and relevant state version',
+      triggered: false,
+      evidence_ref: '/commands_run/0'
+    },
+    accounting: {
+      transcript_responses: 126,
+      proxy_requests: 223,
+      provider_billed_requests: null,
+      cache_hit_tokens: 14508288,
+      cache_miss_tokens: 453592,
+      cache_semantics: 'provider automatic prefix cache; cache_control is ignored by the compatibility endpoint',
+      reconciliation_status: 'partially_reconciled',
+      discrepancy: 'Proxy attempts exceed unique transcript responses; provider invoice and per-attempt telemetry were unavailable',
+      evidence_ref: '/commands_run/0'
+    },
+    encoding: {
+      strict_utf8_checked: true,
+      model_replacement_char_count: 0,
+      tool_output_replacement_char_count: 34,
+      classification: 'tool_output_only',
+      evidence_ref: '/commands_run/0'
+    },
+    semantic_completion: {
+      http_success_not_sufficient: true,
+      terminal_stop_reason_verified: true,
+      stream_utf8_verified: true,
+      tool_round_trip_verified: true,
+      evidence_ref: '/commands_run/0'
+    }
+  };
+  return ledger;
+}
+
 function learningFixture() {
   const ledger = fixture();
   const target = 'fp/schema-memory/SKILL.md';
@@ -993,6 +1206,159 @@ test('incident, multi-agent, and self-iteration profiles have completion evidenc
     verdict: 'pass'
   }];
   assert.ok(!codes(validateLedger(iterative)).includes('E_ITERATION_EVIDENCE'));
+});
+
+test('delegated execution proves fresh implement-review-fix-rereview-integration chains', () => {
+  const valid = delegatedExecutionFixture();
+  assert.deepEqual(validateLedger(valid), []);
+
+  const missingEvidence = delegatedExecutionFixture();
+  delete missingEvidence.delegated_execution_evidence;
+  assert.ok(codes(validateLedger(missingEvidence)).includes('E_DELEGATED_EXECUTION_EVIDENCE'));
+
+  const missingMultiAgent = delegatedExecutionFixture();
+  missingMultiAgent.profiles = ['delegated_execution'];
+  assert.ok(codes(validateLedger(missingMultiAgent)).includes('E_DELEGATED_MULTI_AGENT_PROFILE'));
+
+  const reusedSession = delegatedExecutionFixture();
+  reusedSession.delegations[2].session_id = reusedSession.delegations[0].session_id;
+  assert.ok(codes(validateLedger(reusedSession)).includes('E_DELEGATED_FRESH_SESSION'));
+
+  const brokenReviewChain = delegatedExecutionFixture();
+  brokenReviewChain.delegated_execution_evidence.task_chains[0].reviewer_delegation_ids.pop();
+  brokenReviewChain.delegated_execution_evidence.task_chains[0].review_evidence_refs.pop();
+  assert.ok(codes(validateLedger(brokenReviewChain)).includes('E_DELEGATED_REVIEW_CHAIN'));
+
+  const unavailableRuntime = delegatedExecutionFixture();
+  unavailableRuntime.delegated_execution_evidence.runtime.capability_status = 'unavailable';
+  assert.ok(codes(validateLedger(unavailableRuntime)).includes('E_DELEGATED_RUNTIME'));
+
+  const exceededThreadBudget = delegatedExecutionFixture();
+  exceededThreadBudget.delegated_execution_evidence.max_total_threads = 4;
+  assert.ok(codes(validateLedger(exceededThreadBudget)).includes('E_DELEGATED_THREAD_BUDGET'));
+});
+
+test('delegated writers may hand off the same paths serially but never overlap', () => {
+  const serial = delegatedExecutionFixture();
+  assert.ok(!codes(validateLedger(serial)).includes('E_DELEGATION_WRITER_COLLISION'));
+
+  const overlapping = delegatedExecutionFixture();
+  const fixer = overlapping.delegations.find((entry) => entry.id === 'fix-reset');
+  fixer.depends_on = [];
+  fixer.started_at = '2026-07-14T00:00:30Z';
+  fixer.mutation_lease.acquired_at = fixer.started_at;
+  assert.ok(codes(validateLedger(overlapping)).includes('E_DELEGATION_WRITER_COLLISION'));
+});
+
+test('delegated brief freezes work-item budgets while allowing bounded fresh runtime instances', () => {
+  const ledger = delegatedExecutionFixture();
+  const brief = briefFixture();
+  brief.profiles = [...ledger.profiles];
+  brief.parent_authority = [...ledger.parent_authority];
+  brief.delegation_artifact_root = ledger.delegation_artifact_root;
+  brief.delegations = [];
+  brief.delegated_execution_plan = {
+    runtime_host_id: 'codex',
+    spawn_strategy: 'parent_only',
+    max_active_concurrency: 2,
+    max_total_threads: 6,
+    final_review_required: true,
+    work_items: [{
+      id: 'T001',
+      domain_id: 'auth-reset',
+      allowed_resources: ['src/**', 'tests/**', 'fp/**', 'test/**'],
+      owned_paths: ['src/auth/reset.ts'],
+      max_fix_cycles: 1
+    }]
+  };
+  assert.deepEqual(validateAgainstBrief(ledger, brief).errors, []);
+
+  const overBudget = structuredClone(brief);
+  overBudget.delegated_execution_plan.work_items[0].max_fix_cycles = 0;
+  assert.ok(codes(validateAgainstBrief(ledger, overBudget).errors).includes('E_BRIEF_DELEGATED_FIX_BUDGET'));
+});
+
+test('provider compatibility profile fails closed on retry multiplication, loops, and spend overruns', () => {
+  const valid = providerCompatibilityFixture();
+  assert.deepEqual(validateLedger(valid), []);
+
+  const missingEvidence = providerCompatibilityFixture();
+  delete missingEvidence.provider_compatibility_evidence;
+  assert.ok(codes(validateLedger(missingEvidence)).includes('E_PROVIDER_COMPATIBILITY_EVIDENCE'));
+
+  const retryBomb = providerCompatibilityFixture();
+  retryBomb.provider_compatibility_evidence.retry_budget.layers = [
+    { id: 'claude-code', max_retries: 10 },
+    { id: 'cc-switch', max_retries: 6 }
+  ];
+  retryBomb.provider_compatibility_evidence.retry_budget.computed_worst_case_attempts = 77;
+  assert.ok(codes(validateLedger(retryBomb)).includes('E_PROVIDER_RETRY_BUDGET'));
+
+  const hiddenRetryMath = providerCompatibilityFixture();
+  hiddenRetryMath.provider_compatibility_evidence.retry_budget.computed_worst_case_attempts = 2;
+  assert.ok(codes(validateLedger(hiddenRetryMath)).includes('E_PROVIDER_RETRY_MULTIPLIER'));
+
+  const spent = providerCompatibilityFixture();
+  spent.provider_compatibility_evidence.spend_budget.observed_physical_attempts = 501;
+  assert.ok(codes(validateLedger(spent)).includes('E_PROVIDER_SPEND_BUDGET'));
+
+  const looping = providerCompatibilityFixture();
+  looping.provider_compatibility_evidence.loop_guard.observed_identical_semantic_actions = 3;
+  assert.ok(codes(validateLedger(looping)).includes('E_PROVIDER_LOOP_GUARD'));
+
+  const unexplained = providerCompatibilityFixture();
+  unexplained.provider_compatibility_evidence.accounting.reconciliation_status = 'unexplained';
+  assert.ok(codes(validateLedger(unexplained)).includes('E_PROVIDER_ACCOUNTING'));
+});
+
+test('provider compatibility completion requires semantic stream and strict UTF-8 evidence', () => {
+  const badStream = providerCompatibilityFixture();
+  badStream.provider_compatibility_evidence.semantic_completion.stream_utf8_verified = false;
+  assert.ok(codes(validateLedger(badStream)).includes('E_PROVIDER_SEMANTIC_COMPLETION'));
+
+  const modelMojibake = providerCompatibilityFixture();
+  modelMojibake.provider_compatibility_evidence.encoding.model_replacement_char_count = 1;
+  assert.ok(codes(validateLedger(modelMojibake)).includes('E_PROVIDER_ENCODING'));
+});
+
+test('provider compatibility brief freezes chain, retry, spend, and loop ceilings', () => {
+  const ledger = providerCompatibilityFixture();
+  const brief = briefFixture();
+  brief.profiles = [...ledger.profiles];
+  brief.provider_compatibility_plan = {
+    host_id: 'claude-code',
+    intermediaries: [{ id: 'cc-switch', version: '3.17.0', max_retries: 1 }],
+    provider_id: 'deepseek-api',
+    protocol: 'anthropic-messages',
+    requested_model: 'claude-sonnet-4-6',
+    accepted_effective_models: ['deepseek-v4-pro'],
+    retry_layers: [
+      { id: 'claude-code', max_retries: 2 },
+      { id: 'cc-switch', max_retries: 1 }
+    ],
+    max_physical_attempts_per_logical_request: 6,
+    max_logical_requests: 250,
+    max_physical_attempts: 500,
+    max_input_tokens: 2000000,
+    max_output_tokens: 250000,
+    max_subagent_threads: 12,
+    max_identical_semantic_actions: 2,
+    max_non_narrowing_iterations: 3,
+    paid_probe_authorized: true
+  };
+  assert.deepEqual(validateAgainstBrief(ledger, brief).errors, []);
+
+  const raisedBudget = structuredClone(ledger);
+  raisedBudget.provider_compatibility_evidence.spend_budget.max_physical_attempts = 501;
+  assert.ok(codes(validateAgainstBrief(raisedBudget, brief).errors).includes('E_BRIEF_PROVIDER_BUDGET'));
+
+  const remapped = structuredClone(ledger);
+  remapped.provider_compatibility_evidence.chain.effective_model = 'deepseek-v4-flash';
+  assert.ok(codes(validateAgainstBrief(remapped, brief).errors).includes('E_BRIEF_PROVIDER_MODEL'));
+
+  const noPaidAuthority = structuredClone(brief);
+  noPaidAuthority.provider_compatibility_plan.paid_probe_authorized = false;
+  assert.ok(codes(validateAgainstBrief(ledger, noPaidAuthority).errors).includes('E_BRIEF_PROVIDER_PAID_AUTHORITY'));
 });
 
 test('distributed delegation envelopes enforce authority, DAG, ownership, and terminal gates', () => {

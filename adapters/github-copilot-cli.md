@@ -12,7 +12,11 @@ Infer FP from the user's goal. Activate it automatically for engineering work an
 - **Failed task:** Split smaller instead of retrying the same large task.
 - **Protocol or agent-behavior change:** Confirm intent and boundaries before editing.
 - **Debug-first:** Gather read-only, discriminating evidence before editing an unknown-cause failure.
-- **Multi-agent:** Parallelize independent work, keep a single writer per shared file set, and have the parent verify.
+- **Multi-agent:** Ordinary children handle independent investigation/review. Writing children use delegated execution, one writer per shared file set, and parent verification.
+
+## Delegated execution runtime
+
+Detect the exact surface. Copilot CLI may expose `task`, `list_agents`, `read_agent`, and `write_agent`; compatible editor surfaces may expose `runSubagent`. A new `task`/`runSubagent` is fresh, while `read_agent`/`write_agent` continues an existing child. `/fleet` is high-level fan-out and does not prove per-child cancellation. Activate full delegated execution only when the installed surface exposes every required lifecycle gate.
 
 ## Rules
 

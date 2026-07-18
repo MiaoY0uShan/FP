@@ -100,6 +100,8 @@ Delete optional blocks that do not apply. Never leave placeholders in a final le
 - OpenWrt plan-only: use `phase=plan`, `mode=report_only`, zero touched files, and planned acceptance rows. Do not fabricate execution evidence.
 - `external_context`: required unknown/stale claims block dependent completion. Every record carries structured `freshness_basis.kind/value`; `current` requires a concrete version, tag, versioned page, commit, or update timestamp rather than `latest`/`current` self-assertion.
 - `multi_agent`: completion requires `parent_authority`, one structured `delegations` envelope per child, one-writer evidence, bounded concurrency/depth/time/iterations, stable task-input result order, idempotency, cancellation propagation, passing spec/quality verdicts, re-review, parent rerun, released leases, and terminal agents. Child grants must be a subset of parent authority; leaf and read-only children cannot escalate, no child receives a live-system mutation lease, and proposal/check references must resolve to observed evidence.
+- `delegated_execution`: also requires `multi_agent`, an observed available host runtime, unique task/session IDs for every fresh stage, a passing implementer/reviewer/fixer/re-review chain per frozen work item, a fresh final integration reviewer, bounded cumulative threads, serial writer-lease handoff, and parent integration evidence.
+- `provider_compatibility`: completion records the host/proxy/provider chain, derived nested retry multiplier, frozen/observed request-token-subagent budgets, semantic loop guard, provider-native cache/accounting fields, strict UTF-8 classification, and stream/tool semantic completion. Report-only diagnosis may record a detected failure; successful paid execution may not close across an exceeded or unexplained gate.
 - `background_learning`: also requires `multi_agent`, an agent-created `learning_evidence` candidate, separate read-only candidate/evaluator delegations, hidden holdout coverage, negative controls, invariants, baseline comparison, complexity budget, shadow state, approval, provenance, and rollback. Only `active` claims generalization.
 - `continuation`: only incomplete work may carry it. JSON Pointer references must resolve, and resumed writes require a matching `fp-worktree-v1` rehydration.
 - `self_iteration`: record each observed finding, bounded change, rerun checks, evidence references, and verdict.
@@ -201,6 +203,27 @@ For a fixed wait, use `strategy=fixed`, `duration_ms`, and a substantive `justif
 ```
 
 Direct children use `parent_id=null`. Only `orchestrator` may own children or receive `delegate`; all other roles use `max_spawn_depth=0`. Child authority, resources, and remaining depth are intersected with the direct parent envelope and root ledger scope. Writer ownership patterns must not overlap, and every writer carries a holder/path/time-bound lease with bound release evidence. Artifact paths are parent-persisted logical outputs under the reserved artifact root; a child cannot use them as a hidden source-write channel. Completion derives dependency order, concurrency, timeout, cancellation, lease, retry, result-order, and actual summary-budget gates from envelopes and observed evidence.
+
+### Provider compatibility shape
+
+The complete structural contract is `contracts/evidence-ledger.v1.schema.json`; use `templates/provider-compatibility-and-spend-guard.md` to gather it. The top-level evidence block contains:
+
+```json
+{
+  "profiles": ["provider_compatibility"],
+  "provider_compatibility_evidence": {
+    "chain": "host/version -> intermediaries -> protocol -> requested/effective model -> provider",
+    "retry_budget": "layers plus derived product of every max_retries + 1",
+    "spend_budget": "maximum and observed requests, attempts, tokens, and subagent threads",
+    "loop_guard": "semantic-action fingerprint, ceilings, observations, and trigger",
+    "accounting": "host/proxy/provider counts, provider-native cache fields, discrepancy",
+    "encoding": "strict UTF-8 boundary classification and replacement-character counts",
+    "semantic_completion": "stop reason, incremental stream, and tool round trip"
+  }
+}
+```
+
+Every nested block carries an observed `/commands_run/<index>` evidence reference. Do not copy these explanatory strings into a final ledger; populate the exact schema fields with observed values.
 
 ### Learning and generalization shape
 
