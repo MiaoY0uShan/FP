@@ -2,6 +2,17 @@
   <img src="docs/assets/fp-banner.svg" alt="FP turns ambiguous tasks, parallel agents, and limited examples into verified progress" width="100%">
 </p>
 
+<p align="center"><sub>
+  <a href="README.zh-CN.md">中文</a> ·
+  <a href="README.hi.md">हिन्दी</a> ·
+  <a href="README.es.md">Español</a> ·
+  <a href="README.fr.md">Français</a> ·
+  <a href="README.ar.md">العربية</a> ·
+  <a href="README.pt.md">Português</a> ·
+  <a href="README.ru.md">Русский</a> ·
+  <a href="README.ja.md">日本語</a>
+</sub></p>
+
 # FP
 
 **The patch is not the finish line. Proof is.**
@@ -260,7 +271,7 @@ FP remains an original implementation. Its design was sharpened by studying [Sup
 
 The exact revisions, adopted behaviors, exclusions, and inference boundaries are in [docs/upstream-influences.md](docs/upstream-influences.md). License provenance is in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
-Formerly Xskill. See [MIGRATION.md](MIGRATION.md)
+Formerly Xskill. See [MIGRATION.md](MIGRATION.md).
 
 ---
 
