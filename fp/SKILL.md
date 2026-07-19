@@ -37,7 +37,7 @@ active incident
 
 A read-only incident may OBSERVE and recommend reversible containment/restoration, but it may not mutate the target. Route priority never expands authority.
 
-Remote/stateful, OpenWrt/live-system, external-context/MCP, provider-compatibility, multi-agent, delegated-execution, continuation, stateful-UI, self-iteration, background-learning, and memory-graph are profiles layered onto a route. They are not reasons to load the full chain by themselves. Independent-domain parallelism is an explicit multi-agent sub-route, never an inference from task count alone.
+Remote/stateful, OpenWrt/live-system, external-context/MCP, provider-compatibility, multi-agent, delegated-execution, continuation, stateful-UI, self-iteration, background-learning, memory-graph, and codebase-analysis are profiles layered onto a route. They are not reasons to load the full chain by themselves. Independent-domain parallelism is an explicit multi-agent sub-route, never an inference from task count alone.
 
 ## Routes
 
@@ -210,6 +210,34 @@ Use when a medium or larger task involves schema cards, lessons-learned, or evid
 5. Record every graph-traversal decision in the evidence ledger.
 
 Load `templates/memory-graph-traversal.md`. The memory graph uses only zero-dependency Node.js scripts at `contracts/memory-graph.js` and `contracts/memory-graph.v1.schema.json`. It requires no external tools, databases, or parsers.
+
+## Codebase-Analysis Profile
+
+Use when a task involves reviewing, modifying, or understanding user code — not FP's own internals — and the blast radius of changes is larger than a single file. Layer this profile onto the Build or Read-Only Diagnosis route.
+
+### Preferred: code-review-graph MCP
+
+When a code-review-graph MCP server is available and configured:
+
+1. Call `get_minimal_context_tool` first (~100 tokens). Use the community names and entry points to decide which deeper tools to invoke.
+2. For reviews, call `detect_changes_tool` with the changed files or commit SHA. Use the risk-scored functions, affected flows, and test gaps to build the review scope.
+3. For blast-radius, call `get_impact_radius_tool`. Compare against `templates/codebase-impact-map.md` output for accuracy.
+4. For architecture understanding, call `get_architecture_overview_tool`. Use community structure to identify hub/bridge nodes.
+5. For semantic queries, call `semantic_search_nodes_tool`.
+6. Record every MCP call in the evidence ledger with tool name, arguments, result summary, and token savings estimate.
+
+Load `templates/code-review-graph-mcp-contract.md` for the full 30-tool map and selection protocol.
+
+### Fallback: grep-based impact map
+
+When code-review-graph MCP is unavailable:
+
+1. Load `templates/codebase-impact-map.md`.
+2. Compute blast radius manually: `git diff` → extract changed symbols → `grep -rn` for callers/importers → `Glob` for test files.
+3. Mark `source: grep-fallback` in the impact map.
+4. Record the fallback reason in the evidence ledger.
+
+The MCP's 30 tools are more precise and ~82x more token-efficient than grep-based discovery. When available, prefer MCP. When unavailable, the grep fallback produces the same structural output with more manual steps.
 
 ## Background-Learning Profile
 

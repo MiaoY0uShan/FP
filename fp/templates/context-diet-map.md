@@ -25,6 +25,13 @@ This is not general memory. This is context reduction.
 
 ## Forbidden Context
 
+## Codebase Impact Source
+
+- MCP tool: (e.g., `detect_changes_tool`, `get_impact_radius_tool`, or "none" for manual)
+- Fallback method: (e.g., `grep-based impact map`, or "N/A" when MCP is available)
+- Token savings estimate: (from MCP `context_savings` field, or "unknown" for grep)
+- Impact map reference: (path to `codebase-impact-map.md` output, or "none")
+
 ## Reason
 
 Explain why the excluded context is not needed for this task.
@@ -40,6 +47,12 @@ Explain why the excluded context is not needed for this task.
   "files_to_avoid": [],
   "required_schema_cards": [],
   "forbidden_context": [],
+  "codebase_impact_source": {
+    "mcp_tool": "",
+    "fallback_method": "",
+    "token_savings_estimate": "",
+    "impact_map_reference": ""
+  },
   "reason": ""
 }
 ```

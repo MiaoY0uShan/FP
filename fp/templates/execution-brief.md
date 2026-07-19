@@ -111,6 +111,18 @@ Use this as the final writable contract. Delete optional profile sections that d
 - Freshness evidence:
 - Fallback if unavailable:
 
+## Codebase Analysis Contract
+
+- MCP available: yes | no
+- Primary analysis tool: code-review-graph MCP | grep fallback
+- MCP tools used: (list of tool names called)
+- Impact map: (path to `codebase-impact-map.md` output, or "none")
+- Minimal read set from blast-radius:
+- Test gaps identified:
+- Risk scoring applied: yes | no
+- Token savings estimate: (from MCP `context_savings`, or "unknown")
+- Fallback reason: (only when MCP unavailable)
+
 ## MCP Capability Contract
 
 - Acceptance row requiring the MCP:

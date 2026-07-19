@@ -31,6 +31,8 @@ provider-compatibility/  host/proxy/provider retry, spend, cache, and UTF-8 gate
 
 ```text
 acceptance-evidence-matrix.md
+codebase-impact-map.md
+code-review-graph-mcp-contract.md
 debug-incident-checklist.md
 multi-agent-review-protocol.md
 memory-graph-traversal.md

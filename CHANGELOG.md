@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.4.7 — code-review-graph MCP integration for user codebase analysis
+
+- Added `fp/templates/codebase-impact-map.md` — protocol template for computing blast radius, test coverage, risk scoring, and dependency clusters of user code changes. Supports both MCP and grep-fallback sources.
+- Added `fp/templates/code-review-graph-mcp-contract.md` — full acquisition-and-usage contract mapping all 30 code-review-graph MCP tools to task-oriented categories (orientation, change analysis, deep dive, architecture, risk/quality, refactoring, maintenance). Includes tool selection protocol, fallback rules, authority gates, and acquisition brief following the existing FP MCP Capability Profile pattern.
+- Added Codebase-Analysis Profile to `fp/SKILL.md` — layered onto Build or Read-Only Diagnosis routes when reviewing/modifying user code. Prefers code-review-graph MCP when available (~82x token reduction via `get_minimal_context_tool` etc.); falls back to grep-based `codebase-impact-map.md` when MCP is unavailable.
+- Enhanced `fp/templates/context-diet-map.md` with `## Codebase Impact Source` section — records MCP tool used, fallback method, token savings estimate, and impact map reference.
+- Enhanced `fp/templates/execution-brief.md` with `## Codebase Analysis Contract` section — records MCP availability, primary analysis tool, tools used, test gaps, and risk scoring.
+- Synced codebase-analysis profile to `fp/CLAUDE.md`, `fp/AGENTS.md`, and `fp/README.md`.
+
 ## v0.4.6 — Graph-structured memory with code-review-graph inspired analysis
 
 - Added typed memory graph: schema cards and lesson cards now form a connected graph via `[[wikilink]]` references in lesson cards and `related-schemas` YAML frontmatter in schema cards. Nine edge types: `depends_on`, `informs`, `conflicts_with`, `supersedes`, `generalizes`, `caused_by`, `mitigated_by`, `related_to`, `references`.

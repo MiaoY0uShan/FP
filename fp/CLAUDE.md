@@ -13,7 +13,7 @@ Apply user authority and read-only limits as a global gate first. Then:
 3. **Build** — scale the output to task size: Small → Tiny Brief, Medium → Execution Brief + Ledger, Vague → Idea Cards, Large → minimum modules → final brief.
 4. **Close** — pass with matched evidence, or fail → split smaller.
 
-Layer remote/live-system, OpenWrt, stateful-UI, external-context, provider-compatibility, multi-agent, delegated-execution, continuation, self-iteration, background-learning, and memory-graph as profiles on the selected route.
+Layer remote/live-system, OpenWrt, stateful-UI, external-context, provider-compatibility, multi-agent, delegated-execution, continuation, self-iteration, background-learning, memory-graph, and codebase-analysis as profiles on the selected route.
 
 ## Route Weight
 
@@ -73,3 +73,7 @@ One run is not a reusable law. Lessons are promoted only through adaptive improv
 ## Memory Graph
 
 Schema cards and lesson cards form a typed graph: `[[wikilink]]` references in lessons and `related-schemas` YAML frontmatter in schema cards are edges. Use `fp/contracts/memory-graph.js` (zero-dependency Node.js script) to build the graph, compute blast radius before updates, find relevant clusters by keyword, detect hub/bridge cards, and run incremental diffs. Load `fp/templates/memory-graph-traversal.md` for the full agent protocol.
+
+## Codebase Analysis
+
+When reviewing or modifying user code, FP agents prefer code-review-graph MCP when available. Start with `get_minimal_context_tool` (~100 tokens), then use `detect_changes_tool`, `get_impact_radius_tool`, `get_knowledge_gaps_tool`, and the other 27 tools for architecture, semantic search, and risk analysis. When MCP is unavailable, fall back to the grep-based `codebase-impact-map.md` protocol. Load `fp/templates/code-review-graph-mcp-contract.md` for the full 30-tool map and selection protocol.
