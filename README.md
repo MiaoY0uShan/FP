@@ -256,11 +256,15 @@ Only after a controlled repeated comparison proves it.
 
 ## Influences
 
-FP remains an original implementation. Its design was sharpened by studying [Superpowers](https://github.com/obra/superpowers), [Hermes Agent](https://github.com/NousResearch/hermes-agent), [Ponytail](https://github.com/DietrichGebert/ponytail), [Context7](https://github.com/upstash/context7), and [Grill Me](https://github.com/mattpocock/skills/tree/main/skills/productivity/grill-me).
+FP remains an original implementation. Its design was sharpened by studying [Superpowers](https://github.com/obra/superpowers), [Hermes Agent](https://github.com/NousResearch/hermes-agent), [Ponytail](https://github.com/DietrichGebert/ponytail), [Context7](https://github.com/upstash/context7), [Grill Me](https://github.com/mattpocock/skills/tree/main/skills/productivity/grill-me), and [code-review-graph](https://github.com/tirth8205/code-review-graph).
 
 The exact revisions, adopted behaviors, exclusions, and inference boundaries are in [docs/upstream-influences.md](docs/upstream-influences.md). License provenance is in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
-Formerly Xskill. See [MIGRATION.md](MIGRATION.md).
+Formerly Xskill. See [MIGRATION.md](MIGRATION.md)
+
+---
+
+**Language editions:** [English](README.md) · [中文](README.zh-CN.md) · [हिन्दी](README.hi.md) · [Español](README.es.md) · [Français](README.fr.md) · [العربية](README.ar.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [日本語](README.ja.md)
 
 ## License
 
