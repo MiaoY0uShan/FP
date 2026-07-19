@@ -88,6 +88,10 @@
           "type": "boolean",
           "description": "True when removing this node would disconnect the graph into multiple components."
         },
+        "is_moc": {
+          "type": "boolean",
+          "description": "True when this node is a Map of Content (index card). MOCs have no task-types and list sub-cards via informs edges."
+        },
         "betweenness": {
           "type": "number",
           "minimum": 0,
@@ -123,6 +127,8 @@
           "enum": [
             "depends_on",
             "informs",
+            "next",
+            "previous",
             "conflicts_with",
             "supersedes",
             "generalizes",

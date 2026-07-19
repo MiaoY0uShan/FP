@@ -113,6 +113,21 @@ Group affected files into independent sets. Two files share a cluster if one imp
 
 ---
 
+## 8. Zettelkasten Annotations
+
+Record the Zettelkasten-inspired navigation decisions made during this impact analysis. Load `fp/templates/repository-zettelkasten-navigation.md` for protocol details.
+
+| Annotation | Value |
+|---|---|
+| MOC (entry points identified) | {list of entry-point files used as navigation starting points} |
+| Folgezettel chains discovered | {call chains followed: caller → callee → callee's callee, max depth 3} |
+| Surprising connections | {cross-community edges or unexpected cross-module coupling found} |
+| Refinement candidates | {code patterns that may deserve future FP schema or lesson cards} |
+| Navigation protocols used | {which protocols from `repository-zettelkasten-navigation.md` were applied} |
+| Files skipped by local graph | {count of repository files outside the blast radius} |
+
+---
+
 ## Rules
 
 1. **Compute before reading** — this map determines what to read, not the other way around.

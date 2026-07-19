@@ -211,6 +211,12 @@ Use when a medium or larger task involves schema cards, lessons-learned, or evid
 
 Load `templates/memory-graph-traversal.md`. The memory graph uses only zero-dependency Node.js scripts at `contracts/memory-graph.js` and `contracts/memory-graph.v1.schema.json`. It requires no external tools, databases, or parsers.
 
+### Zettelkasten Conventions
+
+FP cards follow Zettelkasten (Luhmann's slip-box) principles adapted for an AI agent protocol. When writing, linking, or navigating FP memory cards, load `templates/zettelkasten-conventions.md` for conventions on atomicity, bidirectional links, Folgezettel sequences, MOC (Map of Content) cards, the refinement pipeline (fleeting → literature → permanent), serendipity traversal, and card size constraints.
+
+For navigating user code repositories with Zettelkasten-inspired protocols (entry point as MOC, Folgezettel code navigation, local graph view, serendipity discovery, refinement pipeline), load `templates/repository-zettelkasten-navigation.md`.
+
 ## Codebase-Analysis Profile
 
 Use when a task involves reviewing, modifying, or understanding user code — not FP's own internals — and the blast radius of changes is larger than a single file. Layer this profile onto the Build or Read-Only Diagnosis route.

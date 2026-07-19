@@ -74,6 +74,10 @@ One run is not a reusable law. Lessons are promoted only through adaptive improv
 
 Schema cards and lesson cards form a typed graph: `[[wikilink]]` references in lessons and `related-schemas` YAML frontmatter in schema cards are edges. Use `fp/contracts/memory-graph.js` (zero-dependency Node.js script) to build the graph, compute blast radius before updates, find relevant clusters by keyword, detect hub/bridge cards, and run incremental diffs. Load `fp/templates/memory-graph-traversal.md` for the full agent protocol.
 
+Card writing follows Zettelkasten conventions: atomicity, bidirectional links, Folgezettel sequences (`next`/`previous` edges), MOC (Map of Content) index cards, and the refinement pipeline (fleeting → literature → permanent). Load `fp/templates/zettelkasten-conventions.md` for conventions.
+
 ## Codebase Analysis
 
 When reviewing or modifying user code, FP agents prefer code-review-graph MCP when available. Start with `get_minimal_context_tool` (~100 tokens), then use `detect_changes_tool`, `get_impact_radius_tool`, `get_knowledge_gaps_tool`, and the other 27 tools for architecture, semantic search, and risk analysis. When MCP is unavailable, fall back to the grep-based `codebase-impact-map.md` protocol. Load `fp/templates/code-review-graph-mcp-contract.md` for the full 30-tool map and selection protocol.
+
+Navigate code repositories like a Zettelkasten: entry points as MOC, call chains as Folgezettel, blast radius as local graph view. Load `fp/templates/repository-zettelkasten-navigation.md` for the 8 navigation protocols.

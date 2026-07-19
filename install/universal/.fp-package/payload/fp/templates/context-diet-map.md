@@ -32,6 +32,15 @@ This is not general memory. This is context reduction.
 - Token savings estimate: (from MCP `context_savings` field, or "unknown" for grep)
 - Impact map reference: (path to `codebase-impact-map.md` output, or "none")
 
+## Zettelkasten Navigation Source
+
+- Entry Point (MOC): (entry file used as navigation starting point)
+- Folgezettel Chain: (call chain followed during navigation)
+- Local Graph Depth: (1 | 2 | 3 — blast-radius depth used for file selection)
+- Serendipity Alerts: (unexpected cross-module coupling discovered)
+- Files Outside Graph: (count of files excluded by blast radius)
+- Navigation protocol: (which protocol from `repository-zettelkasten-navigation.md` was used)
+
 ## Reason
 
 Explain why the excluded context is not needed for this task.

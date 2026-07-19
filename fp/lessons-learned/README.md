@@ -10,8 +10,26 @@ This directory stores candidate observations and promoted reusable anti-patterns
 4. A severe one-off may create only a narrow expiring `bounded_shadow`; it does not become a reusable law.
 5. Promote a Lesson Card only after `generalization-gate` passes distinct task/session evidence, holdouts, negative controls, invariants, shadow, approval, and rollback.
 6. Revalidate promoted lessons when new evidence contradicts them or source provenance becomes stale.
+7. When a lesson accumulates evidence across multiple independent tasks, consider promoting it through the refinement pipeline: fleeting (evidence-ledger `unverified_claim`) → literature (lesson card, `observation`) → permanent (`schema-memory/` card, `promoted`/`active`). Load `templates/zettelkasten-conventions.md` for the full pipeline.
 
 Do not create a Lesson Card merely because a check failed once. Do not store secrets, raw logs, or long transcripts.
+
+## Refinement Pipeline
+
+FP's lesson cards are the middle stage of a Zettelkasten refinement pipeline. Load `templates/zettelkasten-conventions.md` for conventions.
+
+| Stage | Artifact | Transition Trigger |
+|---|---|---|
+| 1. Fleeting | Evidence ledger `unverified_claim` | Any task observation |
+| 2. Literature | Lesson card, `status: observation` | Observation appears in a second independent task |
+| 3. Permanent | Schema card, `status: promoted` / `active` | Passes `generalization-gate` (2-4 cases, holdout, negative controls, invariants) |
+
+**From lesson to schema:**
+1. Verify at least two independent evidence references exist.
+2. Run `node fp/contracts/memory-graph.js cluster <keywords>` to check for existing coverage.
+3. Create the schema card with `[[wikilink]]` back to this lesson and both source evidence ledgers.
+4. Freeze the candidate and route through `generalization-gate/SKILL.md`.
+5. After promotion, the lesson card can add `mitigated_by: [[schema-card]]` to indicate the schema now covers the anti-pattern.
 
 ## Lesson Card
 

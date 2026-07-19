@@ -34,8 +34,10 @@ acceptance-evidence-matrix.md
 codebase-impact-map.md
 code-review-graph-mcp-contract.md
 debug-incident-checklist.md
-multi-agent-review-protocol.md
 memory-graph-traversal.md
+multi-agent-review-protocol.md
+repository-zettelkasten-navigation.md
+zettelkasten-conventions.md
 agent-runtime-adapters.md
 provider-compatibility-and-spend-guard.md
 remote-stateful-system-checklist.md

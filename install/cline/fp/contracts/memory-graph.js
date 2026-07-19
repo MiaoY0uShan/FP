@@ -173,6 +173,7 @@ function buildGraph(opts = {}) {
       const taskTypes = frontmatter.task_types
         ? (Array.isArray(frontmatter.task_types) ? frontmatter.task_types : [frontmatter.task_types])
         : [];
+      const isMoc = frontmatter.is_moc === true || frontmatter.is_moc === 'true';
       // Parse related-schemas from frontmatter
       const relatedSchemas = frontmatter['related-schemas'] || {};
 
@@ -181,6 +182,7 @@ function buildGraph(opts = {}) {
         nodeType: 'schema_card',
         schemaName,
         taskTypes,
+        isMoc,
         relatedSchemas,
         status: frontmatter.status || 'proposed'
       });
@@ -240,6 +242,7 @@ function buildGraph(opts = {}) {
       status: card.status,
       schema_name: card.schemaName || undefined,
       task_types: card.taskTypes || [],
+      is_moc: card.isMoc || false,
       in_degree: 0,
       out_degree: 0,
       is_hub: false,
@@ -281,7 +284,7 @@ function buildGraph(opts = {}) {
 
     // Process related-schemas from YAML frontmatter
     const rs = card.relatedSchemas || {};
-    const edgeTypes = ['depends_on', 'informs', 'conflicts_with', 'supersedes', 'generalizes'];
+    const edgeTypes = ['depends_on', 'informs', 'next', 'previous', 'generalizes', 'conflicts_with', 'supersedes'];
     for (const etype of edgeTypes) {
       let targets = rs[etype];
       if (!targets) continue;
@@ -829,7 +832,7 @@ function validateGraph(graph, opts = {}) {
     }
 
     const validTypes = [
-      'depends_on', 'informs', 'conflicts_with', 'supersedes',
+      'depends_on', 'informs', 'next', 'previous', 'conflicts_with', 'supersedes',
       'generalizes', 'caused_by', 'mitigated_by', 'related_to', 'references'
     ];
     if (!validTypes.includes(edge.edge_type)) {
@@ -945,9 +948,11 @@ function syncBacklinks(graph, opts = {}) {
     const communityId = node.community_id || '';
     const hubStatus = hubLevel.has(node.node_id) ? `hub (${hubLevel.get(node.node_id)})` : (node.is_hub ? 'hub' : 'leaf');
     const bridgeStatus = bridgeSet.has(node.node_id) ? 'bridge' : '';
+    const mocStatus = node.is_moc ? 'moc' : '';
 
     const metaParts = [];
     if (communityId) metaParts.push(communityId);
+    if (mocStatus) metaParts.push(mocStatus);
     metaParts.push(hubStatus);
     if (bridgeStatus) metaParts.push(bridgeStatus);
 

@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.4.8 — Zettelkasten/Obsidian-inspired conventions and repository navigation
+
+- Added `fp/templates/zettelkasten-conventions.md` — FP card-box writing conventions: atomicity (one pattern per card, ≤50 lines), bidirectional links (every card must link out, backlinks are computed), Folgezettel sequences (`next`/`previous` edges for narrative order), MOC (Map of Content index cards at N≥3 cards per theme), refinement pipeline (fleeting → literature → permanent), serendipity traversal, and card size constraints.
+- Added `fp/templates/repository-zettelkasten-navigation.md` — eight protocols for navigating code repositories like a Zettelkasten: (1) Entry Point as MOC, (2) Folgezettel Code Navigation along call chains, (3) Local Graph View via blast-radius, (4) Serendipity Discovery via surprising connections, (5) Refinement Pipeline from code patterns to FP schema cards, (6) Per-Task Note linking evidence to cards, (7) Graph View as Dashboard for memory health, (8) Atomic Module Verification.
+- Enhanced `fp/templates/schema-memory-card.md` — added `next`/`previous` Folgezettel edges, `informs` edge type, and `is_moc` boolean for MOC cards.
+- Enhanced `fp/contracts/memory-graph.v1.schema.json` — added `next`/`previous` edge types and `is_moc` node property.
+- Enhanced `fp/contracts/memory-graph.js` — `buildGraph` parses `is_moc` + `next`/`previous` edges; `syncBacklinks` displays MOC status in computed backlinks section.
+- Enhanced `fp/schema-memory/SKILL.md` — added Refinement Pipeline (Zettelkasten stages mapped to FP artifacts), MOC Creation Guide (when and how to create index cards), and Zettelkasten convention references.
+- Enhanced `fp/templates/memory-graph-traversal.md` — added Section 7 (Serendipity Traversal: walk different edge types from the same seed) and Section 8 (Folgezettel Navigation: forward/backward along `next`/`previous` edges).
+- Enhanced `fp/templates/context-diet-map.md` — added `## Zettelkasten Navigation Source` section (entry point, Folgezettel chain, local graph depth, serendipity alerts, files outside graph).
+- Enhanced `fp/templates/codebase-impact-map.md` — added `## Zettelkasten Annotations` section (MOC entry points, Folgezettel chains, surprising connections, refinement candidates, protocols used).
+- Enhanced `fp/templates/execution-brief.md` — added navigation style, graph tool used, local graph depth, and navigation protocols to File And Context Budget.
+- Enhanced `fp/lessons-learned/README.md` — added Refinement Pipeline section (Zettelkasten stages mapped to FP artifacts, transition triggers, promotion workflow).
+- Enhanced `fp/SKILL.md` Memory-Graph Profile with Zettelkasten conventions reference and repository navigation protocol.
+- Synced to `fp/CLAUDE.md`, `fp/AGENTS.md`, `fp/README.md`.
+
 ## v0.4.7 — code-review-graph MCP integration for user codebase analysis
 
 - Added `fp/templates/codebase-impact-map.md` — protocol template for computing blast radius, test coverage, risk scoring, and dependency clusters of user code changes. Supports both MCP and grep-fallback sources.

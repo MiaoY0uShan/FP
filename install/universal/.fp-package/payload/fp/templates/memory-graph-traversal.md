@@ -246,6 +246,54 @@ The DOT output uses:
 
 ---
 
+## 7. Serendipity Traversal (Accidental Discovery)
+
+Zettelkasten's power comes from traversing *different edge types* to the same node. This protocol deliberately walks non-obvious paths.
+
+### Procedure
+
+1. Pick a seed node relevant to the current task.
+2. Traverse each edge type from the seed in sequence:
+   - `depends_on` — what foundation does this card assume?
+   - `informs` — what complementary context exists?
+   - `next` / `previous` — what was the author thinking before/after?
+   - `generalizes` — is there a broader or narrower pattern?
+3. Check the seed's **backlinks** (`node memory-graph.js blast-radius <nodeId>` reverse fan-out).
+4. Check the seed's **community** (`node memory-graph.js communities` → find cards sharing the same `community_id`).
+5. For any interesting node found, repeat steps 2-4 (depth 2 max).
+
+### When to use
+- After the primary cluster retrieval, to find cards you wouldn't have explicitly searched for.
+- When a task involves cross-domain concerns (e.g., security + validation + remote systems).
+- Before finalizing a schema update, to check for unexpected blast-radius effects.
+
+---
+
+## 8. Folgezettel Navigation (Sequence Traversal)
+
+FP supports `next` and `previous` edges to encode the narrative order of cards. This follows Zettelkasten's tradition of placing follow-up cards physically adjacent.
+
+### Forward navigation (following the author's thinking)
+```bash
+node fp/contracts/memory-graph.js blast-radius <nodeId> --depth 1
+```
+Filter the `forward_fanout` for `next` edge type. Read cards in sequence.
+
+### Backward navigation (tracing the thought origin)
+Filter `reverse_fanout` for `previous` edge type. Read backward to find the thought that led to this card.
+
+### When to use
+- Understanding how a pattern evolved over time.
+- When a `depends_on` chain is too abstract — `next` gives the narrative version.
+- Tracing a sequence of related lessons (e.g., L001 → L002 → L003 via Folgezettel rather than semantic edges).
+
+### Difference from semantic edges
+- `depends_on` = "This card's correctness depends on that card being true."
+- `next` = "After writing that card, I wrote this one as a follow-up thought."
+- Both are traversable; they serve different discovery goals.
+
+---
+
 ## Rules
 
 1. **Rebuild before analysis.** Always run `node fp/contracts/memory-graph.js build` before traversing if any source card may have changed.

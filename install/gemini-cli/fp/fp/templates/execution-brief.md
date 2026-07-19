@@ -49,6 +49,10 @@ Use this as the final writable contract. Delete optional profile sections that d
 - Max files to touch:
 - Max notes:
 - Forbidden context:
+- Navigation style: zettelkasten | exhaustive | targeted
+- Graph tool used: code-review-graph MCP | memory-graph.js | grep-fallback
+- Local graph depth: 1 | 2 | 3
+- Navigation protocols applied: (from `repository-zettelkasten-navigation.md`)
 
 ## Selected Path
 

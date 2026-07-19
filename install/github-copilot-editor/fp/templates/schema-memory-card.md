@@ -1,24 +1,34 @@
 ---
 # Populate these fields only after evidence supports each relationship.
-# Edge types for related-schemas: depends_on, informs, conflicts_with, supersedes, generalizes
+# Edge types: depends_on, informs, next, previous, generalizes, conflicts_with, supersedes
 # Each value is a list of schema card filenames (without .md extension).
 # Example:
 #   depends_on: ["validation-logic-bug-fix"]
-#   informs: ["api-security-pattern"]
+#   informs: ["api-security-pattern", "token-gateway-guard"]   # MOC uses this to list sub-cards
+#   next: ["dns-debugging"]                                     # Folgezettel forward
+#   previous: ["remote-system-basics"]                          # Folgezettel backward
+#   generalizes: ["token-validation", "form-validation"]
 #   conflicts_with: ["zero-trust-auth"]
 #   supersedes: ["old-validation-pattern"]
-#   generalizes: ["token-validation", "form-validation"]
 related-schemas:
   depends_on: []
   informs: []
+  next: []
+  previous: []
+  generalizes: []
   conflicts_with: []
   supersedes: []
-  generalizes: []
 
 # Keywords describing the class of work this schema applies to.
 # Used for cluster retrieval via memory-graph.js.
 # Keep at most 5 keywords. Example: ["bug", "validation", "auth", "token"]
+# Leave empty for MOC (index) cards — they serve as navigation hubs, not task matchers.
 task-types: []
+
+# Set to true when this card is a Map of Content (index card).
+# MOCs list sub-cards via informs, have no task-types, and serve as navigation starting points.
+# Create a MOC when 3 or more cards share a theme.
+is_moc: false
 ---
 
 # Schema Memory Card

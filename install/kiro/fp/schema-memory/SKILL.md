@@ -65,6 +65,9 @@ A schema memory card captures a reusable pattern for a class of work:
 9. Keep the schema short enough to be reused in a future execution brief.
 10. If the schema relates to other schema or lesson cards, populate the `related-schemas` YAML frontmatter with typed edges before finalizing. Use `templates/memory-graph-traversal.md` to check blast-radius effects.
 11. Populate the `task-types` YAML frontmatter with 3-5 keywords that describe the class of work. These keywords enable cluster retrieval via `memory-graph.js`. Use compact, grep-friendly terms: prefer `["bug", "validation", "auth"]` over `["validation logic for authentication tokens"]`.
+12. If this is a Map of Content (MOC), set `is_moc: true`, leave `task-types` empty, and use `informs` edges to list sub-cards. Create a MOC when 3 or more existing cards share a theme.
+13. For Folgezettel sequences, use `next` and `previous` edges to capture the narrative order of your thinking. These are NOT semantic edges — they capture trajectory, not argument structure.
+14. Follow the Zettelkasten conventions in `templates/zettelkasten-conventions.md`: atomicity (one pattern per card), bidirectional links, MOC at N≥3, refinement pipeline, serendipity traversal, and card size constraints.
 
 ## Graph-Aware Retrieval
 
@@ -120,6 +123,41 @@ Promotion requires all of the following:
 - a bounded trigger and non-trigger boundary, current provenance, complexity budget, passing shadow window, and tested rollback.
 
 Paraphrases, noise variants, or sibling agents from the same run do not satisfy independence. A single severe incident may create a narrow expiring shadow checklist, not schema memory. Do not create a schema just because a task succeeded.
+
+## Refinement Pipeline
+
+FP follows the Zettelkasten refinement pipeline. Load `templates/zettelkasten-conventions.md` for the full model.
+
+| Stage | Zettelkasten | FP Artifact | Location |
+|---|---|---|---|
+| 1. Capture | Fleeting note | Raw observation from a task | `evidence-ledger` `unverified_claims` |
+| 2. Observe | Literature note | Anti-pattern with evidence | `lessons-learned/` card, `status: observation` |
+| 3. Generalize | Permanent note | Evidence-backed schema | `schema-memory/` card, `status: promoted` / `active` |
+
+**When creating a schema card from evidence:**
+
+1. Verify the observation appears in at least two independent evidence ledgers.
+2. Run `node fp/contracts/memory-graph.js cluster <keywords>` to check no existing card covers this pattern.
+3. If an existing card partially overlaps, use `informs` or `generalizes` to connect — don't duplicate.
+4. Link the new card back to its source lesson cards and evidence ledgers via `[[wikilink]]`.
+5. Only `generalization-gate` can promote to `active` — schema creation alone stays at `proposed`.
+
+## MOC Creation Guide
+
+A Map of Content (MOC) is an index card that groups related cards under a theme. Load `templates/zettelkasten-conventions.md` for the full convention.
+
+**Create a MOC when:**
+- 3 or more schema or lesson cards share a recognizable theme.
+- `memory-graph.js stats` shows a growing community without a hub node.
+- `memory-graph.js cluster <keywords>` returns 3+ cards.
+
+**How to create a MOC:**
+1. Create a new schema card.
+2. Set `is_moc: true` and `task-types: []`.
+3. Set `## Schema Name` to the theme (e.g., "Remote System Patterns").
+4. List sub-cards via `informs` edges. Do NOT use `depends_on` from sub-cards back to the MOC.
+5. The `## Trigger` section should describe when any of the sub-cards might apply.
+6. The `## Problem Pattern` section should list the sub-cards with brief descriptions.
 
 ## Output contract
 
