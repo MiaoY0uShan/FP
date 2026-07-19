@@ -112,3 +112,9 @@ Reason: the feature can be added as one optional skill and one template without 
 ## Recommended Next Skill
 
 `optimize-path`
+
+## Backlinks (computed — do not author)
+
+> community-1 | leaf | in_degree=0 out_degree=0 | rebuilt 2026-07-19
+
+_No inbound references._

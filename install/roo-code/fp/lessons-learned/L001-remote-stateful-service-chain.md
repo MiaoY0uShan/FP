@@ -9,6 +9,9 @@ This legacy card predates the v0.3 generalization contract and is not promoted r
 ## Context
 When changing a remote or stateful system such as a router, DNS chain, firewall, service mesh, package manager cache, CI runner, database, or production-like host.
 
+## Related
+- [[L002-stateful-ui-handoffs]](generalizes) — UI handoffs are a special case of remote statefulness where the "remote" is a browser across a navigation boundary, and the "state" lives in client-side persistence (IndexedDB, file/blob handles) instead of a server process.
+
 ## Anti-Pattern (The Trap)
 Treating remote configuration like ordinary repository code:
 
@@ -58,3 +61,10 @@ Apply this lesson when the work touches a running host, network path, firewall, 
 
 ## Safety Boundary
 Do not turn every repository edit into production ceremony. Apply the full live-system profile only when runtime state, external clients, or rollback genuinely matter.
+
+## Backlinks (computed — do not author)
+
+> community-14 | leaf | in_degree=2 out_degree=1 | rebuilt 2026-07-19
+
+- [[L002-stateful-ui-handoffs]](generalizes)
+- [[L003-record-target-precedence]](related_to)

@@ -1,3 +1,8 @@
+---
+related-schemas: {}
+task-types: ["bug", "validation", "auth", "token"]
+---
+
 # Schema Memory Card
 
 Status: candidate only — not promoted. The single password-reset task is insufficient for active schema memory.
@@ -76,3 +81,9 @@ The agent is tempted to patch symptoms or inspect broad provider internals befor
 ## Last Updated Because
 
 One run suggested this bounded candidate; no cross-task generalization claim has been made.
+
+## Backlinks (computed — do not author)
+
+> community-13 | leaf | in_degree=0 out_degree=0 | rebuilt 2026-07-19
+
+_No inbound references._

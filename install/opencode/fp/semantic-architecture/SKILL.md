@@ -69,6 +69,7 @@ If project structure is unknown, first perform the smallest bounded local read-o
 - If the missing fact is current, versioned, or external, load `templates/context-retrieval-contract.md`.
 - If the gap is a user-owned product or policy decision, return `Decision: ask_user` and ask only that blocking question.
 - Do not use reusable pattern memory as a substitute for task-local discovery.
+- When module mapping reveals recurring patterns, check the memory graph (`node fp/contracts/memory-graph.js cluster <keywords>`) for relevant schema or lesson cards that may inform architecture decisions. Load `templates/memory-graph-traversal.md` for cluster retrieval protocol.
 
 ## Procedure
 

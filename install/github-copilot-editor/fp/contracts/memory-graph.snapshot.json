@@ -1,0 +1,256 @@
+{
+  "schema_version": "1.0.0",
+  "graph_id": "fp-memory-graph",
+  "updated_at": "2026-07-19T16:20:11.874Z",
+  "nodes": [
+    {
+      "node_id": "dumb-simple-install.idea-cards",
+      "node_type": "schema_card",
+      "file_path": "fp\\examples\\dumb-simple-install.idea-cards.md",
+      "content_hash": "sha256:02bbe9135e9c6874ec7aa93e85ac71a7424ae0fceef9d79344782c4a913c1d73",
+      "status": "proposed",
+      "task_types": [],
+      "in_degree": 0,
+      "out_degree": 0,
+      "is_hub": false,
+      "is_bridge": false
+    },
+    {
+      "node_id": "fp.semantic-architecture",
+      "node_type": "schema_card",
+      "file_path": "fp\\examples\\fp.semantic-architecture.md",
+      "content_hash": "sha256:a01b028088b0bdc1f7b7c95be4f3b4d2aecd8849240fe91f0d9586ea2638c67c",
+      "status": "proposed",
+      "task_types": [],
+      "in_degree": 0,
+      "out_degree": 0,
+      "is_hub": false,
+      "is_bridge": false
+    },
+    {
+      "node_id": "password-reset.adaptive-improvement",
+      "node_type": "schema_card",
+      "file_path": "fp\\examples\\password-reset.adaptive-improvement.md",
+      "content_hash": "sha256:35569de7955ee3e6fc17ad8c8f8a7ad8bc4ac358d8f312853cfc32023a002a25",
+      "status": "proposed",
+      "task_types": [],
+      "in_degree": 0,
+      "out_degree": 0,
+      "is_hub": false,
+      "is_bridge": false
+    },
+    {
+      "node_id": "password-reset.context-diet-map",
+      "node_type": "schema_card",
+      "file_path": "fp\\examples\\password-reset.context-diet-map.md",
+      "content_hash": "sha256:4ce6f2488ec9d0061919855cb6ffb937ff5fe3cc9dacf20138ff81e9e17dda9a",
+      "status": "proposed",
+      "task_types": [],
+      "in_degree": 0,
+      "out_degree": 0,
+      "is_hub": false,
+      "is_bridge": false
+    },
+    {
+      "node_id": "password-reset.delete-scope",
+      "node_type": "schema_card",
+      "file_path": "fp\\examples\\password-reset.delete-scope.md",
+      "content_hash": "sha256:0ea9028bb43aaea55106096952ff098f62ea4e81e40001e1e21bfad0944aab26",
+      "status": "proposed",
+      "task_types": [],
+      "in_degree": 0,
+      "out_degree": 0,
+      "is_hub": false,
+      "is_bridge": false
+    },
+    {
+      "node_id": "password-reset.evidence-ledger",
+      "node_type": "schema_card",
+      "file_path": "fp\\examples\\password-reset.evidence-ledger.md",
+      "content_hash": "sha256:ead0a6abe8512f5525d3819c467a85349be0fc781874d79dfe2d24c286111f6a",
+      "status": "proposed",
+      "task_types": [],
+      "in_degree": 0,
+      "out_degree": 0,
+      "is_hub": false,
+      "is_bridge": false
+    },
+    {
+      "node_id": "password-reset.execution-brief",
+      "node_type": "schema_card",
+      "file_path": "fp\\examples\\password-reset.execution-brief.md",
+      "content_hash": "sha256:6ac564c151747c85bcb5d4c1b6600a36d5c48348a57508e973deab06e7a39d37",
+      "status": "proposed",
+      "task_types": [],
+      "in_degree": 0,
+      "out_degree": 0,
+      "is_hub": false,
+      "is_bridge": false
+    },
+    {
+      "node_id": "password-reset.failure-to-smaller-task",
+      "node_type": "schema_card",
+      "file_path": "fp\\examples\\password-reset.failure-to-smaller-task.md",
+      "content_hash": "sha256:fbc741691e57fecdd4e0c12060803a89cfab720497a6392cce8501acfab51d26",
+      "status": "proposed",
+      "task_types": [],
+      "in_degree": 0,
+      "out_degree": 0,
+      "is_hub": false,
+      "is_bridge": false
+    },
+    {
+      "node_id": "password-reset.metrics-report",
+      "node_type": "schema_card",
+      "file_path": "fp\\examples\\password-reset.metrics-report.md",
+      "content_hash": "sha256:62ceb367721c4e1d80dc65dd1961b38d8e57c59f2aadd1bac3712ead831ffbdc",
+      "status": "proposed",
+      "task_types": [],
+      "in_degree": 0,
+      "out_degree": 0,
+      "is_hub": false,
+      "is_bridge": false
+    },
+    {
+      "node_id": "password-reset.optimize-path",
+      "node_type": "schema_card",
+      "file_path": "fp\\examples\\password-reset.optimize-path.md",
+      "content_hash": "sha256:31589c314a0e05280c7ab4262b3c35d5df6dd8f4ceb634a11d28c7d20168a566",
+      "status": "proposed",
+      "task_types": [],
+      "in_degree": 0,
+      "out_degree": 0,
+      "is_hub": false,
+      "is_bridge": false
+    },
+    {
+      "node_id": "password-reset.question-requirements",
+      "node_type": "schema_card",
+      "file_path": "fp\\examples\\password-reset.question-requirements.md",
+      "content_hash": "sha256:59e75e8deed0dce829b12d72c08ef0c5561afd44c8e4a6a1443bbaa245b26205",
+      "status": "proposed",
+      "task_types": [],
+      "in_degree": 0,
+      "out_degree": 0,
+      "is_hub": false,
+      "is_bridge": false
+    },
+    {
+      "node_id": "password-reset.shorten-iteration",
+      "node_type": "schema_card",
+      "file_path": "fp\\examples\\password-reset.shorten-iteration.md",
+      "content_hash": "sha256:03c08294ea7cd232db5ef42c90aac13fdd7dc52de3c424946ff2431070c8b1d0",
+      "status": "proposed",
+      "task_types": [],
+      "in_degree": 0,
+      "out_degree": 0,
+      "is_hub": false,
+      "is_bridge": false
+    },
+    {
+      "node_id": "validation-bug.automation-candidate",
+      "node_type": "schema_card",
+      "file_path": "fp\\examples\\validation-bug.automation-candidate.md",
+      "content_hash": "sha256:1f8a4837c3536dcc80f354d76aa71326f9c6a417a46c5d675e36f7bf1405d395",
+      "status": "proposed",
+      "task_types": [],
+      "in_degree": 0,
+      "out_degree": 0,
+      "is_hub": false,
+      "is_bridge": false
+    },
+    {
+      "node_id": "validation-bug.schema-memory-card",
+      "node_type": "schema_card",
+      "file_path": "fp\\examples\\validation-bug.schema-memory-card.md",
+      "content_hash": "sha256:84150ba5cb9df85dfed83fc33cb13632817c5711aa7115c448aaf167a918fcb3",
+      "status": "proposed",
+      "schema_name": "Validation Logic Bug Fix",
+      "task_types": [],
+      "in_degree": 0,
+      "out_degree": 0,
+      "is_hub": false,
+      "is_bridge": false
+    },
+    {
+      "node_id": "L001-remote-stateful-service-chain",
+      "node_type": "lesson_card",
+      "file_path": "fp\\lessons-learned\\L001-remote-stateful-service-chain.md",
+      "content_hash": "sha256:4ac37d5119ae8b7009e004b1978137037858f741728b96a6d35fddb052a2284b",
+      "status": "promoted",
+      "task_types": [],
+      "in_degree": 2,
+      "out_degree": 2,
+      "is_hub": false,
+      "is_bridge": false
+    },
+    {
+      "node_id": "L002-stateful-ui-handoffs",
+      "node_type": "lesson_card",
+      "file_path": "fp\\lessons-learned\\L002-stateful-ui-handoffs.md",
+      "content_hash": "sha256:8d315e16993b5a6f3a85cd666c522fb2ecc2003bd8a98e38f92bf48f16a67406",
+      "status": "promoted",
+      "task_types": [],
+      "in_degree": 2,
+      "out_degree": 2,
+      "is_hub": false,
+      "is_bridge": false
+    },
+    {
+      "node_id": "L003-record-target-precedence",
+      "node_type": "lesson_card",
+      "file_path": "fp\\lessons-learned\\L003-record-target-precedence.md",
+      "content_hash": "sha256:ccb32e6504071e9b71d4ef2f025540445ce455785b0a10f5248e5c2f7e29bb86",
+      "status": "promoted",
+      "task_types": [],
+      "in_degree": 2,
+      "out_degree": 2,
+      "is_hub": false,
+      "is_bridge": false
+    }
+  ],
+  "edges": [
+    {
+      "source_id": "L001-remote-stateful-service-chain",
+      "target_id": "L002-stateful-ui-handoffs",
+      "edge_type": "generalizes",
+      "direction": "outgoing",
+      "created_at": "2026-07-19T16:20:11.873Z"
+    },
+    {
+      "source_id": "L001-remote-stateful-service-chain",
+      "target_id": "L003-record-target-precedence",
+      "edge_type": "related_to",
+      "direction": "outgoing",
+      "created_at": "2026-07-19T16:20:11.874Z"
+    },
+    {
+      "source_id": "L002-stateful-ui-handoffs",
+      "target_id": "L001-remote-stateful-service-chain",
+      "edge_type": "generalizes",
+      "direction": "outgoing",
+      "created_at": "2026-07-19T16:20:11.874Z"
+    },
+    {
+      "source_id": "L002-stateful-ui-handoffs",
+      "target_id": "L003-record-target-precedence",
+      "edge_type": "mitigated_by",
+      "direction": "outgoing",
+      "created_at": "2026-07-19T16:20:11.874Z"
+    },
+    {
+      "source_id": "L003-record-target-precedence",
+      "target_id": "L002-stateful-ui-handoffs",
+      "edge_type": "mitigated_by",
+      "direction": "outgoing",
+      "created_at": "2026-07-19T16:20:11.874Z"
+    },
+    {
+      "source_id": "L003-record-target-precedence",
+      "target_id": "L001-remote-stateful-service-chain",
+      "edge_type": "related_to",
+      "direction": "outgoing",
+      "created_at": "2026-07-19T16:20:11.874Z"
+    }
+  ]
+}

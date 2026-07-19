@@ -165,3 +165,9 @@ The MVP is now a small, verifiable reset-token validation fix.
 ## Recommended Next Skill
 
 optimize-path
+
+## Backlinks (computed — do not author)
+
+> community-4 | leaf | in_degree=0 out_degree=0 | rebuilt 2026-07-19
+
+_No inbound references._

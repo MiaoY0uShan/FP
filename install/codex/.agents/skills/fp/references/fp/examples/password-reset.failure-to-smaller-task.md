@@ -31,3 +31,9 @@ The email adapter is not mockable, so adding the endpoint and email delivery in 
 
 ## Stop Condition
 Stop if the seam requires provider migration or changes more than two files.
+
+## Backlinks (computed — do not author)
+
+> community-7 | leaf | in_degree=0 out_degree=0 | rebuilt 2026-07-19
+
+_No inbound references._

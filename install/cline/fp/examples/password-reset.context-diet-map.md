@@ -50,3 +50,9 @@ The MVP is reset-token validation. OAuth, billing, and email infrastructure are 
   "reason": "Task only touches reset-token validation, not OAuth provider internals."
 }
 ```
+
+## Backlinks (computed — do not author)
+
+> community-3 | leaf | in_degree=0 out_degree=0 | rebuilt 2026-07-19
+
+_No inbound references._

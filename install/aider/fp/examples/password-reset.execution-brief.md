@@ -93,3 +93,9 @@ Stop if implementation requires auth provider refactor.
 ## Handoff
 
 Execute only this brief. After execution, produce an Evidence Ledger.
+
+## Backlinks (computed — do not author)
+
+> community-6 | leaf | in_degree=0 out_degree=0 | rebuilt 2026-07-19
+
+_No inbound references._

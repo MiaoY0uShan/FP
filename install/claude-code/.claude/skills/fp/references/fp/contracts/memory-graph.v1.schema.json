@@ -1,0 +1,316 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/MiaoY0uShan/FP/v0.4.5/fp/contracts/memory-graph.v1.schema.json",
+  "title": "FP Memory Graph v1",
+  "description": "Typed graph linking schema cards, lesson cards, and evidence ledgers. Nodes and edges support blast-radius traversal, cluster detection, hub scoring, and incremental update. Structural validation only; cross-field, path, hash, and edge-reference rules are enforced by memory-graph.js.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "graph_id", "updated_at", "nodes", "edges"],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "graph_id": {
+      "type": "string",
+      "description": "Stable identifier for this graph snapshot, e.g. 'fp-memory-graph'"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this graph snapshot was last rebuilt from source cards"
+    },
+    "nodes": {
+      "type": "array",
+      "description": "All nodes (schema cards, lesson cards, evidence ledgers, templates) in the FP memory graph",
+      "items": { "$ref": "#/$defs/graphNode" }
+    },
+    "edges": {
+      "type": "array",
+      "description": "All typed directed edges between nodes",
+      "items": { "$ref": "#/$defs/graphEdge" }
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Open extension point for custom data; validated only that it is an object",
+      "additionalProperties": true
+    }
+  },
+  "$defs": {
+    "graphNode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["node_id", "node_type", "file_path", "content_hash", "status"],
+      "properties": {
+        "node_id": {
+          "type": "string",
+          "description": "Stable identifier derived from the filename without .md extension, e.g. 'L001-remote-stateful-service-chain'"
+        },
+        "node_type": {
+          "description": "What kind of FP artifact this node represents",
+          "enum": ["schema_card", "lesson_card", "evidence_ledger", "template"]
+        },
+        "file_path": {
+          "type": "string",
+          "description": "Path relative to the fp/ repository root, e.g. 'fp/lessons-learned/L001-remote-stateful-service-chain.md'"
+        },
+        "content_hash": {
+          "type": "string",
+          "description": "sha256:<hex> of the source file content at build time. Used for incremental update detection.",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "status": {
+          "description": "Promotion/state status of the node, using FP's standard lifecycle vocabulary",
+          "enum": ["observation", "shadow", "proposed", "promoted", "active", "rejected", "archived", "legacy"]
+        },
+        "schema_name": {
+          "type": "string",
+          "description": "Human-readable name from the card's ## Schema Name heading. Only meaningful for schema_card nodes."
+        },
+        "task_types": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Keywords describing the class of work this schema applies to. Used for cluster retrieval.",
+          "uniqueItems": true
+        },
+        "in_degree": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of edges pointing to this node. Computed at build time."
+        },
+        "out_degree": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of edges originating from this node. Computed at build time."
+        },
+        "is_hub": {
+          "type": "boolean",
+          "description": "True when in_degree >= 3. Hub cards (in_degree >= 5) are flagged separately by detectHubsAndBridges()."
+        },
+        "is_bridge": {
+          "type": "boolean",
+          "description": "True when removing this node would disconnect the graph into multiple components."
+        },
+        "betweenness": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Normalized betweenness centrality score (Brandes' algorithm). 0 = never on shortest paths; 1 = on all shortest paths."
+        },
+        "community_id": {
+          "type": "string",
+          "description": "Community/cluster ID assigned by findCommunities(). Nodes in the same community share the same ID."
+        },
+        "last_validated": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When this node's evidence was last independently verified"
+        }
+      }
+    },
+    "graphEdge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_id", "target_id", "edge_type", "direction"],
+      "properties": {
+        "source_id": {
+          "type": "string",
+          "description": "node_id of the edge origin"
+        },
+        "target_id": {
+          "type": "string",
+          "description": "node_id of the edge destination"
+        },
+        "edge_type": {
+          "description": "Typed relationship between source and target",
+          "enum": [
+            "depends_on",
+            "informs",
+            "conflicts_with",
+            "supersedes",
+            "generalizes",
+            "caused_by",
+            "mitigated_by",
+            "related_to",
+            "references"
+          ]
+        },
+        "direction": {
+          "description": "Always 'outgoing' from the source's perspective. 'incoming' edges are the reverse view and are derived, not authored.",
+          "enum": ["outgoing"]
+        },
+        "evidence_ref": {
+          "type": "string",
+          "description": "Reference to the evidence that justifies this edge, e.g. a task ID or command reference"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When this edge was first recorded"
+        }
+      }
+    },
+    "blastRadiusResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["seed_node_id", "affected_nodes", "depth", "computed_at"],
+      "properties": {
+        "seed_node_id": {
+          "type": "string",
+          "description": "The node from which the blast-radius traversal started"
+        },
+        "affected_nodes": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Union of forward_fanout and reverse_fanout, deduplicated"
+        },
+        "forward_fanout": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Nodes reachable by following outgoing edges from the seed"
+        },
+        "reverse_fanout": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Nodes that have an edge pointing TO the seed (inbound dependents)"
+        },
+        "depth": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "BFS depth limit used for the traversal"
+        },
+        "computed_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "clusterResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["communities", "algorithm", "computed_at"],
+      "properties": {
+        "communities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["community_id", "node_ids", "label"],
+            "properties": {
+              "community_id": {
+                "type": "string",
+                "description": "Unique identifier for this community, e.g. 'community-0'"
+              },
+              "node_ids": {
+                "type": "array",
+                "items": { "type": "string" },
+                "description": "Node IDs belonging to this community"
+              },
+              "label": {
+                "type": "string",
+                "description": "Human-readable label derived from the most-connected node in the community"
+              }
+            }
+          }
+        },
+        "algorithm": {
+          "description": "Algorithm used. 'connected_components' for undirected connectivity; 'label_propagation' for a lightweight community-detection pass.",
+          "enum": ["connected_components", "label_propagation"]
+        },
+        "modularity": {
+          "type": "number",
+          "description": "Modularity score when using label_propagation. Not computed for connected_components.",
+          "minimum": -1,
+          "maximum": 1
+        },
+        "computed_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "hubReport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["hubs", "bridges", "computed_at"],
+      "properties": {
+        "hubs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["node_id", "in_degree", "out_degree", "level"],
+            "properties": {
+              "node_id": { "type": "string" },
+              "in_degree": { "type": "integer", "minimum": 0 },
+              "out_degree": { "type": "integer", "minimum": 0 },
+              "level": {
+                "description": "hub: in_degree >= 3; critical_hub: in_degree >= 5",
+                "enum": ["hub", "critical_hub"]
+              }
+            }
+          },
+          "description": "Nodes sorted by in_degree descending. Only nodes with in_degree >= 3 are included."
+        },
+        "bridges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["node_id"],
+            "properties": {
+              "node_id": { "type": "string" },
+              "connects_communities": {
+                "type": "array",
+                "items": { "type": "string" },
+                "description": "Community IDs that would become disconnected if this node were removed"
+              }
+            }
+          },
+          "description": "Nodes whose removal would increase the number of connected components"
+        },
+        "computed_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "incrementalDiff": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["changed_nodes", "affected_nodes", "needs_review", "computed_at"],
+      "properties": {
+        "changed_nodes": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Nodes whose content_hash changed since the last build"
+        },
+        "hash_diffs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["node_id", "old_hash", "new_hash"],
+            "properties": {
+              "node_id": { "type": "string" },
+              "old_hash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+              "new_hash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+            }
+          },
+          "description": "Detailed hash comparison for each changed node"
+        },
+        "affected_nodes": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Nodes in the blast-radius of changed nodes that may also need review"
+        },
+        "needs_review": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Subset of affected_nodes whose status or edge relationships may be invalidated by the changes"
+        },
+        "computed_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}

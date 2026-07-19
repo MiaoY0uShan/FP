@@ -57,3 +57,9 @@ complete
 ## Next Action
 
 Track email delivery as a separate integration task.
+
+## Backlinks (computed — do not author)
+
+> community-5 | leaf | in_degree=0 out_degree=0 | rebuilt 2026-07-19
+
+_No inbound references._

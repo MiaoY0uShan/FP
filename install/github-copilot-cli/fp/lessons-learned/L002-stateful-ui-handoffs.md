@@ -9,6 +9,10 @@ This legacy card predates the v0.3 generalization contract and is not promoted r
 ## Context
 When a UI moves selected files, draft input, wizard state, or a pending import into another route, project, upload, or container-backed process.
 
+## Related
+- [[L001-remote-stateful-service-chain]](generalizes) — this is a client-side instance of the broader remote-stateful pattern. The same staged-runtime loop (map boundaries, persist before navigate, verify from client boundary, prove negative controls) applies.
+- [[L003-record-target-precedence]](mitigated_by) — record precedence prevents stale handoff data from corrupting the updated target when a user changes the destination mid-task.
+
 ## Anti-Pattern
 
 - Store payloads only in module globals, component state, or transient router state.
@@ -33,3 +37,10 @@ Apply to selected files, pending uploads, wizard/draft state, import/project cre
 
 ## Safety Boundary
 Do not persist secrets or regulated payloads merely for convenience; choose storage lifetime and cleanup from the product/security requirement.
+
+## Backlinks (computed — do not author)
+
+> community-14 | leaf | in_degree=2 out_degree=2 | rebuilt 2026-07-19
+
+- [[L001-remote-stateful-service-chain]](generalizes)
+- [[L003-record-target-precedence]](mitigated_by)

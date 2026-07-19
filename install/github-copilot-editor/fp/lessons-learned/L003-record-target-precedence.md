@@ -9,6 +9,10 @@ This legacy card predates the v0.3 generalization contract and is not promoted r
 ## Context
 When a user changes where histories, summaries, handoffs, logs, or audit records should be written during a long task.
 
+## Related
+- [[L002-stateful-ui-handoffs]](mitigated_by) — record precedence prevents stale handoff data from corrupting the updated target. When a UI handoff also involves redirecting output destinations, combining the two lessons is safer than applying either alone.
+- [[L001-remote-stateful-service-chain]](related_to) — both involve state management across boundaries. L001 handles runtime state (processes, configs, ports); L003 handles record state (handoffs, ledgers, logs).
+
 ## Anti-Pattern
 Continue writing to an older destination after the user says to use a newer destination instead, or assume every additional requested destination replaces all prior destinations.
 
@@ -29,3 +33,9 @@ Apply whenever record destinations change while work is still active or resumed 
 
 ## Safety Boundary
 Do not infer replacement from mere recency. Follow explicit user semantics and preserve legally or operationally required records unless authorized to change them.
+
+## Backlinks (computed — do not author)
+
+> community-14 | leaf | in_degree=1 out_degree=2 | rebuilt 2026-07-19
+
+- [[L002-stateful-ui-handoffs]](mitigated_by)

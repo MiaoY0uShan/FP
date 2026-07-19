@@ -99,3 +99,9 @@ Copy these into the Evidence Ledger:
 ## Recommended Next Step
 
 Execute Loop 1, then record evidence before continuing.
+
+## Backlinks (computed — do not author)
+
+> community-11 | leaf | in_degree=0 out_degree=0 | rebuilt 2026-07-19
+
+_No inbound references._

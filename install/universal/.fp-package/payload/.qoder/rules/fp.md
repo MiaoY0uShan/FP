@@ -13,7 +13,7 @@ Apply user authority and read-only limits as a global gate first. Then:
 3. **Build** — scale the output to task size: Small → Tiny Brief, Medium → Execution Brief + Ledger, Vague → Idea Cards, Large → minimum modules → final brief.
 4. **Close** — pass with matched evidence, or fail → split smaller.
 
-Layer remote/live-system, OpenWrt, stateful-UI, external-context, provider-compatibility, multi-agent, delegated-execution, continuation, self-iteration, and background-learning as profiles on the selected route.
+Layer remote/live-system, OpenWrt, stateful-UI, external-context, provider-compatibility, multi-agent, delegated-execution, continuation, self-iteration, background-learning, memory-graph, and codebase-analysis as profiles on the selected route.
 
 ## Route Weight
 
@@ -46,6 +46,7 @@ After multiple fixes across a target or fleet:
 9. **Reuse supported evidence**: another diagnostic probe must change a named decision or fill a named acceptance row; otherwise stop. Relevant mutations and declared safety checks still require fresh evidence.
 10. **Stop means stop**: after declared checks pass, emit one verdict. A user stop cancels pending work and is reported without another probe.
 11. **Use required MCPs safely**: call an already-available task-required MCP automatically within current authority. If missing, show exact source/version/scope/permissions/rollback and obtain explicit approval before download or installation.
+12. **Graph-Aware Memory Updates:** When updating a schema card or promoted lesson, run `node fp/contracts/memory-graph.js blast-radius <nodeId>` to check the blast-radius set (cards that reference the updated card via `related-schemas` or `[[wikilink]]`). For hub cards (in_degree >= 3), confirm the update is safe before finalizing. The memory graph is a zero-dependency script — no install required.
 
 After a timeout or transport failure following a possible remote mutation, do not replay the write. Perform one bounded read-only reconciliation and classify `applied | not_applied | split | unknown` first.
 
@@ -68,3 +69,11 @@ When an agent host uses a third-party/API-compatible model, gateway, or local pr
 ## Learning
 
 One run is not a reusable law. Lessons are promoted only through adaptive improvement backed by evidence from multiple independent cases. A failure is an observation first; a single severe case may justify a narrow expiring shadow checklist, never a cross-task schema.
+
+## Memory Graph
+
+Schema cards and lesson cards form a typed graph: `[[wikilink]]` references in lessons and `related-schemas` YAML frontmatter in schema cards are edges. Use `fp/contracts/memory-graph.js` (zero-dependency Node.js script) to build the graph, compute blast radius before updates, find relevant clusters by keyword, detect hub/bridge cards, and run incremental diffs. Load `fp/templates/memory-graph-traversal.md` for the full agent protocol.
+
+## Codebase Analysis
+
+When reviewing or modifying user code, FP agents prefer code-review-graph MCP when available. Start with `get_minimal_context_tool` (~100 tokens), then use `detect_changes_tool`, `get_impact_radius_tool`, `get_knowledge_gaps_tool`, and the other 27 tools for architecture, semantic search, and risk analysis. When MCP is unavailable, fall back to the grep-based `codebase-impact-map.md` protocol. Load `fp/templates/code-review-graph-mcp-contract.md` for the full 30-tool map and selection protocol.

@@ -63,6 +63,48 @@ A schema memory card captures a reusable pattern for a class of work:
 7. Identify stop conditions that would prevent drift.
 8. Decide whether to create, update, or reject the schema.
 9. Keep the schema short enough to be reused in a future execution brief.
+10. If the schema relates to other schema or lesson cards, populate the `related-schemas` YAML frontmatter with typed edges before finalizing. Use `templates/memory-graph-traversal.md` to check blast-radius effects.
+11. Populate the `task-types` YAML frontmatter with 3-5 keywords that describe the class of work. These keywords enable cluster retrieval via `memory-graph.js`. Use compact, grep-friendly terms: prefer `["bug", "validation", "auth"]` over `["validation logic for authentication tokens"]`.
+
+## Graph-Aware Retrieval
+
+When the task context justifies it (multi-module, risk of missed dependencies, or update to an existing schema), use the memory graph traversal protocol (`templates/memory-graph-traversal.md`) to expand retrieval beyond the directly-matched schema.
+
+Build the graph snapshot before querying:
+```bash
+node fp/contracts/memory-graph.js build
+```
+
+### When loading one schema, check its edges
+
+After finding a relevant schema card for the task:
+
+1. Read the card's `related-schemas` YAML frontmatter.
+2. Check `depends_on` cards first — these are foundational and may contain prerequisites or constraints that the directly-matched card assumes.
+3. Check `informs` cards next — these may provide complementary context.
+4. Do NOT automatically load `conflicts_with` or `supersedes` cards unless the task involves reconciling conflicting recommendations.
+
+Bound: at most 3 additional cards loaded this way. If the directly-matched card has no `related-schemas`, skip this step.
+
+### When updating a card, compute blast radius
+
+Before finalizing an update to a schema card:
+
+1. Run the Blast-Radius Protocol (section 1 of `memory-graph-traversal.md`).
+2. List every card that links to the updated card (reverse fan-out).
+3. For each, decide whether the change requires a re-read of the dependent card's `## Trigger`, `## Problem Pattern`, and `## Evidence Required` sections.
+4. Record the blast-radius check in the evidence ledger under the update's acceptance evidence.
+
+If the blast-radius set contains a hub card (in_degree >= 3 per `node fp/contracts/memory-graph.js hubs`), pause and confirm the update is safe before proceeding.
+
+### When a task type matches a cluster
+
+If the task has well-defined keywords (e.g., "validation" + "bug" + "auth"), run the Cluster Retrieval Protocol (section 2 of `memory-graph-traversal.md`):
+```bash
+node fp/contracts/memory-graph.js cluster validation bug auth
+```
+
+This replaces ad-hoc "search for relevant schemas" with a structured sweep that also catches schemas linked by edges but not by keyword match alone.
 
 ## Schema promotion rules
 
@@ -147,7 +189,8 @@ When a schema is updated from repeated runs, record any stable metric pattern:
 - typical scope creep risks;
 - typical verification checks;
 - typical rework causes;
-- proxy TVP trend, if available.
+- proxy TVP trend, if available;
+- graph in-degree / out-degree trend for this schema type.
 
 Do not update schema metrics from one weak or unverifiable run.
 
@@ -165,3 +208,13 @@ When a schema is relevant, provide:
 - reason for exclusion.
 
 This should feed the Context Diet Map in the next Compiled Execution Brief.
+
+### Graph-enriched handoff
+
+When the graph traversal protocol was used for this task, the Context Diet Map must include:
+
+- **Relevant schema cards:** the directly-matched card plus any cluster cards loaded through `depends_on` or `informs` edges.
+- **Exclusion reason for pruned cluster cards:** e.g., "trigger mismatch — this schema applies to API endpoints, not CLI scripts."
+- **Blast-radius note (if updating):** list of dependent cards checked and their re-evaluation status.
+
+All graph-traversal decisions are bounded: the agent records which protocol section was used, the seed card(s), the depth limit, and the cards loaded or excluded.
