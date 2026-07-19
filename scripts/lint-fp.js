@@ -132,7 +132,7 @@ function main() {
   ], failures);
   requireText('fp/generalization-gate/SKILL.md', ['leave-one-case-out', 'near-neighbor negative control', 'candidate agent and evaluator must be different', 'shadow', 'does not train model weights'], failures);
   requireText('fp/templates/multi-agent-review-protocol.md', ['idempotency_key', 'task_input_index', 'parent cancellation', 'dependency cycles'], failures);
-  requireText('THIRD_PARTY_NOTICES.md', ['superpowers', 'hermes-agent', 'ponytail', 'context7', 'mattpocock/skills'], failures);
+  requireText('THIRD_PARTY_NOTICES.md', ['superpowers', 'hermes-agent', 'ponytail', 'context7', 'mattpocock/skills', 'code-review-graph'], failures);
   requireText('fp-copy-paste.md', ['Debug-first', 'one writer', 'required-check'], failures);
   requireText('TEST_FP.md', ['diagnose-only', 'single writer', 'unknown'], failures);
 
