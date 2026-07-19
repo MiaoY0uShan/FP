@@ -135,3 +135,9 @@ C
 merge A+B
 none, generate 3 new cards
 ```
+
+## Backlinks (computed — do not author)
+
+> community-0 | leaf | in_degree=0 out_degree=0 | rebuilt 2026-07-19
+
+_No inbound references._

@@ -1,5 +1,23 @@
 # Changelog
 
+## v0.4.6 — Graph-structured memory with code-review-graph inspired analysis
+
+- Added typed memory graph: schema cards and lesson cards now form a connected graph via `[[wikilink]]` references in lesson cards and `related-schemas` YAML frontmatter in schema cards. Nine edge types: `depends_on`, `informs`, `conflicts_with`, `supersedes`, `generalizes`, `caused_by`, `mitigated_by`, `related_to`, `references`.
+- Added `fp/contracts/memory-graph.v1.schema.json` — JSON Schema v1 for the typed memory graph, covering nodes, edges, blast-radius results, cluster detection, hub reports, and incremental diffs.
+- Added `fp/contracts/memory-graph.js` (1522 lines, zero-dependency) — graph operations library: `buildGraph` (scan cards + parse frontmatter/wikilinks), `blastRadius` (BFS traversal on directed edges), `findCommunities` (connected components), `labelPropagation` (lightweight community detection with modularity scoring), `betweennessCentrality` (Brandes' algorithm), `detectHubsAndBridges` (in-degree heuristic + removal test), `incrementalUpdate` (SHA-256 hash diff), `findRelevantCluster` (keyword-scored cluster retrieval), `syncBacklinks` (write computed fields back to source cards), `graphToDot` (Graphviz export), `validateGraph` (referential integrity + dead-link detection). All adapted from code-review-graph's SQLite graph, Leiden community detection, and betweenness centrality; re-expressed as FP-native zero-dependency Node.js scripts following the `evidence-ledger.js` pattern.
+- Added `fp/templates/memory-graph-traversal.md` — agent protocol for blast-radius checks, cluster retrieval, hub/bridge detection, incremental updates, DOT visualization, and context-diet-map integration.
+- Added Memory-Graph Profile to `fp/SKILL.md` — layered onto medium+ tasks involving schema/lesson cards. Guides agents through graph-aware retrieval, update blast-radius, and cluster retrieval.
+- Enhanced `fp/templates/schema-memory-card.md` with YAML frontmatter (`related-schemas`, `task-types`) and computed `## Backlinks` section.
+- Enhanced `fp/schema-memory/SKILL.md` with Graph-Aware Retrieval (one-hop edge following), Update Blast-Radius (pre-update traversal), Cluster Retrieval (keyword-based `memory-graph.js` query), and graph-enriched context-diet-map handoff.
+- Enhanced `fp/lessons-learned/README.md` with mandatory `[[wikilink]]` graph convention, typed edge table, backlinks protocol, and cross-directory edge rules.
+- Added typed `## Related` sections with `[[wikilink]]` edges to all three legacy lesson cards (L001, L002, L003), forming the first connected memory component.
+- Added YAML frontmatter with `task-types` to the example validation-bug schema card.
+- Enhanced `fp/semantic-architecture/SKILL.md` with memory-graph bridge: when module mapping reveals recurring patterns, check the memory graph for relevant schema/lesson cards.
+- Enhanced `scripts/lint-contracts.js` with `--memory-graph` flag for automated graph validation in CI.
+- Synced memory-graph references to `fp/CLAUDE.md` (Core Rule 12 + Memory Graph section), `fp/AGENTS.md` (Learning And Records bullet), and `fp/README.md` (Route-Selected Resources).
+- Recorded code-review-graph audit baseline in `docs/upstream-influences.md`.
+- Updated all generated backlinks to example and lesson cards via `sync-backlinks`.
+
 ## v0.4.5 — Delegated execution and provider spend safety
 
 - Added host-capability-driven delegated execution: fresh implementer, task reviewer, conditional fixer/re-reviewer, final integration reviewer, and parent verification.

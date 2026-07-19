@@ -110,6 +110,7 @@ When an agent host uses a third-party/API-compatible model, gateway, or local pr
 - Count distinct task and session IDs. Paraphrases, perturbations, and sibling agents from one run test robustness but do not create independent evidence.
 - Active candidates require a bounded trigger and non-trigger boundary, current provenance, complexity budget, passing shadow window, explicit approval, and tested rollback. Load `generalization-gate/SKILL.md`.
 - Metrics use observed values. Missing values stay `unknown`; no baseline means no efficiency claim.
+- Schema cards and lesson cards form a typed memory graph via `[[wikilink]]` references and `related-schemas` YAML frontmatter. Before updating a promoted card, run the blast-radius protocol (`fp/contracts/memory-graph.js` + `fp/templates/memory-graph-traversal.md`) to identify dependent cards that may need re-evaluation. Hub cards (in_degree >= 3) and bridge cards require deeper evidence before modification.
 
 ## Repository And Release Boundary
 

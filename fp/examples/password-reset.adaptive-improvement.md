@@ -81,3 +81,9 @@ What could this improvement make worse?
 ## Recommended Next Step
 
 Keep this as an observation. Use `generalization-gate` only after independent cases and blind evaluation evidence exist.
+
+## Backlinks (computed — do not author)
+
+> community-2 | leaf | in_degree=0 out_degree=0 | rebuilt 2026-07-19
+
+_No inbound references._

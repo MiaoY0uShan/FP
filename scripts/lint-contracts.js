@@ -1,14 +1,10 @@
 #!/usr/bin/env node
 
-const {
-  computeWorktreeFingerprint,
-  loadLedger,
-  parseJsonFile,
-  validateCompletion
-} = require('../fp/contracts/evidence-ledger');
+const { computeWorktreeFingerprint, loadLedger, parseJsonFile, validateCompletion } = require('../fp/contracts/evidence-ledger');
+const { buildGraph, validateGraph, loadGraph } = require('../fp/contracts/memory-graph');
 
 function usage() {
-  return 'Usage: node scripts/lint-contracts.js --ledger <json> [--brief <json>] [--budget <json>] [--legacy]';
+  return 'Usage: node scripts/lint-contracts.js --ledger <json> [--brief <json>] [--budget <json>] [--legacy] [--memory-graph]';
 }
 
 function parseArgs(argv) {
@@ -22,6 +18,8 @@ function parseArgs(argv) {
       if (!value || value.startsWith('--')) throw new Error(`Missing value for ${arg}`);
       options[arg.slice(2)] = value;
       index += 1;
+    } else if (arg === '--memory-graph') {
+      options.memoryGraph = true;
     } else {
       throw new Error(`Unknown argument: ${arg}`);
     }
@@ -87,6 +85,28 @@ function main(argv) {
     if (errors.length > 0) {
       errors.forEach((entry) => console.error(`${entry.code} ${entry.path}: ${entry.message}`));
       return 1;
+    }
+
+    // Memory graph validation
+    if (options.memoryGraph) {
+      console.error('memory-graph: building snapshot...');
+      const { graph, warnings } = buildGraph();
+      warnings.forEach((w) => console.error(`memory-graph warning: ${w}`));
+      const mgResult = validateGraph(graph, { strict: true });
+      if (mgResult.errors.length > 0) {
+        mgResult.errors.forEach((e) => console.error(`memory-graph error ${e.path}: ${e.message}`));
+        return 1;
+      }
+      if (mgResult.warnings.length > 0) {
+        mgResult.warnings.forEach((w) => console.error(`memory-graph warning ${w.path}: ${w.message}`));
+      }
+      // Check that the snapshot file is loadable
+      const snapshot = loadGraph();
+      if (!snapshot) {
+        console.error('memory-graph error: snapshot file not found or not loadable');
+        return 1;
+      }
+      console.error(`memory-graph: ok (${graph.nodes.length} nodes, ${graph.edges.length} edges)`);
     }
 
     console.log(`ok: ${options.ledger}`);
