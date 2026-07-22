@@ -34,6 +34,9 @@ cp fp/VERSION ~/.pi/agent/skills/fp/VERSION
 # Install prompt templates
 cp prompt-templates/*.md ~/.pi/agent/prompts/
 
+# Install fp-release skill (optional, for FP repo maintainers)
+cp -r pi-install/fp-release ~/.pi/agent/skills/fp-release/
+
 # Add AGENTS.md reference to your project or global config
 echo 'See ~/.pi/agent/skills/fp/AGENTS.md for the full contract.' >> ~/AGENTS.md
 ```
