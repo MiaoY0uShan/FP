@@ -25,7 +25,7 @@ Profiles (remote, live-system, multi-agent, continuation, etc.) layer onto a rou
 
 1. **No evidence, no done.** Implementation or child summary is not completion evidence.
 2. **Debug before patching.** Gather discriminating evidence before changing code. Speculative patches are not probes.
-3. **Reuse ladder:** need exist? → codebase? → stdlib? → native? → installed dep? → one line? → minimum new code. Stop at first safe rung.
+3. **Reuse ladder:** does this need to exist? → already in this codebase? → standard library does it? → native platform feature? → installed dependency? → one line is sufficient? → minimum new code only then. Stop at first safe rung.
 4. **State read set, touch set, verify method** before first edit.
 5. **Rerun original symptom + regression + negative control** after a fix.
 6. **One writer per shared file set.** Parallelize only independent investigation or review.
@@ -33,15 +33,19 @@ Profiles (remote, live-system, multi-agent, continuation, etc.) layer onto a rou
 8. **Redact secrets** from logs, examples, handoffs, and final answers.
 9. **Challenge system changes:** for protocol, trigger, or memory-policy changes, confirm before editing unless already approved.
 
-## Build Routes
+## Route Weight
+
+### 3. Build
 
 | Route | Trigger | Output |
 |-------|---------|--------|
-| **Small** | Single-file, 3-5 lines | Task, read/touch, done-when, verify, result. Record first safe reuse rung. |
+| **Small** | Single-file, 3-5 lines | Tiny Brief: task, read/touch, done-when, verify, result. Record first safe reuse rung. |
 | **Medium** | Multi-file, bounded scope | Execution Brief + Acceptance Evidence Matrix + Evidence Ledger |
 | **Vague** | Underspecified | Three Idea Cards (Title, Assumption, MVP, Risk) → user picks → then Medium |
 | **Large/risky** | Architectural, breaking | Only internal modules that reduce risk, compiled into one final brief |
 | **Failed** | — | Capture evidence, split smaller. Do not repeat the same large attempt. |
+
+Do not generate a full ledger for small changes unless risk appears.
 
 ## Definition of Done
 
@@ -51,11 +55,17 @@ requirement → observable → check/probe → pass condition → evidence locat
 
 Implementation is not an observable. Bug fix: original symptom must fail before (or be pinned), then pass after fix. Load `templates/acceptance-evidence-matrix.md` for Medium+. Unknown remains `unknown`.
 
+For medium, risky, or multi-agent work, capture pre-existing worktree changes and pre-existing failures before the first edit.
+
 Evidence is bound to observed state. A relevant mutation, rollback, or freshness change invalidates affected evidence.
 
 ## Debug-First Route
 
-Pin symptom → read-only baseline → falsifiable hypothesis → cheapest discriminating probe → decision → authorized fix. Speculative patches are not probes. Three consecutive non-narrowing probes trigger an architecture checkpoint. Unknown cause stays unknown; unknown remains `unknown` until evidence resolves it.
+Diagnosis is read-only by default. Pin symptom → read-only baseline → falsifiable hypothesis → cheapest discriminating probe → decision → authorized fix. Speculative patches are not probes. three consecutive non-narrowing probes trigger an architecture checkpoint. After a hypothesis is supported, another diagnostic probe must be able to change a named decision or fill a named acceptance row; otherwise stop and reuse the bound evidence. Unknown cause stays unknown; unknown remains `unknown` until evidence resolves it. Load `templates/debug-incident-checklist.md` for the full checklist.
+
+## Provider-Compatibility Profile
+
+When using a third-party proxy, gateway, or API-compatible endpoint, or when retries, loops, token spend, cache accounting, streaming, or encoding are suspect, load `provider-compatibility/SKILL.md`. Resolve the effective host/proxy/provider chain and health before paid work.
 
 ## On-Demand Profiles
 
@@ -105,6 +115,14 @@ FP learns across projects via Hermes-style closed loop:
 ## Pi Integration
 
 FP provides pi-specific adapters in `skills/` (auto-loaded sub-skills with pi frontmatter) and `../prompt-templates/` (slash-command expansions). Install via `pi-install/README.md`.
+
+## MCP Capability Gate
+
+Automatically use an already-available task-required MCP when it is the first safe reuse rung and the call stays within task authority. Obtain explicit user approval before any download, installation, configuration, authentication, or service start. MCP availability does not expand read, write, network, credential, deployment, messaging, or live-system authority.
+
+## Delegated-Execution Profile
+
+Freeze work items, domain IDs, authority, concurrency limits, and fix-cycle budgets. Load `delegated-execution/SKILL.md`. When two or more domains are independent, also load `dispatch-parallel-domains/SKILL.md`.
 
 ## Multi-Agent Profile
 

@@ -1,6 +1,6 @@
 # FP Agent Contract
 
-Activate automatically for engineering work; stay dormant for casual or other non-engineering goals. FP: and $fp are optional explicit invocations — do not require a keyword. Select the lightest route that can still be verified.
+Load it automatically for engineering work; keep it dormant for casual or other non-engineering goals. FP: and $fp are optional explicit invocations — do not require a keyword. Select the lightest route that can still be verified.
 
 ## Route Before Editing
 
@@ -33,7 +33,11 @@ Layer profiles (remote, live-system, multi-agent, provider-compatibility, etc.) 
 7. **Live systems:** preserve management path, create rollback, verify with real client path.
 8. **Redact secrets** from logs, examples, and final answers.
 
-Implementation is not an observable. For bugs: original symptom must fail before or be pinned, then pass after fix.
+Implementation is not an observable. For bugs: original symptom must fail before or be pinned, then pass after fix. If the user says stop or accepts current completion, cancel pending work and report verified/unverified state without another probe.
+
+## MCP Gate
+
+An available task-required MCP is used automatically within existing authority. Download, install, or start only after explicit user approval. Resident or auto-start behavior requires separate explicit approval. MCP availability does not expand read, write, network, credential, deployment, messaging, or live-system authority.
 
 ## Multi-Agent
 
