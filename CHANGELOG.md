@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.4.9 — Core slim-down: route-first architecture
+
+- **Core SKILL.md reduced 74%** (350 → 90 lines): kept routing priority, core mandates, build routes, and definition of done. All 14 profiles moved to on-demand sub-skills and templates.
+- **AGENTS.md reduced 80%** (120 → 50 lines): minimal bootstrap that delegates detail to SKILL.md.
+- **On-Demand Profile table**: 17 conditions mapped to their sub-skills/templates (provider-compatibility, debug-first, live-system, multi-agent, continuation, codebase-analysis, memory-graph, etc.). Profiles load only when their condition matches.
+- Combined core context footprint: ~400 lines → ~100 lines per session (75% reduction).
+- All existing sub-skills and templates preserved unchanged.
+
 ## v0.4.8 — Zettelkasten/Obsidian-inspired conventions and repository navigation
 
 - Added `fp/templates/zettelkasten-conventions.md` — FP card-box writing conventions: atomicity (one pattern per card, ≤50 lines), bidirectional links (every card must link out, backlinks are computed), Folgezettel sequences (`next`/`previous` edges for narrative order), MOC (Map of Content index cards at N≥3 cards per theme), refinement pipeline (fleeting → literature → permanent), serendipity traversal, and card size constraints.

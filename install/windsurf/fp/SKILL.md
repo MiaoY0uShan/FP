@@ -5,252 +5,86 @@ description: "Use automatically when the user's goal is engineering work (build,
 
 # FP: Universal Execution Protocol
 
-FP is a lightweight execution discipline for AI coding agents. It selects the smallest route that can still produce trustworthy evidence. Infer activation from the user's goal; an explicit keyword is optional.
-
-## Core Mandates
-
-1. **Goal-Matched Ghost Mode:** Activate automatically for engineering goals. Do not require `FP:` or `$fp`, and stay dormant for casual or other non-engineering goals.
-2. **Lessons First:** Search `lessons-learned/` only for patterns relevant to the task. Only cards whose status is `promoted` may act as reusable policy; observations and bounded shadows are hypotheses that require task-local evidence.
-3. **No Proof, No Edit:** Before editing, state the read set, touch set, acceptance evidence, and verification method.
-4. **Baseline Before Blame:** For medium, risky, or multi-agent work, capture repository root/revision, pre-existing worktree changes and their ownership, and relevant pre-existing failures before the first edit. Do not attribute them to this run or overwrite them. Isolation is a risk decision, not a mandatory worktree.
-5. **Debug Before Patching:** When the cause is unknown, gather discriminating evidence before changing code or live state.
-6. **Auto-Verify:** Run the declared checks after execution and rerun the original symptom for fixes.
-7. **Evidence-Led:** No task is complete without observed results. Unknown remains `unknown`.
-8. **Latest Record Target Wins When It Replaces:** If the user explicitly narrows or replaces a record destination, write only to the newest target. Do not infer replacement when the user asks for an additional destination.
-9. **Challenge System Changes:** For protocol, trigger, install-boundary, memory-policy, or default-workflow changes, confirm intent and scope unless the user already approved implementation.
-10. **Reuse Before Creation:** On every coding route, including Small and Medium, stop at the first safe rung: does this need to exist -> already in this codebase -> standard library -> native platform feature -> installed dependency -> one line -> minimum new code only then. Record the winning rung in the brief; do not require the full chain merely to perform this check.
-11. **Decision-Relevant Evidence:** After a diagnostic hypothesis is supported, run another diagnostic probe only when its possible outcomes can change a named decision or fill a named acceptance row. Otherwise reuse the bound evidence and stop diagnostic expansion. A relevant mutation, staleness, or a declared post-change safety check invalidates reuse and must still be verified.
-12. **MCP Capability Gate:** Automatically use an already-available task-required MCP when it is the first safe reuse rung and the call stays within task authority. If it is missing, obtain explicit user approval before any download, installation, configuration, authentication, or service start. MCP availability does not expand read, write, network, credential, deployment, messaging, or live-system authority.
+FP selects the smallest route that can still produce trustworthy evidence. Infer activation from the goal; no keyword required.
 
 ## Routing Priority
 
-First apply user authority and read-only limits as a global gate over every route. Then select the first matching operational route:
+Apply user authority and read-only limits as a global gate first. Then select:
 
 ```text
 active incident
--> explicit "grill/challenge me" request
--> diagnose-only or unknown-cause bug
--> audit/survey (scan a fleet, cluster, or multi-device target for issues)
--> protocol or agent-behavior change
--> small / medium / vague / large route
+→ explicit grill/challenge
+→ diagnose-only or unknown cause
+→ protocol/agent-behavior change
+→ build route: small → medium → vague → large
 ```
 
-A read-only incident may OBSERVE and recommend reversible containment/restoration, but it may not mutate the target. Route priority never expands authority.
+Profiles (remote, live-system, multi-agent, continuation, etc.) layer onto a route; they do not expand authority.
 
-Remote/stateful, OpenWrt/live-system, external-context/MCP, provider-compatibility, multi-agent, delegated-execution, continuation, stateful-UI, self-iteration, background-learning, memory-graph, and codebase-analysis are profiles layered onto a route. They are not reasons to load the full chain by themselves. Independent-domain parallelism is an explicit multi-agent sub-route, never an inference from task count alone.
+## Core Mandates
 
-## Routes
+1. **No evidence, no done.** Implementation or child summary is not completion evidence.
+2. **Debug before patching.** Gather discriminating evidence before changing code. Speculative patches are not probes.
+3. **Reuse ladder:** need exist? → codebase? → stdlib? → native? → installed dep? → one line? → minimum new code. Stop at first safe rung.
+4. **State read set, touch set, verify method** before first edit.
+5. **Rerun original symptom + regression + negative control** after a fix.
+6. **One writer per shared file set.** Parallelize only independent investigation or review.
+7. **Live systems:** preserve management path, create rollback, inspect desired/generated/effective state, verify with real client path.
+8. **Redact secrets** from logs, examples, handoffs, and final answers.
+9. **Challenge system changes:** for protocol, trigger, or memory-policy changes, confirm before editing unless already approved.
 
-Select the first matching route. Every route below sub-routes by scale or scenario internally.
+## Build Routes
 
-### 1. Urgent / High-Stakes
-
-Use for active incidents, explicit grill/challenge requests, or protocol/behavior changes that affect the agent's own rules.
-
-**Active incident (ongoing outage, security event, data-loss risk, unstable management path):**
-
-```text
-OBSERVE -> CONTAIN -> RESTORE -> REPAIR -> LEARN
-```
-
-Preserve evidence, access, and rollback. Restore service before long-term refactoring. Use separate briefs for restoration and permanent repair. Load `templates/debug-incident-checklist.md`.
-
-**Grill / challenge:** Load `question-requirements/SKILL.md` before any other routing. Investigate repository facts yourself; ask one user-owned decision at a time, with a recommendation and alternative. Do not edit until the user confirms shared understanding or explicitly accepts safe defaults.
-
-**Protocol / agent-behavior change:** Restate the inferred goal, challenge assumptions, list affected areas, and ask for confirmation unless the user explicitly approved the discussed change.
-
-### 2. Read-Only Diagnosis
-
-Use when the target has an unknown failure, the user asked for diagnosis without a fix, or the user wants a proactive scan across multiple targets (fleet / cluster / routers / VMs / containers / repos).
-
-**Debug-first (known symptom, unknown cause):**
-
-```text
-pin symptom -> read-only baseline -> falsifiable hypothesis
--> cheapest discriminating probe -> decision -> authorized fix
--> original reproduction + regression + negative control
-```
-
-Diagnosis is read-only by default. Keep at most two active hypotheses and run one discriminating probe at a time. Speculative patches are never probes. Three consecutive non-narrowing probes trigger an architecture/observability checkpoint. If the third probe narrows the cause, continue from that evidence. Once a hypothesis is supported, extra corroboration must change a named decision or fill a named acceptance row; otherwise stop and reuse the evidence. When the user asked only for diagnosis, stop before any fix.
-
-Load `templates/debug-incident-checklist.md` for the causal trace, shared-boundary regression set, and condition-based wait contract.
-
-**Audit / survey (no known failure, proactive discovery):**
-
-```text
-read-only -> per-target baseline -> cross-target comparison -> triaged report
-```
-
-1. Gather current state from every target in parallel (read-only probes only).
-2. Compare against known-good baselines (config, sysctl, firewall, services, logs, resources).
-3. Prioritize findings by severity: P0 (degraded/broken) -> P1 (measurable impact) -> P2 (cosmetic/idle).
-4. Report with per-target evidence before offering to fix.
-5. After user authorization, apply fixes in serial per target to avoid correlated blast radius.
-
-A one-target audit degenerates to a read-only survey. Do not mutate any target until the user approves specific findings for repair.
-
-### 3. Build
-
-Scale the output template to task size and uncertainty. Every build route records the first safe reuse rung (Core Mandate 10) before the first edit.
-
-| Scale | Trigger | Output |
+| Route | Trigger | Output |
 |-------|---------|--------|
-| **Small** | Clear, single-file, 3-5 lines of change | Tiny Brief: task, read/touch, done-when, verify, result |
-| **Medium** | Clear, multi-file, bounded scope | Execution Brief + acceptance evidence matrix + Evidence Ledger |
-| **Vague** | Underspecified, uncertain requirements | Three Idea Cards (Title, Assumption, MVP, Risk), then user choice |
-| **Large/risky** | Architectural, multi-module, breaking | Only the internal modules that reduce risk, compiled into one final brief |
+| **Small** | Single-file, 3-5 lines | Task, read/touch, done-when, verify, result. Record first safe reuse rung. |
+| **Medium** | Multi-file, bounded scope | Execution Brief + acceptance evidence matrix + Evidence Ledger |
+| **Vague** | Underspecified | Three Idea Cards (Title, Assumption, MVP, Risk) → user picks → then Medium |
+| **Large/risky** | Architectural, breaking | Only internal modules that reduce risk, compiled into one final brief |
+| **Failed** | — | Capture evidence, split smaller. Do not repeat the same large attempt. |
 
-Do not generate a full ledger for small changes unless risk appears.
-
-### 4. Close
-
-**Pass:** Evidence weight matches route weight. All required checks passed. The original symptom no longer reproduces. Emit one verdict and stop; do not add optional corroboration after the declared evidence passes.
-
-**Fail / blocked:** Record evidence, split into a smaller testable slice. A failure is not permission to repeat the same patch. Lessons and automation are promoted only through adaptive improvement backed by evidence.
-
-A user direction to stop or accept current completion cancels pending probes and background work immediately. Report the last observed evidence and remaining unknowns without running another command merely to improve closure.
-
-## Definition Of Done
-
-Before the first edit on medium, debug, live, or risky work, map each requirement to:
+## Definition of Done
 
 ```text
-requirement -> observable -> check/probe -> pass condition -> evidence location
+requirement → observable → check/probe → pass condition → evidence location
 ```
 
-Implementation is not an observable. For a bug fix, the original reproduction must fail before or be otherwise pinned, then pass after the fix. Use `templates/acceptance-evidence-matrix.md`.
+Implementation is not an observable. Bug fix: original symptom must fail before (or be pinned), then pass after fix. Load `templates/acceptance-evidence-matrix.md` for Medium+.
 
-Evidence reuse is bound to the observed state. A relevant edit, deployment, rollback, timeout with possible mutation, or freshness change invalidates affected evidence and requires the declared checks again. This gate never waives original reproduction, sibling regression, negative controls, external-client checks, rollback, cleanup, or parent integration verification.
+Evidence is bound to observed state. A relevant mutation, rollback, or freshness change invalidates affected evidence.
 
-### Batch Regression Verification
+## On-Demand Profiles
 
-After completing multiple fixes across a target or fleet, run a closing sweep before declaring done:
+Each profile is a separate sub-skill. Load only when the condition matches:
 
-1. Re-run every originally-failed check from the pre-fix baseline. Every one must pass.
-2. Run at least one negative control: a check that should still fail (or still be absent) and does. This guards against over-fixing.
-3. For cross-target work, verify each dependency edge from the consumer side (e.g., DNS resolution from a client, not just the DNS server's own `nslookup`).
-4. Produce a single `repair-verdict` block listing each fix, its post-repair observed value, and the verifying check. Missing or still-broken items stay as open items, not silent successes.
+| Condition | Load |
+|-----------|------|
+| Third-party proxy, gateway, retry/loop/spend/encoding suspect | `provider-compatibility/SKILL.md` |
+| Unknown failure; user asks diagnosis without fix | `templates/debug-incident-checklist.md` → debug-first route |
+| Active outage, security event, data loss | `templates/debug-incident-checklist.md` → OBSERVE→CONTAIN→RESTORE→REPAIR→LEARN |
+| Remote/stateful target, OpenWrt, embedded, router | `templates/remote-stateful-system-checklist.md` + `templates/openwrt-live-system-verification-profile.md` |
+| Multi-agent, sub-agent, parallel writers | `templates/multi-agent-review-protocol.md` |
+| Delegated execution with fresh agents per work item | `delegated-execution/SKILL.md` |
+| Cross-session continuation, resume after compaction | `templates/continuation-handoff.md` |
+| External library/API version lookup needed | `templates/context-retrieval-contract.md` |
+| Vague/risky/large; need requirements challenge | `question-requirements/SKILL.md` |
+| Memory graph, Zettelkasten, background learning | `templates/memory-graph-traversal.md` |
+| Codebase analysis, impact mapping | `templates/codebase-impact-map.md` |
+| After non-trivial evidenced run: adaptive improvement | `adaptive-improvement/SKILL.md` |
+| Iterative improvement with declared cycles | `shorten-iteration/SKILL.md` |
+| Schema memory card creation/update | `schema-memory/SKILL.md` |
+| Metrics collection | `metrics/SKILL.md` |
+| Evidence ledger creation/validation | `evidence-ledger/SKILL.md` |
+| Deleting or scoping down | `delete-scope/SKILL.md` |
 
-## Multi-Agent Profile
+## Multi-Agent (Compact)
 
-Use ordinary parallel agents for independent investigation or review. Use writing subagents only through the Delegated-Execution Profile or another explicitly bounded protocol. The parent is the integrator and independently verifies every completion claim.
+Parent is integrator, default writer, and final verifier. Subagents get bounded envelopes (goal, scope, invariants, forbidden actions, output). Leaves cannot delegate, deploy, promote memory, message externally, use credentials, or mutate live state. Parent reruns critical checks.
 
-- For ordinary multi-agent work, default to one parent plus at most two reviewers; add a specialist only for a distinct, bounded risk. Delegated execution may accumulate more terminal threads while keeping active concurrency and total thread creation within the frozen brief.
-- One active writer owns each shared file set. A delegated implementer may transfer the same paths to a later fresh fixer only after a dependency-ordered terminal handoff and observed lease release. Only the parent holds a live-system mutation lease.
-- Give every subagent a task-local envelope: goal, exact files/resources, invariants, verification, forbidden actions, and output location.
-- Keep first-pass reviewers independent. Resolve disagreement with evidence, not a vote.
-- Record spec and quality verdicts. Important fixes must be re-reviewed.
-- Stop stale agents when the user changes direction. End with no active agent, poller, or temporary live mutation.
+## External Context
 
-For distributed or resumable work, every child also receives a structured task/result envelope: task/session/parent IDs, bounded goal/context, role, authority/tool ceiling, dependency IDs, max iterations/attempts/time/depth, workspace/resources, idempotency key, terminal status, bound evidence, parent-only reserved artifact reference, touched files, checks, actual summary usage, and start/finish time. Return results in task-input order. Derive concurrency, dependency, timeout, retry, cancellation, and summary gates from envelopes. Every writer needs a holder/path/time-bound lease with observed release evidence. Distinct read-only spec and quality reviewers return separately bound commands; booleans or prose alone never close the integration gate. Leaf agents cannot delegate, promote memory, message externally, deploy, use credentials, or mutate live state.
+Retrieve only the exact topic and installed version. Prefer authoritative sources. A stale external claim blocks dependent completion. Provider failure never disables routing.
 
-Load `templates/multi-agent-review-protocol.md` when this profile applies.
+## Learning
 
-## Delegated-Execution Profile
-
-Use when an accepted executable plan should be carried out by fresh task-local agents and the current host exposes a verified subagent runtime. Do not use it merely because a tiny task could be delegated, and do not infer it from a model name.
-
-Freeze work items, independent domain IDs, authority, path ownership, active-concurrency and cumulative-thread limits, fix-cycle budgets, final review, and parent checks before dispatch. Then load `delegated-execution/SKILL.md`. It requires a fresh implementer for every work item, a fresh task reviewer carrying both spec and quality verdicts, a fresh fixer plus fresh re-reviewer for blocking findings, a fresh final integration reviewer, and parent-side integration verification.
-
-Before the first spawn, load `templates/agent-runtime-adapters.md`, inspect the host's actual tool catalog, and consult `contracts/agent-runtime-registry.v1.json`. Use host-native primitives only when observed. Capability absence falls back explicitly; never invent tools or launch another AI CLI from a shell.
-
-When two or more domains are claimed independent, also load `dispatch-parallel-domains/SKILL.md`. Fan out only after proving disjoint mutable state, writer paths, generated outputs, dependencies, rollback, and acceptance evidence. Otherwise keep the chains serial.
-
-### Multi-Device Coordination
-
-When a task spans multiple independent targets (routers, VMs, containers, physical hosts), the one-writer rule applies per target, not globally. Parallel read-only probes across targets are safe. Serialize writes within a single target; parallel writes to different targets are permitted when they share no dependency or blast-radius coupling.
-
-1. Document each target's identity (hostname, IP, role) before the first probe.
-2. Each target gets its own read set, touch set, and rollback point.
-3. Cross-target dependencies (e.g., DNS on A, proxy on B) must be mapped before any write.
-4. After all fixes, run a cross-target smoke test: verify each dependency pair from the consumer's perspective, not the provider's.
-
-## Live-System Profiles
-
-- For any remote or stateful target, load `templates/remote-stateful-system-checklist.md`.
-- For OpenWrt, embedded Linux, routers, Wi-Fi, procd, or BusyBox, also load `templates/openwrt-live-system-verification-profile.md`.
-- For stateful UI handoffs, load `templates/stateful-ui-handoff-checklist.md`.
-
-Capability claims must be proved on the target. A successful restart or `ready` label is not functional evidence.
-
-## External Context Profile
-
-When a task depends on a current/versioned library or API, retrieve only the exact topic and installed version needed. Prefer authoritative sources, redact external queries, bound retries, record freshness, and keep unknown claims unverified. Provider failure never disables the FP router, but a fact required for acceptance blocks dependent edits and completion until local or official evidence verifies it. External providers are optional; FP still works without network, API keys, MCP, or a CLI. Load `templates/context-retrieval-contract.md`.
-
-## Provider-Compatibility Profile
-
-Use when an agent host runs through a third-party model provider, API-compatible endpoint, gateway, or local proxy, or when retries, loops, token spend, cache accounting, streaming, tool calls, or encoding are suspect. Layer it over debug-first while the cause is unknown and keep external configuration read-only unless the user authorized that exact change.
-
-Load `provider-compatibility/SKILL.md` and `templates/provider-compatibility-and-spend-guard.md`. Resolve the effective host -> environment/settings -> proxy/gateway -> wire model -> provider chain, check proxy health before paid work, and compare the installed versions with official compatibility limits. Freeze request, physical-attempt, token, turn, time, and subagent budgets before execution. Nested retry owners are multiplicative; a budget breach, third identical semantic action, or three non-narrowing iterations stops new work.
-
-HTTP success alone never proves semantic completion. Verify the terminal stop reason, incremental strict UTF-8 stream, tool round trip, provider-native usage fields, and reconciled host/proxy/provider accounting. A model API does not become a subagent runtime merely because an agent host uses it.
-
-## MCP Capability Profile
-
-Use the reuse ladder before acquisition. When a task-required MCP is already installed, configured, and available, call it automatically within the user's existing authority and the task's read/write/network scope; do not ask merely because the capability is an MCP. A mutating MCP call still needs the same authorization as the underlying action.
-
-When the required MCP is absent, stop only the dependent step and present one acquisition brief: exact MCP and authoritative source, pinned version or immutable reference, why it is needed, safe alternatives, install scope, commands, permissions/data exposure, credentials/authentication, processes/restarts, verification, and rollback/uninstall. Download or install only after explicit user approval, and only the approved item and scope. Installation approval does not imply credential disclosure, login, configuration mutation, a resident service, or broader task authority; obtain separate approval when those are not already covered. If the user declines or the source cannot be verified, use a safe fallback or leave the dependent acceptance row `unverified` while continuing unrelated work. Record acquisition and minimal semantic-call evidence in `templates/context-retrieval-contract.md`.
-
-## Continuation Profile
-
-For incomplete work crossing a session or compaction, compile a structured Evidence Ledger `continuation` block. Capture the versioned `fp-worktree-v1` fingerprint. On resume, reload the router, compute current state with `scripts/fingerprint-worktree.js`, resolve evidence references, and continue only the exact next action after a match. Never auto-replay writes. Corrupt or stale continuation fails closed for mutation. Load `templates/continuation-handoff.md`.
-
-## Self-Iteration Profile
-
-When the user requests iterative improvement, predeclare the number of evidence cycles. Each cycle must have a new failing observation or review finding, a bounded change, and rerun evidence. Do not invent changes merely to fill a cycle. Use adaptive improvement after an Evidence Ledger; never silently rewrite FP from confidence alone.
-
-## Memory-Graph Profile
-
-Use when a medium or larger task involves schema cards, lessons-learned, or evidence ledgers that may have cross-card dependencies. Layer this profile onto schema-memory, adaptive-improvement, or any route where related cards could reduce context or prevent missed dependencies.
-
-1. Build or refresh the memory graph: `node fp/contracts/memory-graph.js build`.
-2. If the task updates or creates a schema card or lesson, compute the blast radius of the changed card and check all affected cards before finalizing.
-3. If the task type matches known schema keywords, run cluster retrieval to find the connected component of related cards.
-4. If the change touches a hub card (in_degree >= 3) or bridge card, deepen the evidence check.
-5. Record every graph-traversal decision in the evidence ledger.
-
-Load `templates/memory-graph-traversal.md`. The memory graph uses only zero-dependency Node.js scripts at `contracts/memory-graph.js` and `contracts/memory-graph.v1.schema.json`. It requires no external tools, databases, or parsers.
-
-### Zettelkasten Conventions
-
-FP cards follow Zettelkasten (Luhmann's slip-box) principles adapted for an AI agent protocol. When writing, linking, or navigating FP memory cards, load `templates/zettelkasten-conventions.md` for conventions on atomicity, bidirectional links, Folgezettel sequences, MOC (Map of Content) cards, the refinement pipeline (fleeting → literature → permanent), serendipity traversal, and card size constraints.
-
-For navigating user code repositories with Zettelkasten-inspired protocols (entry point as MOC, Folgezettel code navigation, local graph view, serendipity discovery, refinement pipeline), load `templates/repository-zettelkasten-navigation.md`.
-
-## Codebase-Analysis Profile
-
-Use when a task involves reviewing, modifying, or understanding user code — not FP's own internals — and the blast radius of changes is larger than a single file. Layer this profile onto the Build or Read-Only Diagnosis route.
-
-### Preferred: code-review-graph MCP
-
-When a code-review-graph MCP server is available and configured:
-
-1. Call `get_minimal_context_tool` first (~100 tokens). Use the community names and entry points to decide which deeper tools to invoke.
-2. For reviews, call `detect_changes_tool` with the changed files or commit SHA. Use the risk-scored functions, affected flows, and test gaps to build the review scope.
-3. For blast-radius, call `get_impact_radius_tool`. Compare against `templates/codebase-impact-map.md` output for accuracy.
-4. For architecture understanding, call `get_architecture_overview_tool`. Use community structure to identify hub/bridge nodes.
-5. For semantic queries, call `semantic_search_nodes_tool`.
-6. Record every MCP call in the evidence ledger with tool name, arguments, result summary, and token savings estimate.
-
-Load `templates/code-review-graph-mcp-contract.md` for the full 30-tool map and selection protocol.
-
-### Fallback: grep-based impact map
-
-When code-review-graph MCP is unavailable:
-
-1. Load `templates/codebase-impact-map.md`.
-2. Compute blast radius manually: `git diff` → extract changed symbols → `grep -rn` for callers/importers → `Glob` for test files.
-3. Mark `source: grep-fallback` in the impact map.
-4. Record the fallback reason in the evidence ledger.
-
-The MCP's 30 tools are more precise and ~82x more token-efficient than grep-based discovery. When available, prefer MCP. When unavailable, the grep fallback produces the same structural output with more manual steps.
-
-## Background-Learning Profile
-
-After a non-trivial evidenced run, a read-only background learner may stage one checklist, schema, skill-patch, or automation candidate while the parent continues independent work. It receives only relevant ledgers and a bounded envelope; it never writes shared policy or long-term memory. A separate read-only evaluator runs hidden holdout, negative-control, and invariant cases. The parent alone may move a candidate from observation/proposed to shadow or active.
-
-One run is not a reusable law. Load `adaptive-improvement/SKILL.md`, then `generalization-gate/SKILL.md`. Two to four independent positive cases use leave-one-case-out; every active candidate also needs distinct task/session evidence, baseline comparison, at least one improvement, no regression, negative controls, zero-tolerance invariants, a complexity budget, passing shadow observations, approval, current provenance, and rollback. Paraphrases and sibling agents from the same run do not count as independent cases.
-
-## Repository Boundary
-
-`.agents/skills/` is local agent configuration unless a repository explicitly owns it. Keep portable source under `fp/`; refresh generated install copies with the repository sync script. Do not hand-edit generated copies.
+One run is not a reusable law. Lessons promote only through adaptive improvement backed by evidence from multiple independent cases.

@@ -4,3 +4,5 @@
 # The install/codex/.agents template is intentionally tracked.
 /.agents/skills/
 未完成.md
+# Added by code-review-graph
+.code-review-graph/
