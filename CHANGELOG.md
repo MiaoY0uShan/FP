@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.4.10 — Pi-native integration: auto-load sub-skills, prompt templates, install target
+
+- **4 new pi auto-load sub-skills** in `skills/`: `fp-debug` (debug-first + incident), `fp-live-system` (remote/stateful/OpenWrt), `fp-continue` (cross-session handoff), `fp-codebase` (codebase analysis with MCP/grep). Each has proper frontmatter for pi's description-based auto-loading.
+- **4 pi prompt templates** in `prompt-templates/`: `/fp-cards` (Idea Cards), `/fp-brief` (Execution Brief), `/fp-evidence` (Evidence Ledger), `/fp-small` (Small route). Type `/` in pi's editor to expand.
+- **Pi install target** in `pi-install/README.md` with step-by-step setup.
+- Core SKILL.md now includes Pi Integration section with references to pi-specific adapters.
+- On-Demand table updated to reference new sub-skills alongside existing templates.
+
 ## v0.4.9 — Core slim-down: route-first architecture
 
 - **Core SKILL.md reduced 74%** (350 → 90 lines): kept routing priority, core mandates, build routes, and definition of done. All 14 profiles moved to on-demand sub-skills and templates.

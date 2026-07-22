@@ -60,22 +60,26 @@ Each profile is a separate sub-skill. Load only when the condition matches:
 | Condition | Load |
 |-----------|------|
 | Third-party proxy, gateway, retry/loop/spend/encoding suspect | `provider-compatibility/SKILL.md` |
-| Unknown failure; user asks diagnosis without fix | `templates/debug-incident-checklist.md` → debug-first route |
-| Active outage, security event, data loss | `templates/debug-incident-checklist.md` → OBSERVE→CONTAIN→RESTORE→REPAIR→LEARN |
-| Remote/stateful target, OpenWrt, embedded, router | `templates/remote-stateful-system-checklist.md` + `templates/openwrt-live-system-verification-profile.md` |
+| Unknown failure; user asks diagnosis without fix | `skills/debug-incident/SKILL.md` + `templates/debug-incident-checklist.md` |
+| Active outage, security event, data loss | `skills/debug-incident/SKILL.md` → OBSERVE→CONTAIN→RESTORE→REPAIR→LEARN |
+| Remote/stateful target, OpenWrt, embedded, router | `skills/live-system/SKILL.md` + `templates/remote-stateful-system-checklist.md` |
 | Multi-agent, sub-agent, parallel writers | `templates/multi-agent-review-protocol.md` |
 | Delegated execution with fresh agents per work item | `delegated-execution/SKILL.md` |
-| Cross-session continuation, resume after compaction | `templates/continuation-handoff.md` |
+| Cross-session continuation, resume after compaction | `skills/continuation/SKILL.md` + `templates/continuation-handoff.md` |
 | External library/API version lookup needed | `templates/context-retrieval-contract.md` |
 | Vague/risky/large; need requirements challenge | `question-requirements/SKILL.md` |
 | Memory graph, Zettelkasten, background learning | `templates/memory-graph-traversal.md` |
-| Codebase analysis, impact mapping | `templates/codebase-impact-map.md` |
+| Codebase analysis, impact mapping | `skills/codebase-analysis/SKILL.md` + `templates/codebase-impact-map.md` |
 | After non-trivial evidenced run: adaptive improvement | `adaptive-improvement/SKILL.md` |
 | Iterative improvement with declared cycles | `shorten-iteration/SKILL.md` |
 | Schema memory card creation/update | `schema-memory/SKILL.md` |
 | Metrics collection | `metrics/SKILL.md` |
 | Evidence ledger creation/validation | `evidence-ledger/SKILL.md` |
 | Deleting or scoping down | `delete-scope/SKILL.md` |
+
+## Pi Integration
+
+FP provides pi-specific adapters in `skills/` (auto-loaded sub-skills with pi frontmatter) and `../prompt-templates/` (slash-command expansions). Install via `pi-install/README.md`.
 
 ## Multi-Agent (Compact)
 
