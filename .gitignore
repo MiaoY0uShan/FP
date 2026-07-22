@@ -6,3 +6,5 @@
 未完成.md
 # Added by code-review-graph
 .code-review-graph/
+# Local Gemini CLI backup files may contain machine-specific paths.
+.gemini/*.bak

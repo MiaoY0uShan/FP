@@ -5,6 +5,7 @@ set -euo pipefail
 
 cat > /dev/null || true
 
-code-review-graph update --skip-flows --repo "C:/Users/fp/Desktop/github/fpskill" >/dev/null 2>&1 || true
+repo="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+code-review-graph update --skip-flows --repo "$repo" >/dev/null 2>&1 || true
 echo '{"suppressOutput": true}'
 exit 0

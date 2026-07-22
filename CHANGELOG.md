@@ -1,6 +1,13 @@
 # Changelog
 
-## v0.4.11 — Hermes-style self-evolution + GCM credential management
+## v0.4.9 — Route-first architecture, portable integrations, and release hardening
+
+This release consolidates the development previously tagged from v0.4.9 through v0.4.17 and v2.0.0 into the single supported release after v0.4.8.
+
+- Removed machine-specific absolute paths from tracked Gemini, MCP, VS Code, and POSIX test configuration.
+- Hardened release packaging with synchronized install packs, version checks, pre-commit validation, checksums, and main/tag equality gates.
+
+### Adaptive improvement and credential management
 
 - **Self-evolution skill** `skills/self-evolve/SKILL.md`: Hermes-inspired closed learning loop with three subsystems:
   - **Memory:** `MEMORY.md` (cross-project facts, ~2200 char limit) + `USER.md` (preferences, ~1375 char limit). Loaded at session start, updated automatically.
@@ -12,7 +19,7 @@
 - Core SKILL.md: added Self-Evolution and Credential Management sections.
 - On-Demand table: added `skills/self-evolve/SKILL.md` for task-completion auto-capture.
 
-## v0.4.10 — Pi-native integration: auto-load sub-skills, prompt templates, install target
+### Pi-native integration: auto-load sub-skills, prompt templates, install target
 
 - **4 new pi auto-load sub-skills** in `skills/`: `fp-debug` (debug-first + incident), `fp-live-system` (remote/stateful/OpenWrt), `fp-continue` (cross-session handoff), `fp-codebase` (codebase analysis with MCP/grep). Each has proper frontmatter for pi's description-based auto-loading.
 - **4 pi prompt templates** in `prompt-templates/`: `/fp-cards` (Idea Cards), `/fp-brief` (Execution Brief), `/fp-evidence` (Evidence Ledger), `/fp-small` (Small route). Type `/` in pi's editor to expand.
@@ -20,7 +27,7 @@
 - Core SKILL.md now includes Pi Integration section with references to pi-specific adapters.
 - On-Demand table updated to reference new sub-skills alongside existing templates.
 
-## v0.4.9 — Core slim-down: route-first architecture
+### Core slim-down: route-first architecture
 
 - **Core SKILL.md reduced 74%** (350 → 90 lines): kept routing priority, core mandates, build routes, and definition of done. All 14 profiles moved to on-demand sub-skills and templates.
 - **AGENTS.md reduced 80%** (120 → 50 lines): minimal bootstrap that delegates detail to SKILL.md.

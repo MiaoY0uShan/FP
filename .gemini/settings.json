@@ -5,8 +5,7 @@
       "args": [
         "code-review-graph",
         "serve"
-      ],
-      "cwd": "C:\\Users\\fp\\Desktop\\github\\fpskill"
+      ]
     }
   },
   "hooks": {
