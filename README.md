@@ -1,133 +1,243 @@
 <p align="center">
-  <img src="docs/assets/fp-banner.svg" alt="FP turns ambiguous tasks, parallel agents, and limited examples into verified progress" width="100%">
+  <img src="docs/assets/fp-banner.svg" alt="FP — Finish with Proof. Route the risk, bound the work, verify the result." width="100%">
 </p>
 
-<p align="center"><sub>
-  <a href="README.zh-CN.md">中文</a> ·
-  <a href="README.hi.md">हिन्दी</a> ·
-  <a href="README.es.md">Español</a> ·
-  <a href="README.fr.md">Français</a> ·
-  <a href="README.ar.md">العربية</a> ·
-  <a href="README.pt.md">Português</a> ·
-  <a href="README.ru.md">Русский</a> ·
-  <a href="README.ja.md">日本語</a>
-</sub></p>
+<h1 align="center">FP — Finish with Proof</h1>
 
-# FP
+<p align="center"><strong>Make coding agents finish with proof — not vibes.</strong></p>
 
-**The patch is not the finish line. Proof is.**
+<p align="center">
+  A portable execution protocol for Codex, Claude Code, Gemini CLI, Pi, Cursor, Copilot, and other coding agents.
+</p>
 
-[![Validate](https://github.com/MiaoY0uShan/FP/actions/workflows/validate.yml/badge.svg)](https://github.com/MiaoY0uShan/FP/actions/workflows/validate.yml)
-[![Release](https://img.shields.io/github/v/release/MiaoY0uShan/FP)](https://github.com/MiaoY0uShan/FP/releases)
-[![License: MIT](https://img.shields.io/badge/license-MIT-22c55e.svg)](LICENSE)
+<p align="center">
+  <a href="https://github.com/MiaoY0uShan/FP/stargazers"><img src="https://img.shields.io/github/stars/MiaoY0uShan/FP?style=social" alt="GitHub stars"></a>
+  <a href="https://github.com/MiaoY0uShan/FP/actions/workflows/validate.yml"><img src="https://github.com/MiaoY0uShan/FP/actions/workflows/validate.yml/badge.svg" alt="Validate"></a>
+  <a href="https://github.com/MiaoY0uShan/FP/releases"><img src="https://img.shields.io/github/v/release/MiaoY0uShan/FP" alt="Latest release"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-22c55e.svg" alt="MIT license"></a>
+</p>
 
-Most coding agents rush from prompt to patch. FP makes yours find the real task, bound every delegation, and finish with evidence a parent agent can independently verify. It learns from prior runs — not by turning one lucky anecdote into permanent law, but through a gated refinement pipeline backed by cross-validated evidence.
+<p align="center">
+  <a href="https://github.com/MiaoY0uShan/FP/releases/latest"><strong>Download</strong></a> ·
+  <a href="#30-second-tour">30-second tour</a> ·
+  <a href="INSTALL.md">Install guide</a> ·
+  <a href="README.zh-CN.md">中文</a>
+</p>
 
-FP activates automatically for engineering work and stays dormant for casual conversation. `FP:` and `$fp` remain optional explicit invocations.
+> **The shareable version:** FP gives coding agents a risk-matched workflow: diagnose before patching, keep delegation bounded, rerun real checks, and refuse to call work done without evidence.
 
-No daemon. No database. Install it, reload your agent, and work normally.
+FP activates automatically for engineering work and stays dormant for casual conversation. Small fixes stay small. Incidents restore service before refactoring. Unknown causes trigger diagnosis before edits.
+
+**No daemon. No database. No vendor lock-in.** Install the instructions, reload your agent, and work normally.
 
 ---
 
-## How it works
+## Why FP
+
+| Without FP | With FP |
+|---|---|
+| Prompt → patch → “looks fixed” | Route risk → bound scope → verify → verdict |
+| Guess at the cause and edit immediately | Find the first supported divergence before patching |
+| Spawn agents and trust their summaries | One writer, bounded tasks, fresh review, parent verification |
+| Run one happy-path test | Rerun the symptom, regression checks, and a negative control |
+| Install tools or MCPs when convenient | Show source, scope, permissions, rollback, then ask |
+| Turn one lucky result into a permanent rule | Promote patterns only after independent evidence |
+
+The rule people remember:
+
+> **No proof, no done.**
+
+## 30-second tour
+
+You ask an agent:
 
 ```text
-request
--> route the actual risk
--> freeze scope, authority, and acceptance
--> map the blast radius (MCP-preferred, grep-fallback)
--> navigate the codebase like a Zettelkasten (entry point → call chain → local graph)
--> execute or delegate bounded work
--> run observed checks
--> validate the Evidence Ledger
--> optionally refine patterns from fleeting → literature → permanent
+Fix the intermittent authentication test.
 ```
 
-Small work stays small. Incidents restore service before polishing. Unknown causes trigger diagnosis before patches. Before adding code, FP walks a short reuse ladder:
+A typical agent may increase a timeout, run the test once, and say “fixed.”
+
+FP changes the workflow:
 
 ```text
-1. Does this need to exist?      no → skip it (YAGNI)
-2. Already in the codebase?     yes → reuse it
-3. Standard library does it?    yes → use it
-4. Native platform feature?     yes → use it
-5. Installed dependency?        yes → use it
-6. One clear line is enough?    yes → write one line
-7. Only then                    → add the minimum new code that works
+1. Reproduce the original failure.
+2. Find the first point where expected and actual behavior diverge.
+3. Make the smallest change that addresses that cause.
+4. Rerun the original failure.
+5. Run adjacent regression checks.
+6. Run a negative control to guard against over-fixing.
+7. Report one verdict with observed evidence.
 ```
 
-## Routes
+For a small task, FP may produce only a few lines. For a risky change, it freezes scope, authority, rollback, and acceptance evidence before execution.
 
-FP uses a compressed 4-route model with layered profiles:
+## What you get
 
-| Route | When | What happens |
-| --- | --- | --- |
-| **Urgent / High-Stakes** | Incidents, grills, protocol changes | Confirm intent → act within authority. Incidents restore before repairing. |
-| **Read-Only Diagnosis** | Unknown failures or proactive scans | Debug-first: hypothesis → probe → authorized fix. Audit: per-target baseline → P0/P1/P2 report. |
-| **Build** | Clear or vague implementation | Small → Tiny Brief. Medium → Execution Brief + Ledger. Vague → Idea Cards. Large → minimum modules → final brief. |
-| **Close** | Every task | Pass with matched evidence → one verdict → stop. |
+| Capability | What it prevents |
+|---|---|
+| **Risk-matched routing** | Turning every one-line fix into ceremony — or treating an incident like a one-line fix |
+| **Debug before patch** | Speculative edits that hide the real cause |
+| **Reuse before creation** | Agent-generated abstractions, dependencies, and files that did not need to exist |
+| **Bounded delegation** | Runaway subagents, overlapping writers, and “the child said it passed” |
+| **Evidence Ledger** | Completion claims that cannot be independently checked |
+| **Provider/spend guards** | Retry multiplication, semantic loops, silent model remapping, and misleading usage totals |
+| **MCP acquisition gate** | Surprise installs, credentials, background services, or permissions |
+| **Evidence-gated learning** | Overfitting one task and silently rewriting future behavior |
 
-Profiles layer onto these routes: **live-system**, **multi-agent**, **delegated-execution**, **provider-compatibility** (spend/boundary safety), **external-context** (versioned retrieval), **memory-graph** (blast-radius and cluster retrieval for FP's own schema/lesson cards), **codebase-analysis** (code-review-graph MCP preferred, grep-fallback), and **Zettelkasten conventions** (card-box writing discipline for FP's internal memory).
+## Works where you work
 
-## Graph in your favor
+FP ships dedicated release packs or portable instruction adapters for:
 
-FP builds two kinds of graphs. Neither needs a database.
+**Codex · Claude Code · Gemini CLI · Pi · GitHub Copilot CLI · Cursor · Windsurf · Cline · Roo Code · OpenCode · Kiro · Aider · GitHub Copilot Editor · and more**
 
-### FP's own memory: typed card graph
+All adapters delegate to one canonical router. You do not maintain a different methodology for every agent.
 
-Schema cards and lesson cards form a typed graph via `[[wikilink]]` references and YAML frontmatter edges (`depends_on`, `informs`, `next`, `previous`, `generalizes`, `conflicts_with`, `supersedes`). A zero-dependency Node.js script (`fp/contracts/memory-graph.js`) builds the graph, computes blast radius before card updates, finds relevant clusters by keyword, detects hub/bridge cards via centrality analysis, and runs incremental SHA-256 diffs. See [Memory Graph Traversal](fp/templates/memory-graph-traversal.md).
+## Install in about a minute
 
-Card writing follows Zettelkasten (Luhmann's slip-box) principles: atomicity (one pattern per card, ≤50 lines), bidirectional links (forward links authored, backlinks computed), Folgezettel sequences (`next`/`previous` edges), MOC (Map of Content) index cards at N≥3 cards per theme, and a refinement pipeline (fleeting note → literature note → permanent note). See [Zettelkasten Conventions](fp/templates/zettelkasten-conventions.md).
+1. Open the [latest release](https://github.com/MiaoY0uShan/FP/releases/latest).
+2. Download the asset whose name starts with `fp-universal-v`.
+3. Extract it into your project root.
+4. Run the installer and its read-only verification.
 
-### The user's codebase: blast-radius navigation
+### Windows
 
-When code-review-graph MCP is available, FP calls `get_minimal_context_tool` (~100 tokens) to orient, then `detect_changes_tool` / `get_impact_radius_tool` for blast-radius analysis, `get_knowledge_gaps_tool` for untested hotspots, and the 27 other MCP tools for architecture, semantic search, and risk scoring. ~82x token reduction vs reading full files. When MCP is unavailable, FP falls back to grep-based protocols (`codebase-impact-map.md`).
+```powershell
+.\INSTALL-FP.cmd
+.\INSTALL-FP.cmd -Verify
+```
 
-Navigation follows Zettelkasten-inspired protocols: entry points as MOC index notes, call chains as Folgezettel sequences, blast radius as local graph view, and serendipity via surprising cross-community connections. See [Repository Zettelkasten Navigation](fp/templates/repository-zettelkasten-navigation.md) for all 8 protocols.
+### macOS / Linux
+
+```sh
+sh ./INSTALL-FP.sh
+sh ./INSTALL-FP.sh --verify
+```
+
+Reload your agent. No special command is required: FP activates automatically when the goal is engineering work.
+
+Optional explicit invocations still work:
+
+```text
+FP: Fix the password reset bug and prove it with the original failing check.
+$fp Diagnose the flaky test without editing until the cause is supported.
+```
+
+[Full install matrix](INSTALL.md) · [Migration from ZeroToHero or Xskill](MIGRATION.md) · [Copy-paste fallback](fp-copy-paste.md)
+
+## The protocol
+
+FP compresses work into four routes and layers specialist profiles only when needed:
+
+| Route | Use it for | Behavior |
+|---|---|---|
+| **Urgent / High-Stakes** | Incidents, security events, protocol changes | Confirm boundaries, preserve access, restore before repairing |
+| **Read-Only Diagnosis** | Unknown failures and proactive audits | Hypothesis → discriminating probe → supported cause → authorized fix |
+| **Build** | Clear, vague, medium, or large implementation | Scale planning weight to risk; delete scope before adding code |
+| **Close** | Every task | Match evidence to acceptance, emit one verdict, stop |
+
+Profiles cover live systems, multi-agent work, provider compatibility, external context, continuation, memory graphs, codebase analysis, and background learning.
+
+### The reuse ladder
+
+Before creating code, FP asks:
+
+```text
+Does this need to exist?
+→ already in the codebase?
+→ standard library?
+→ native platform feature?
+→ installed dependency?
+→ one clear line?
+→ only then add the minimum new code
+```
 
 ## Distributed, not chaotic
 
-```text
-parent / integrator
-|-- bounded investigation A       read-only
-|-- bounded investigation B       read-only
-|-- evidence reviewer             independent task + session
-|-- integration reviewer          independent task + session
-+-- candidate learner             read-only, proposal only
-             → bound evidence + verdicts
+The parent agent owns integration and the final claim. Delegated work gets a frozen envelope: goal, scope, allowed resources, forbidden actions, budget, and required evidence.
 
-one writer → parent reruns critical checks → canonical ledger
+```text
+fresh implementer
+→ fresh reviewer
+→ bounded fixer when needed
+→ re-review
+→ final integration review
+→ parent reruns critical checks
 ```
 
-Every child task receives a bounded envelope with authority ceilings, dependency IDs, file/resources, iteration/attempt/time/depth limits, idempotency key, and stop conditions. Leaves cannot delegate, deploy, message externally, promote memory, or mutate live state.
+Parallelism is for work that is actually independent. Shared files keep one active writer.
+
+## Context and graphs without lock-in
+
+FP can use code-review-graph MCP for blast-radius analysis, affected flows, architecture, and test gaps. When the MCP is unavailable, the protocol falls back to local repository search and explicit impact maps.
+
+FP's own reusable knowledge uses plain Markdown, YAML frontmatter, `[[wikilink]]` edges, and zero-dependency Node.js scripts. No database is required.
 
 ## Learn without memorizing the accident
 
-FP refines patterns through a gated pipeline:
+One successful run is an observation, not a law.
 
 ```text
-fleeting note (Evidence Ledger unverified_claim)
-→ literature note (lesson card, observation status)
-→ permanent note (schema card, promoted/active status)
+observation
+→ bounded candidate
+→ independent cases
+→ negative control
+→ shadow use
+→ authorized promotion
+→ rollback if it transfers badly
 ```
 
-Promotion requires 2–4 independent positive cases, leave-one-out cross-validation, blind evaluation, near-neighbor negative controls, zero-tolerance invariants, shadow observations, and tested rollback. Paraphrases and sibling agents from one session count as one independent experience.
+This keeps useful learning while resisting overfitting, self-confirmation, and silent rule drift.
 
-See [Generalization Gate](fp/generalization-gate/SKILL.md) and [Evidence Ledger schema](fp/contracts/evidence-ledger.v1.schema.json).
+## Trust model
 
-## Install
+- FP does not expand filesystem, credential, deployment, messaging, or live-system authority.
+- Missing tools are not installed without explicit approval.
+- Another agent's summary is not completion evidence.
+- A healthy process, HTTP 200, or passing happy path is not automatically proof of function.
+- Secrets must be redacted from logs, handoffs, examples, and final answers.
+- Release assets are checksummed and validated through install, verify, and uninstall lifecycles.
 
-One archive. One installer. One read-only verification.
+## FAQ
 
-1. Download the latest `fp-universal-v{version}.zip` from [Releases](https://github.com/MiaoY0uShan/FP/releases).
-2. Extract it into the project root.
-3. On Windows, run `INSTALL-FP.cmd`. On macOS/Linux, run `sh ./INSTALL-FP.sh`.
-4. Verify with `INSTALL-FP.cmd -Verify` on Windows or `sh ./INSTALL-FP.sh --verify` on macOS/Linux, then reload your agent.
+### Does every task become a ceremony?
 
-[Install guide](INSTALL.md) | [Migration from ZeroToHero or Xskill](MIGRATION.md) | [Copy-paste fallback](fp-copy-paste.md)
+No. FP deliberately keeps small work small and adds process only when risk or ambiguity requires it.
+
+### Is FP another coding agent?
+
+No. FP is a portable execution protocol installed into the agent you already use.
+
+### Does FP require a specific model or provider?
+
+No. It is model- and host-agnostic. Provider-specific behavior is handled through compatibility and spend guards.
+
+### Can a subagent declare the whole task complete?
+
+No. The parent owns integration and reruns critical checks before claiming completion.
+
+### Does FP automatically install missing MCP servers?
+
+No. It uses an already available task-required MCP automatically, but a missing dependency gets an acquisition brief and requires approval.
+
+### Is this autonomous self-modifying AI?
+
+No. Reusable changes require independent evidence, bounded evaluation, declared promotion authority, shadow observations, and rollback.
+
+## If this resonates
+
+If you have ever watched an agent confidently say “done” before proving anything:
+
+1. **Star the repository** so you can find it again.
+2. Share this line with your team: **“No proof, no done.”**
+3. Open an issue describing the failure mode FP should handle next.
+
+Suggested share text:
+
+> FP is a portable protocol for coding agents: diagnose before patching, bound subagents, verify real outcomes, and finish with proof — not vibes.
 
 ## Develop
 
-Canonical source in `fp/`. Generated host packs in `install/` for 18+ agents. All copies refreshed by script — never hand-edit `install/`.
+Canonical source lives in `fp/`; generated host packs live in `install/`. Never hand-edit generated packs.
 
 ```text
 node scripts/lint-fp.js
@@ -137,43 +247,17 @@ node --test
 powershell -NoProfile -File scripts/sync-install-packs.ps1 -Check
 ```
 
-## FAQ
-
-### Does every task become a ceremony?
-
-No. A one-line fix stays one line. FP scales its process weight to task risk.
-
-### Can a subagent declare the whole task complete?
-
-No. The parent reruns critical checks and owns the final claim.
-
-### Does it learn from one successful run?
-
-It records one observation. One anecdote is not a schema. The refinement pipeline requires independent evidence.
-
-### Does it need Hermes, Context7, code-review-graph, or another service running?
-
-No. Their useful protocol ideas were adapted into portable local contracts (typed-agent delegation, bounded context retrieval, blast-radius analysis, MCP tool contracts). Their daemons, databases, and backends are not dependencies. When code-review-graph MCP is available, FP uses it automatically for ~82x token reduction; when absent, grep-based fallback protocols produce the same output.
-
-### Will FP install a missing MCP automatically?
-
-Only after explicit approval. FP automatically calls a task-required MCP that is already available; a missing MCP gets a bounded acquisition brief first.
-
-### Is this autonomous self-modifying AI?
-
-No. Background agents propose frozen candidates. Independent evaluators test them against hidden holdouts. Promotion requires declared authority, machine evidence, shadow observations, and rollback.
-
 ## Influences
 
-FP remains an original implementation. Its design was sharpened by studying [Superpowers](https://github.com/obra/superpowers) (fresh implementer/reviewer task chains), [Hermes Agent](https://github.com/NousResearch/hermes-agent) (bounded task/result envelopes), [Ponytail](https://github.com/DietrichGebert/ponytail) (seven-rung reuse ladder), [Context7](https://github.com/upstash/context7) (versioned external retrieval), [Grill Me](https://github.com/mattpocock/skills/tree/main/skills/productivity/grill-me) (decision DAG), and [code-review-graph](https://github.com/tirth8205/code-review-graph) (typed node-edge graph, blast-radius traversal, community detection, betweenness centrality, incremental SHA-256 update).
+FP is an original implementation sharpened by studying [Superpowers](https://github.com/obra/superpowers), [Hermes Agent](https://github.com/NousResearch/hermes-agent), [Ponytail](https://github.com/DietrichGebert/ponytail), [Context7](https://github.com/upstash/context7), [Grill Me](https://github.com/mattpocock/skills/tree/main/skills/productivity/grill-me), and [code-review-graph](https://github.com/tirth8205/code-review-graph).
 
-Exact revisions, adopted behaviors, and exclusions are in [docs/upstream-influences.md](docs/upstream-influences.md). License provenance is in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+Exact revisions, adopted behaviors, and exclusions are documented in [upstream influences](docs/upstream-influences.md). License provenance is in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 Formerly Xskill. See [MIGRATION.md](MIGRATION.md).
 
 ---
 
-**Language editions:** [English](README.md) · [中文](README.zh-CN.md) · [हिन्दी](README.hi.md) · [Español](README.es.md) · [Français](README.fr.md) · [العربية](README.ar.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [日本語](README.ja.md)
+**Languages:** [English](README.md) · [中文](README.zh-CN.md) · [हिन्दी](README.hi.md) · [Español](README.es.md) · [Français](README.fr.md) · [العربية](README.ar.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [日本語](README.ja.md)
 
 ## License
 

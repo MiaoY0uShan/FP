@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 360" role="img" aria-labelledby="title desc">
-  <title id="title">FP: from prompt chaos to verified progress</title>
-  <desc id="desc">Several uncertain task paths enter a bounded evidence gate and leave as one verified result.</desc>
+  <title id="title">FP — Finish with Proof</title>
+  <desc id="desc">Route the risk, bound the work, and finish with verified evidence instead of vibes.</desc>
   <defs>
     <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#090d1a"/>
@@ -31,18 +31,18 @@
 
   <g font-family="Segoe UI, Inter, Arial, sans-serif">
     <g fill="#cbd5e1" font-size="18">
-      <text x="82" y="88">ambiguous request</text>
-      <text x="82" y="166">parallel agents</text>
-      <text x="82" y="244">limited examples</text>
+      <text x="82" y="88">vague prompt</text>
+      <text x="82" y="166">agent swarm</text>
+      <text x="82" y="244">risky change</text>
     </g>
 
     <g transform="translate(405 78)">
       <rect width="390" height="204" rx="28" fill="#0f172a" stroke="url(#beam)" stroke-width="2"/>
       <text x="195" y="70" text-anchor="middle" fill="#f8fafc" font-size="38" font-weight="700">FP</text>
-      <text x="195" y="111" text-anchor="middle" fill="#67e8f9" font-size="18" letter-spacing="2">BOUNDARIES · EVIDENCE</text>
-      <text x="195" y="143" text-anchor="middle" fill="#6ee7b7" font-size="18" letter-spacing="2">GENERALIZATION · ROLLBACK</text>
+      <text x="195" y="111" text-anchor="middle" fill="#67e8f9" font-size="18" letter-spacing="2">ROUTE · BOUND · VERIFY</text>
+      <text x="195" y="143" text-anchor="middle" fill="#6ee7b7" font-size="17" letter-spacing="2">SCOPE · EVIDENCE · ROLLBACK</text>
       <path d="M92 169 H298" stroke="#334155"/>
-      <text x="195" y="190" text-anchor="middle" fill="#94a3b8" font-size="14">no evidence, no done</text>
+      <text x="195" y="190" text-anchor="middle" fill="#94a3b8" font-size="14">finish with proof — not vibes</text>
     </g>
 
     <g transform="translate(1080 180)">
