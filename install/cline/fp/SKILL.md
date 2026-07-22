@@ -5,7 +5,7 @@ description: "Use automatically when the user's goal is engineering work (build,
 
 # FP: Universal Execution Protocol
 
-FP selects the smallest route that can still produce trustworthy evidence. Infer activation from the goal; no keyword required.
+FP selects the smallest route that can still produce trustworthy evidence. Activate automatically for engineering goals; no keyword required. FP: and $fp remain optional explicit invocations. Stay dormant for casual or other non-engineering goals.
 
 ## Routing Priority
 
@@ -38,7 +38,7 @@ Profiles (remote, live-system, multi-agent, continuation, etc.) layer onto a rou
 | Route | Trigger | Output |
 |-------|---------|--------|
 | **Small** | Single-file, 3-5 lines | Task, read/touch, done-when, verify, result. Record first safe reuse rung. |
-| **Medium** | Multi-file, bounded scope | Execution Brief + acceptance evidence matrix + Evidence Ledger |
+| **Medium** | Multi-file, bounded scope | Execution Brief + Acceptance Evidence Matrix + Evidence Ledger |
 | **Vague** | Underspecified | Three Idea Cards (Title, Assumption, MVP, Risk) → user picks → then Medium |
 | **Large/risky** | Architectural, breaking | Only internal modules that reduce risk, compiled into one final brief |
 | **Failed** | — | Capture evidence, split smaller. Do not repeat the same large attempt. |
@@ -49,9 +49,13 @@ Profiles (remote, live-system, multi-agent, continuation, etc.) layer onto a rou
 requirement → observable → check/probe → pass condition → evidence location
 ```
 
-Implementation is not an observable. Bug fix: original symptom must fail before (or be pinned), then pass after fix. Load `templates/acceptance-evidence-matrix.md` for Medium+.
+Implementation is not an observable. Bug fix: original symptom must fail before (or be pinned), then pass after fix. Load `templates/acceptance-evidence-matrix.md` for Medium+. Unknown remains `unknown`.
 
 Evidence is bound to observed state. A relevant mutation, rollback, or freshness change invalidates affected evidence.
+
+## Debug-First Route
+
+Pin symptom → read-only baseline → falsifiable hypothesis → cheapest discriminating probe → decision → authorized fix. Speculative patches are not probes. Three consecutive non-narrowing probes trigger an architecture checkpoint. Unknown cause stays unknown; unknown remains `unknown` until evidence resolves it.
 
 ## On-Demand Profiles
 
@@ -101,6 +105,14 @@ FP learns across projects via Hermes-style closed loop:
 ## Pi Integration
 
 FP provides pi-specific adapters in `skills/` (auto-loaded sub-skills with pi frontmatter) and `../prompt-templates/` (slash-command expansions). Install via `pi-install/README.md`.
+
+## Multi-Agent Profile
+
+Parent is integrator, default writer, and final verifier. Subagents get bounded envelopes (goal, scope, invariants, forbidden actions, output). Leaves cannot delegate, deploy, promote memory, message externally, use credentials, or mutate live state. Parent reruns critical checks. Load `templates/multi-agent-review-protocol.md` for full protocol.
+
+## Background-Learning Profile
+
+After an evidenced run, a read-only background learner may stage a candidate while the parent continues. A separate evaluator runs hidden holdout and negative controls. Promotion requires `generalization-gate/SKILL.md` with 2-4 independent positive cases using leave-one-case-out. One run is not a reusable law.
 
 ## Multi-Agent (Compact)
 

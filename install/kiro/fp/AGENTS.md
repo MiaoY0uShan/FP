@@ -1,6 +1,6 @@
 # FP Agent Contract
 
-Activate automatically for engineering work; stay dormant for casual conversation. Select the lightest route that can still be verified.
+Activate automatically for engineering work; stay dormant for casual or other non-engineering goals. FP: and $fp are optional explicit invocations — do not require a keyword. Select the lightest route that can still be verified.
 
 ## Route Before Editing
 

@@ -1,6 +1,6 @@
 ---
 name: debug-issue
-description: Systematically debug issues using graph-powered code navigation
+description: "Systematically debug issues using graph-powered code navigation"
 ---
 
 ## Debug Issue
