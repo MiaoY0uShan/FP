@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/fp-banner.svg" alt="FP — Finish with Proof. Route the risk, bound the work, verify the result." width="100%">
+  <img src="docs/assets/fp-social-preview.jpg" alt="FP — Finish with Proof. Route the risk, bound the work, verify the result." width="100%">
 </p>
 
 <h1 align="center">FP — Finish with Proof</h1>
@@ -58,6 +58,10 @@ Fix the intermittent authentication test.
 A typical agent may increase a timeout, run the test once, and say “fixed.”
 
 FP changes the workflow:
+
+<p align="center">
+  <img src="docs/assets/fp-demo.gif" alt="FP workflow demo: diagnose, bound, fix, verify, and finish with proof" width="100%">
+</p>
 
 ```text
 1. Reproduce the original failure.
