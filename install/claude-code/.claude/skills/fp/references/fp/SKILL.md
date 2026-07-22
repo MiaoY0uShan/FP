@@ -76,6 +76,27 @@ Each profile is a separate sub-skill. Load only when the condition matches:
 | Metrics collection | `metrics/SKILL.md` |
 | Evidence ledger creation/validation | `evidence-ledger/SKILL.md` |
 | Deleting or scoping down | `delete-scope/SKILL.md` |
+| Task completes, error resolved, or 5+ tool calls | `skills/self-evolve/SKILL.md` → auto-capture to MEMORY.md/USER.md |
+
+## Credential Management
+
+Store API keys in OS credential store, not plaintext. Retrieve with `scripts/gcm-get.ps1` (Windows) or `scripts/gcm-get.sh` (macOS/Linux).
+
+In `models.json`, use `!` shell command syntax:
+```json
+"apiKey": "!powershell.exe -NoProfile \"<fp-dir>/scripts/gcm-get.ps1\" akile-api-key"
+```
+
+Or store in environment variables: `"apiKey": "$AKILE_API_KEY"`.
+
+## Self-Evolution
+
+FP learns across projects via Hermes-style closed loop:
+
+- **Memory:** `MEMORY.md` (cross-project facts, ~2200 char limit) + `USER.md` (preferences, ~1375 char limit). Loaded at session start, updated by `skills/self-evolve/SKILL.md`.
+- **Nudge:** After ~10 turns or a complex task, run silent reflection — anything worth saving? Update memory or patch a skill if yes.
+- **Skill patching:** When a task hits an issue not covered by an existing skill, patch its Pitfalls section.
+- **Fast-track pipeline:** Observation (1 task) → Shadow skill (2 tasks) → Active (3 successes) → Promoted (4+ cases, full generalization gate).
 
 ## Pi Integration
 
@@ -91,4 +112,4 @@ Retrieve only the exact topic and installed version. Prefer authoritative source
 
 ## Learning
 
-One run is not a reusable law. Lessons promote only through adaptive improvement backed by evidence from multiple independent cases.
+One run is not a reusable law. FP learns continuously through the self-evolution loop (MEMORY.md, USER.md, skill patching). Classic adaptive improvement with full generalization gate remains available for high-confidence promotions.

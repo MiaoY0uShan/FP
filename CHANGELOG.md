@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.4.11 — Hermes-style self-evolution + GCM credential management
+
+- **Self-evolution skill** `skills/self-evolve/SKILL.md`: Hermes-inspired closed learning loop with three subsystems:
+  - **Memory:** `MEMORY.md` (cross-project facts, ~2200 char limit) + `USER.md` (preferences, ~1375 char limit). Loaded at session start, updated automatically.
+  - **Skill:** auto-patching Pitfalls sections when tasks hit uncovered issues. Skill creation when same pattern appears in 2+ tasks.
+  - **Nudge:** after ~10 turns or complex task (5+ tool calls), silent reflection decides what's worth saving.
+  - **Fast-track pipeline:** Observation (1 task) → Shadow (2 tasks) → Active (3 successes) → Promoted (4+ cases).
+- **GCM credential scripts:** `scripts/gcm-get.ps1` (Windows: cmdkey, CredentialManager module, git-credential-manager, env, ~/.fp/credentials fallbacks) + `scripts/gcm-get.sh` (macOS Keychain, Linux secret-tool, git-credential-manager, env).
+- **Nudge prompt template:** `/fp-nudge` — manual reflection trigger.
+- Core SKILL.md: added Self-Evolution and Credential Management sections.
+- On-Demand table: added `skills/self-evolve/SKILL.md` for task-completion auto-capture.
+
 ## v0.4.10 — Pi-native integration: auto-load sub-skills, prompt templates, install target
 
 - **4 new pi auto-load sub-skills** in `skills/`: `fp-debug` (debug-first + incident), `fp-live-system` (remote/stateful/OpenWrt), `fp-continue` (cross-session handoff), `fp-codebase` (codebase analysis with MCP/grep). Each has proper frontmatter for pi's description-based auto-loading.
