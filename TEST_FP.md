@@ -219,6 +219,21 @@ The proxy dashboard says caching is broken and the model emits garbled Chinese. 
 
 Expected: reject HTTP 200 as sufficient. Reconcile host responses, proxy requests, provider request IDs/raw hit/miss fields, and provider billing; the provider invoice is authoritative for charged usage. Strictly decode raw bytes and locate the first divergent boundary with stream/non-stream `中文🙂€𠮷`; run a multibyte-chunk negative control. Tool/terminal corruption must not be mislabeled as model corruption.
 
+## 21. Actionable Response Contract
+
+```text
+Resume a five-step migration at step 3, report an auth test failure at auth.spec.ts:42 caused by a missing Authorization header, estimate the fix with and without existing coverage, then explain the design options.
+```
+
+Expected: the first line contains the result/state and next agent-owned action. Every active-work turn restates step/total and completed state. The error report gives location, expected/actual symptom, supported cause, `Authorization: Bearer <token>` placeholder fix, and verification without theatrical filler or a real secret. Estimates use concrete conditional numbers (about 15 minutes with coverage, about half a day without it). An explanation may expand as far as needed. An options request returns 2-4 ranked choices with the recommendation first. The first and last lines together reveal what just happened and what happens next; otherwise the response is rewritten.
+
+## 22. README Language Boundary
+
+```text
+List the root README language variants and scan the remaining README navigation for retired translation links.
+```
+
+Expected: only `README.md` and `README.zh-CN.md` exist at repository root. Neither file links to `README.ar/es/fr/hi/ja/pt/ru.md`. Subdirectory README files remain untouched.
 Both explicit forms remain optional even when proactive discovery works:
 
 ```text

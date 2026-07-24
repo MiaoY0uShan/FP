@@ -365,6 +365,33 @@ test('semantic architecture routes context gaps without retired modules', () => 
   }
 });
 
+test('actionable responses preserve first-line result and last-line next state', () => {
+  const router = read('fp/SKILL.md');
+  const contract = read('fp/templates/actionable-response-contract.md');
+  const agentContract = read('fp/AGENTS.md');
+  const claudeContract = read('fp/CLAUDE.md');
+  const fallback = read('fp-copy-paste.md');
+
+  for (const content of [router, contract, agentContract, claudeContract, fallback]) {
+    assert.match(content, /first and last lines|first-and-last-line/i);
+    assert.match(content, /what just happened/i);
+    assert.match(content, /what happens next/i);
+    assert.match(content, /otherwise rewrite|if not, rewrite/i);
+  }
+  assert.match(contract, /agent-owned work/i);
+  assert.match(contract, /asks to .*explain|asks to “explain”/i);
+  assert.match(contract, /one short blocking clarification/i);
+  assert.match(contract, /2–4 ranked options/i);
+  assert.match(contract, /recommendation first/i);
+  assert.match(contract, /explicit user output format/i);
+assert.match(contract, /casual and non-engineering conversation stays natural/i);
+  assert.match(router, /answer, observed result, blocker, or next agent-owned action in the first line/i);
+  assert.match(router, /Step 3 of 5 complete: schema updated/i);
+  assert.match(router, /Report errors without theater/i);
+  assert.match(router, /Authorization: Bearer <token>/i);
+  assert.match(router, /15 minutes if tests already cover it/i);
+  assert.match(router, /half a day if coverage must be added/i);
+});
 test('deliberate shortcuts enter the deferred ledger', () => {
   const ledger = read('fp/evidence-ledger/SKILL.md');
   assert.match(ledger, /deferred_items/);

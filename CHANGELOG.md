@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.4.10 — Actionable responses, behavior evaluation, and bilingual documentation
+
+- Added the actionable response contract: answer/result and next agent-owned action first, per-turn step recovery, matter-of-fact errors, task-priority handling for explanation/ambiguity/options, conditional numeric estimates, and the blocking first-and-last-line rewrite gate.
+- Added a cross-platform Node.js response evaluation harness with 19 behavior cases, blind scoring, negative controls, budget/isolation gates, resumable runs, and no-regression release criteria.
+- Reduced root README translations to English (`README.md`) and Simplified Chinese (`README.zh-CN.md`), rebuilt the Chinese README to mirror the English structure, images, installation flow, FAQ, and current response-contract copy, and added language-alignment regression tests.
+
 ## v0.4.9 — Route-first architecture, portable integrations, and release hardening
 
 This release consolidates the development previously tagged from v0.4.9 through v0.4.17 and v2.0.0 into the single supported release after v0.4.8.

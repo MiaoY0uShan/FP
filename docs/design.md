@@ -65,6 +65,12 @@ They give the user three close implementation paths to choose from.
 
 Use explicit budgets only when the task is medium or large enough for budget risk to matter.
 
+## Actionable response layer
+
+Execution evidence is only useful when the reader can recover the state. The canonical response contract applies a blocking first-and-last-line gate: those two lines together state what just happened and what happens next, or the response is rewritten. Active work restates step/total every turn; agent-owned work stays with the agent; errors are location/symptom/cause-or-unknown/fix/verification rather than theater; explanation, ambiguity, options, and conditional numeric estimates follow the task-specific exceptions in `fp/templates/actionable-response-contract.md`.
+
+Behavior changes are not accepted by prose inspection alone. `evals/fp-response/` runs isolated baseline/candidate conditions, blind scoring, negative controls, and a no-regression release gate for correctness, authority/safety, and evidence fidelity.
+
 ## Portable boundary
 
 FP remains portable:

@@ -25,6 +25,7 @@ The top router chooses internal modules. Users should not call child skills manu
 - External context is version-pinned, redacted, and bounded.
 - Available task-required MCPs are used automatically within current authority; missing MCPs require an exact acquisition brief and explicit approval before download/install.
 - Long work uses structured continuation, not transcript summaries.
+- User-facing engineering responses apply `fp/templates/actionable-response-contract.md`: answer/result and next action first, active step/total restated every turn, matter-of-fact errors, conditional numeric estimates, and a blocking first-and-last-line rewrite gate.
 
 ## Completion
 
@@ -34,6 +35,7 @@ The top router chooses internal modules. Users should not call child skills manu
 - Multi-agent: spec/quality verdicts, blocking-finding re-review, parent rerun, all agents terminal.
 - Delegated execution: every work-item chain passes, fresh final integration review passes, and the parent reruns the integrated checks.
 - Provider compatibility: budgets remain within bounds, no loop guard is active, stream/tool semantics and UTF-8 pass, and accounting is reconciled or explicitly partial.
+- Response behavior: the first and last lines expose what happened and what happens next; otherwise rewrite. Candidate changes also pass the isolated blind response-evaluation release gate.
 
 Metrics run only when measurement matters. Adaptive improvement stages evidence-backed observations; it does not silently rewrite the protocol.
 

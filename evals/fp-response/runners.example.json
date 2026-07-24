@@ -1,0 +1,22 @@
+{
+  "runners": {
+    "fixed-model": {
+      "command": [
+        "fp-eval-runner",
+        "--model",
+        "{model}",
+        "--remaining-budget-usd",
+        "{budget_usd}",
+        "--prompt",
+        "{prompt}"
+      ],
+      "response_format": "json",
+      "text_field": "response",
+      "cost_field": "cost_usd",
+      "usage_field": "usage",
+      "isolated": true,
+      "metered": true,
+      "model": "replace-with-an-exact-model-id"
+    }
+  }
+}

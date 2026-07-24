@@ -141,6 +141,18 @@ FP compresses work into four routes and layers specialist profiles only when nee
 
 Profiles cover live systems, multi-agent work, provider compatibility, external context, continuation, memory graphs, codebase analysis, and background learning.
 
+## Responses that survive a skim
+
+FP now applies a blocking first-and-last-line gate: if a reader sees only those two lines, they must know both what just happened and what happens next. Otherwise the response is rewritten.
+
+- Put the answer/result and next agent-owned action in the first line; move context later and omit filler.
+- Restate active multi-step state every turn: `Step 3 of 5 complete: schema updated. Next: run the backfill script.`
+- Report errors without theater: location, symptom, cause or `unknown`, fix/probe, and verification. Never expose a real bearer token.
+- Let explanation requests expand as far as needed; ask one clarification for real ambiguity; rank 2-4 options with the recommendation first.
+- Give concrete conditional estimates when useful: about 15 minutes if tests already cover the change, about half a day if coverage must be added.
+
+Behavior changes are compared with the cross-platform harness in `evals/fp-response/`: isolated baseline/candidate runs, blind scoring, negative controls, cost gates, and no-regression release criteria.
+
 ### The reuse ladder
 
 Before creating code, FP asks:
@@ -253,7 +265,7 @@ powershell -NoProfile -File scripts/sync-install-packs.ps1 -Check
 
 ## Influences
 
-FP is an original implementation sharpened by studying [Superpowers](https://github.com/obra/superpowers), [Hermes Agent](https://github.com/NousResearch/hermes-agent), [Ponytail](https://github.com/DietrichGebert/ponytail), [Context7](https://github.com/upstash/context7), [Grill Me](https://github.com/mattpocock/skills/tree/main/skills/productivity/grill-me), and [code-review-graph](https://github.com/tirth8205/code-review-graph).
+FP is an original implementation sharpened by studying [Superpowers](https://github.com/obra/superpowers), [Hermes Agent](https://github.com/NousResearch/hermes-agent), [Ponytail](https://github.com/DietrichGebert/ponytail), [Context7](https://github.com/upstash/context7), [Grill Me](https://github.com/mattpocock/skills/tree/main/skills/productivity/grill-me), [code-review-graph](https://github.com/tirth8205/code-review-graph), and [i-have-adhd](https://github.com/ayghri/i-have-adhd).
 
 Exact revisions, adopted behaviors, and exclusions are documented in [upstream influences](docs/upstream-influences.md). License provenance is in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
@@ -261,7 +273,7 @@ Formerly Xskill. See [MIGRATION.md](MIGRATION.md).
 
 ---
 
-**Languages:** [English](README.md) · [中文](README.zh-CN.md) · [हिन्दी](README.hi.md) · [Español](README.es.md) · [Français](README.fr.md) · [العربية](README.ar.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [日本語](README.ja.md)
+**Languages:** [English](README.md) · [中文](README.zh-CN.md)
 
 ## License
 

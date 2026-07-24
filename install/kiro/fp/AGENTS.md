@@ -32,8 +32,13 @@ Layer profiles (remote, live-system, multi-agent, provider-compatibility, etc.) 
 6. **One writer per shared file set.** Parallelize only independent investigation.
 7. **Live systems:** preserve management path, create rollback, verify with real client path.
 8. **Redact secrets** from logs, examples, and final answers.
+9. **First-and-last-line gate:** the first and last lines together state what just happened and what happens next; otherwise rewrite.
 
 Implementation is not an observable. For bugs: original symptom must fail before or be pinned, then pass after fix. If the user says stop or accepts current completion, cancel pending work and report verified/unverified state without another probe.
+
+## Actionable Responses
+
+Load `templates/actionable-response-contract.md` when available. Put the answer/result and next agent-owned action first; omit filler that changes nothing. Keep agent-owned work with the agent. Every active multi-step turn restates step/total, completed state, and one next step. Errors name location, symptom, cause or `unknown`, fix/probe, and verification without theater. Estimates use concrete conditional numbers with named assumptions, not vague effort. Explanation requests may expand fully; genuine ambiguity gets one short clarification; option requests get 2-4 ranked choices with the recommendation first. If open, end with one real next action; if complete, end with one verdict. Explicit formats, safety, and authority outrank this shape.
 
 ## MCP Gate
 

@@ -32,6 +32,7 @@ Profiles (remote, live-system, multi-agent, continuation, etc.) layer onto a rou
 7. **Live systems:** preserve management path, create rollback, inspect desired/generated/effective state, verify with real client path.
 8. **Redact secrets** from logs, examples, handoffs, and final answers.
 9. **Challenge system changes:** for protocol, trigger, or memory-policy changes, confirm before editing unless already approved.
+10. **First-and-last-line gate:** for user-facing engineering responses, the first and last lines together must reveal both what just happened and what happens next; otherwise rewrite. Load `templates/actionable-response-contract.md`.
 
 ## Route Weight
 
@@ -58,6 +59,20 @@ Implementation is not an observable. Bug fix: original symptom must fail before 
 For medium, risky, or multi-agent work, capture pre-existing worktree changes and pre-existing failures before the first edit.
 
 Evidence is bound to observed state. A relevant mutation, rollback, or freshness change invalidates affected evidence.
+
+## Actionable Response Contract
+
+Apply `templates/actionable-response-contract.md` to user-facing engineering responses.
+
+- Put the answer, observed result, blocker, or next agent-owned action in the first line. Context and filler go later; omit them when they do not change understanding or action.
+- Keep authorized edits, tests, inspection, and verification with the agent. Completion claims sit next to observed evidence.
+- During active multi-step work, every turn restates recoverable state: `Step 3 of 5 complete: schema updated. Next: run the backfill script.` Keep one active/next step.
+- Report errors without theater: exact location and symptom, supported cause or `unknown`, bounded fix/probe, and verification. Use placeholders such as `Authorization: Bearer <token>`; never expose a real secret.
+- When an estimate is requested or decision-relevant, use concrete conditional numbers with named assumptions, for example: `About 15 minutes if tests already cover it; about half a day if coverage must be added.` Never use only vague effort language or present an unsupported number as measured fact.
+- Explain requests may run as long as the subject needs. After checking discoverable facts, real ambiguity gets one short clarification instead of a guess. What-are-my-options requests get 2-4 ranked choices with the recommendation first and one-line tradeoffs.
+- Open work ends with one real next action; completed work ends with one verdict. Explicit user formats, safety, authority, and harness rules still win.
+
+The blocking pre-send gate is: if a reader sees only the first line and last line, can they tell both what just happened and what happens next? If yes, send. Otherwise rewrite.
 
 ## Debug-First Route
 

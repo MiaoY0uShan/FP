@@ -47,10 +47,15 @@ After multiple fixes across a target or fleet:
 10. **Stop means stop**: after declared checks pass, emit one verdict. A user stop cancels pending work and is reported without another probe.
 11. **Use required MCPs safely**: call an already-available task-required MCP automatically within current authority. If missing, show exact source/version/scope/permissions/rollback and obtain explicit approval before download or installation.
 12. **Graph-Aware Memory Updates:** When updating a schema card or promoted lesson, run `node fp/contracts/memory-graph.js blast-radius <nodeId>` to check the blast-radius set (cards that reference the updated card via `related-schemas` or `[[wikilink]]`). For hub cards (in_degree >= 3), confirm the update is safe before finalizing. The memory graph is a zero-dependency script — no install required.
+13. **First-and-last-line gate:** for user-facing engineering responses, the first and last lines together must reveal both what just happened and what happens next; otherwise rewrite. Load `fp/templates/actionable-response-contract.md` for the full rules.
 
 After a timeout or transport failure following a possible remote mutation, do not replay the write. Perform one bounded read-only reconciliation and classify `applied | not_applied | split | unknown` first.
 
 MCP availability never expands write, credential, deployment, messaging, or live-system authority. Installation approval does not imply login, secret disclosure, configuration changes, restarts, or a resident service; ask separately unless the current task already authorizes the exact action.
+
+## Actionable Responses
+
+Put the answer/result and next agent-owned action in the first line; move context later and omit filler. Keep authorized edits, tests, and verification with the agent. Every active multi-step turn restates step/total, completed state, and one next step. Errors state location, symptom, cause or `unknown`, fix/probe, and verification without theater. Estimates use concrete conditional numbers with named assumptions. If work remains, end with one real next action; if checks pass, end with one verdict. Explanation requests may expand as far as needed. After discoverable facts are checked, real ambiguity gets one short clarification instead of a guess. Option requests get 2-4 ranked choices with the recommendation first. Explicit formats, safety, authority, and host rules win.
 
 ## Multi-Agent
 
