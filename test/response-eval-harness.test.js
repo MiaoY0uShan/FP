@@ -36,6 +36,10 @@ test('response case catalog is broad and includes negative controls', async () =
   assert.ok(cases.some((item) => item.id === 'ranked-options'));
   assert.ok(cases.some((item) => item.id === 'detailed-explanation'));
   assert.ok(cases.some((item) => item.id === 'real-ambiguity'));
+  for (const id of ['route-small-known-edit', 'route-medium-multifile', 'route-vague-requirements', 'route-large-architecture', 'concision-does-not-shrink-scope']) {
+    assert.ok(cases.some((item) => item.id === id), `missing route-scale regression case: ${id}`);
+  }
+  assert.equal(cases.filter((item) => item.category === 'route-scale').length, 5);
 });
 
 test('release gate passes only when weighted quality improves without critical regression', async () => {

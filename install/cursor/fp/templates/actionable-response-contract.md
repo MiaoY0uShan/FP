@@ -1,6 +1,6 @@
 # Actionable Response Contract
 
-Apply this contract to user-facing FP responses for engineering work. It shapes delivery; it never overrides authority, safety, evidence, the selected route, or an explicit user output format.
+Apply this contract to user-facing FP responses for engineering work. It shapes delivery only; it never overrides authority, safety, evidence, the selected route, the authorized execution scope, completion criteria, or an explicit user output format.
 
 ## First-And-Last-Line Gate
 
@@ -13,6 +13,12 @@ The two lines together must make both facts clear:
 
 If the answer is yes, send. Otherwise rewrite before sending. This is a blocking pre-send check, not a stylistic preference.
 
+## Execution Scope Is Not Response Shape
+
+Classify the entire authorized task before decomposing it. A compact update, one active file, or one next action does not turn a Medium or Large parent task into Small. Continue all authorized agent-owned work in the current run unless completion, a real blocker, a safety/authority boundary, or an explicit user stop requires returning control.
+
+The instruction to expose one next action is a reporting-focus rule, not permission to execute only one micro-step. Concision may compress the explanation of completed work; it must not reduce implementation, verification, evidence, or regression coverage.
+
 ## Delivery Rules
 
 1. **Answer and next action first.** Put the direct answer, observed result, exact blocker, or next agent-owned action in the first line. Put context after it, and omit context that does not change understanding or action. Do not begin with a preamble announcing a plan.
@@ -21,7 +27,7 @@ If the answer is yes, send. Otherwise rewrite before sending. This is a blocking
 4. **Bound multi-step work.** Use numbered steps only when more than one action is needed. Each step has one observable action or decision and no hidden chain of repeated “and then” work.
 5. **Report errors without theater.** Do not use alarm, apology, or suspense as a substitute for information. State the exact location and symptom, the supported cause or `unknown`, the bounded fix/probe, and verification. Example: `auth.spec.ts:42: expected 200, got 401. Cause: missing Authorization header. Fix: send Authorization: Bearer <token>, then rerun the auth test.` Never print a real token or secret.
 6. **Answer options as options.** When the request is “what are my options?” or multiple valid paths are the answer, give 2–4 ranked options, recommendation first, with one-line tradeoffs. Do not collapse the answer into one path or append unrelated possibilities.
-7. **End on the real next state.** If declared checks pass, end with one verdict and stop. If work remains, end with exactly one smallest decision-relevant next action. Do not add a recap, invitation, or unrelated suggestion after it.
+7. **End on the real next state.** If declared checks pass, end with one verdict and stop. If a response is required before completion because of a real blocker, safety/authority boundary, user-owned decision, or explicit turn boundary, end with exactly one smallest decision-relevant next action. Do not stop authorized work merely to manufacture that next action, and do not add a recap, invitation, or unrelated suggestion after it.
 
 ## Exceptions And Boundaries
 

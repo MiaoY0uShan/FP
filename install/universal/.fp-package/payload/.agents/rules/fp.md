@@ -10,17 +10,19 @@ Apply user authority and read-only limits as a global gate first. Then:
 
 1. **Urgent / High-Stakes** — incidents, grills, protocol changes. Confirm intent and boundaries, then act within current authority.
 2. **Read-Only Diagnosis** — debug-first (known symptom, unknown cause) or audit/survey (proactive multi-target scan). Read-only until a cause is supported and the user authorizes a fix.
-3. **Build** — scale the output to task size: Small → Tiny Brief, Medium → Execution Brief + Ledger, Vague → Idea Cards, Large → minimum modules → final brief.
+3. **Build** — classify the entire authorized outcome by scope and uncertainty, then choose Small | Medium | Vague | Large. Route order is not a fallback sequence, and a current micro-step does not redefine the parent task.
 4. **Close** — pass with matched evidence, or fail → split smaller.
 
 Layer remote/live-system, OpenWrt, stateful-UI, external-context, provider-compatibility, multi-agent, delegated-execution, continuation, self-iteration, background-learning, memory-graph, and codebase-analysis as profiles on the selected route.
 
 ## Route Weight
 
-- **Small:** 3-5 lines: task, read/touch, done-when, verify, result. Record the first safe reuse rung.
-- **Medium:** compact Execution Brief + acceptance evidence matrix + Evidence Ledger.
-- **Vague:** three Idea Cards (Title, Assumption, MVP, Risk) before implementation.
-- **Large/risky:** only the internal modules that reduce scope or risk, compiled into one final brief.
+Classify the whole requested outcome before decomposing it. Small matches only when every Small condition is known true; concise output, a single active file, or one next action cannot downgrade a larger task.
+
+- **Small:** clear outcome and acceptance check, exactly one file, no more than 5 substantive changed lines, known cause/scope, and no new public interface, schema, dependency, deployment behavior, or cross-module contract. Use a 3-5 line Tiny Brief and record the first safe reuse rung.
+- **Medium:** clear bounded work exceeding any Small limit, including multi-file work, more than 5 changed lines, or test changes. Use a compact Execution Brief + acceptance evidence matrix + Evidence Ledger.
+- **Vague:** requirements, acceptance criteria, or a user-owned product decision are underspecified. Produce three Idea Cards (Title, Assumption, MVP, Risk) before implementation, then continue as Medium after the user chooses.
+- **Large/risky:** architectural, multi-module, breaking, migration-heavy, or high-blast-radius work. Use only the internal modules that reduce scope or risk, compiled into one final brief.
 - **Failed:** capture evidence, split smaller. Do not repeat the same large attempt.
 - **Remote/stateful, OpenWrt, continuation, multi-agent, or background-learning tasks**: layer the matching profile onto the selected route; they are not reasons to load the full chain by themselves.
 - **Multi-device:** one-writer rule is per target, not global. Parallel read-only probes are safe. Cross-target dependencies must be mapped before writes. End with a cross-target smoke test from the consumer's perspective.
@@ -55,7 +57,7 @@ MCP availability never expands write, credential, deployment, messaging, or live
 
 ## Actionable Responses
 
-Put the answer/result and next agent-owned action in the first line; move context later and omit filler. Keep authorized edits, tests, and verification with the agent. Every active multi-step turn restates step/total, completed state, and one next step. Errors state location, symptom, cause or `unknown`, fix/probe, and verification without theater. Estimates use concrete conditional numbers with named assumptions. If work remains, end with one real next action; if checks pass, end with one verdict. Explanation requests may expand as far as needed. After discoverable facts are checked, real ambiguity gets one short clarification instead of a guess. Option requests get 2-4 ranked choices with the recommendation first. Explicit formats, safety, authority, and host rules win.
+This response contract controls presentation only; it never changes route selection, authorized execution scope, or completion criteria. Do not stop a Medium or Large task after its first micro-step merely to emit a next action. Put the answer/result and next agent-owned action in the first line; move context later and omit filler. Keep authorized edits, tests, and verification with the agent. Every active multi-step turn restates step/total, completed state, and one next step. Errors state location, symptom, cause or `unknown`, fix/probe, and verification without theater. Estimates use concrete conditional numbers with named assumptions. If work remains, end with one real next action; if checks pass, end with one verdict. Explanation requests may expand as far as needed. After discoverable facts are checked, real ambiguity gets one short clarification instead of a guess. Option requests get 2-4 ranked choices with the recommendation first. Explicit formats, safety, authority, and host rules win.
 
 ## Multi-Agent
 

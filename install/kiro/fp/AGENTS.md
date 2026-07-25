@@ -1,6 +1,6 @@
 # FP Agent Contract
 
-Load it automatically for engineering work; keep it dormant for casual or other non-engineering goals. FP: and $fp are optional explicit invocations — do not require a keyword. Select the lightest route that can still be verified.
+Load it automatically for engineering work; keep it dormant for casual or other non-engineering goals. FP: and $fp are optional explicit invocations — do not require a keyword. Classify the entire authorized task by explicit predicates, then select the lightest fully matching route; route order is not a fallback sequence and concise reporting never shrinks execution scope.
 
 ## Route Before Editing
 
@@ -10,16 +10,18 @@ Apply user authority/read-only as a global gate first. Then:
 2. **Grill/challenge** → investigate facts, one decision at a time
 3. **Diagnose-only / unknown cause** → debug-first, read-only until cause is supported
 4. **Protocol/agent-behavior change** → confirm before editing
-5. **Build route** → Small → Medium → Vague → Large
+5. **Build route** → classify scope and uncertainty → Small | Medium | Vague | Large
 
 Layer profiles (remote, live-system, multi-agent, provider-compatibility, etc.) onto the selected route.
 
 ## Route Weight
 
-- **Small:** 3-5 lines: task, read/touch, done-when, verify, result. Record first safe reuse rung.
-- **Medium:** Execution Brief + acceptance evidence matrix + Evidence Ledger.
-- **Vague:** three Idea Cards (Title, Assumption, MVP, Risk) → user picks → then Medium.
-- **Large/risky:** only internal modules that reduce risk, compiled into one final brief.
+Classify the whole requested outcome before splitting it into steps. Small applies only when every Small condition is known true; a current micro-step, single active file, or concise status request never makes a larger parent task Small.
+
+- **Small:** clear outcome and acceptance check, exactly one file, at most 5 substantive changed lines, known cause/scope, and no new public interface, schema, dependency, deployment behavior, or cross-module contract. Use a 3-5 line Tiny Brief and record the first safe reuse rung.
+- **Medium:** clear bounded work that exceeds any Small limit, including multi-file work, more than 5 changed lines, or test changes. Use an Execution Brief + acceptance evidence matrix + Evidence Ledger.
+- **Vague:** requirements, acceptance criteria, or a user-owned product decision are underspecified. Produce three Idea Cards (Title, Assumption, MVP, Risk); after the user chooses, continue as Medium.
+- **Large/risky:** architectural, multi-module, breaking, migration-heavy, or high-blast-radius work. Use only the internal modules that reduce risk, compiled into one final brief.
 - **Failed:** capture evidence, split smaller. Do not repeat the same attempt.
 
 ## Core Mandates
@@ -38,7 +40,7 @@ Implementation is not an observable. For bugs: original symptom must fail before
 
 ## Actionable Responses
 
-Load `templates/actionable-response-contract.md` when available. Put the answer/result and next agent-owned action first; omit filler that changes nothing. Keep agent-owned work with the agent. Every active multi-step turn restates step/total, completed state, and one next step. Errors name location, symptom, cause or `unknown`, fix/probe, and verification without theater. Estimates use concrete conditional numbers with named assumptions, not vague effort. Explanation requests may expand fully; genuine ambiguity gets one short clarification; option requests get 2-4 ranked choices with the recommendation first. If open, end with one real next action; if complete, end with one verdict. Explicit formats, safety, and authority outrank this shape.
+Load `templates/actionable-response-contract.md` when available. It controls presentation, not route selection or completion scope: do not stop an authorized Medium or Large task after its first micro-step merely to report one next action. Put the answer/result and next agent-owned action first; omit filler that changes nothing. Keep agent-owned work with the agent. Every active multi-step turn restates step/total, completed state, and one next step. Errors name location, symptom, cause or `unknown`, fix/probe, and verification without theater. Estimates use concrete conditional numbers with named assumptions, not vague effort. Explanation requests may expand fully; genuine ambiguity gets one short clarification; option requests get 2-4 ranked choices with the recommendation first. If open, end with one real next action; if complete, end with one verdict. Explicit formats, safety, and authority outrank this shape.
 
 ## MCP Gate
 

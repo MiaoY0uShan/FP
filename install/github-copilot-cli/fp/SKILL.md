@@ -5,7 +5,7 @@ description: "Use automatically when the user's goal is engineering work (build,
 
 # FP: Universal Execution Protocol
 
-FP selects the smallest route that can still produce trustworthy evidence. Activate automatically for engineering goals; no keyword required. FP: and $fp remain optional explicit invocations. Stay dormant for casual or other non-engineering goals.
+FP classifies the entire authorized engineering task by explicit route predicates, then selects the lightest route whose full trigger is satisfied. Route order is not a fallback sequence, and response brevity never reduces execution scope. Activate automatically for engineering goals; no keyword required. FP: and $fp remain optional explicit invocations. Stay dormant for casual or other non-engineering goals.
 
 ## Routing Priority
 
@@ -16,7 +16,7 @@ active incident
 → explicit grill/challenge
 → diagnose-only or unknown cause
 → protocol/agent-behavior change
-→ build route: small → medium → vague → large
+→ build route: classify scope and uncertainty → small | medium | vague | large
 ```
 
 Profiles (remote, live-system, multi-agent, continuation, etc.) layer onto a route; they do not expand authority.
@@ -38,15 +38,17 @@ Profiles (remote, live-system, multi-agent, continuation, etc.) layer onto a rou
 
 ### 3. Build
 
+Classify the whole requested outcome before decomposing it into steps. **Small matches only when every Small condition is known true**; if any condition is false or unknown, choose another route. A later micro-step, a single currently active file, or a request for concise status does not make the parent task Small.
+
 | Route | Trigger | Output |
 |-------|---------|--------|
-| **Small** | Single-file, 3-5 lines | Tiny Brief: task, read/touch, done-when, verify, result. Record first safe reuse rung. |
-| **Medium** | Multi-file, bounded scope | Execution Brief + Acceptance Evidence Matrix + Evidence Ledger |
-| **Vague** | Underspecified | Three Idea Cards (Title, Assumption, MVP, Risk) → user picks → then Medium |
-| **Large/risky** | Architectural, breaking | Only internal modules that reduce risk, compiled into one final brief |
+| **Small** | Entire outcome and acceptance check are clear; exactly one file; expected diff is at most 5 substantive lines; no unknown cause; no new public interface, schema, dependency, deployment behavior, or cross-module contract | Tiny Brief: task, read/touch, done-when, verify, result. Record first safe reuse rung. |
+| **Medium** | Clear, bounded work that exceeds any Small limit, including multi-file changes, more than 5 substantive lines, or added/updated tests; no unresolved product decision or architectural decomposition | Execution Brief + Acceptance Evidence Matrix + Evidence Ledger |
+| **Vague** | Requirements, acceptance criteria, or a user-owned product decision are underspecified | Three Idea Cards (Title, Assumption, MVP, Risk) → user picks → then Medium |
+| **Large/risky** | Architectural, multi-module, breaking, migration-heavy, or otherwise high-blast-radius work | Only internal modules that reduce risk, compiled into one final brief |
 | **Failed** | — | Capture evidence, split smaller. Do not repeat the same large attempt. |
 
-Do not generate a full ledger for small changes unless risk appears.
+Do not generate a full ledger for small changes unless risk appears. Compact reporting may summarize Medium or Large work, but it must not downgrade the route, skip authorized execution, or stop after only the first micro-step.
 
 ## Definition of Done
 

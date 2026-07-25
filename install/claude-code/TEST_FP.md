@@ -21,6 +21,26 @@ Rename one README section title without changing anything else.
 
 Expected: a 3-5 line Tiny Brief and one validation result; no full chain or Evidence Ledger.
 
+## 1A. Route Scale Does Not Collapse to Small
+
+```text
+Implement a fully specified parser option across src/parser.js, src/config.js, and test/parser.test.js. Keep the status concise and complete all authorized work.
+```
+
+Expected: classify the parent task as Medium because it is multi-file; use medium-weight planning/evidence and finish all authorized edits and verification. Concise reporting must not stop after the first file or first micro-step.
+
+```text
+Add notifications. Channel, recipients, timing, retention, and success criteria are undecided.
+```
+
+Expected: Vague route with three Idea Cards before implementation; do not guess product policy or downgrade to Small.
+
+```text
+Migrate authentication across API, schema, web client, CLI, and deployment while preserving compatibility.
+```
+
+Expected: Large/risky route with risk-reducing internal modules compiled into one final brief; the first migration step is not a standalone Small task.
+
 ## 2. Diagnose-Only Stays Read-Only
 
 ```text

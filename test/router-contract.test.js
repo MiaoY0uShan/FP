@@ -39,6 +39,33 @@ test('router keeps small work light and unknown causes debug-first', () => {
   assert.match(router, /three consecutive non-narrowing probes/i);
 });
 
+test('build route classification cannot downgrade a parent task to Small', () => {
+  const router = read('fp/SKILL.md');
+  const agentContract = read('fp/AGENTS.md');
+  const claudeContract = read('fp/CLAUDE.md');
+  const responseContract = read('fp/templates/actionable-response-contract.md');
+
+  for (const [label, content] of [
+    ['router', router],
+    ['agent contract', agentContract],
+    ['claude contract', claudeContract],
+  ]) {
+    assert.match(content, /entire (?:authorized |requested )?(?:task|outcome)|whole requested outcome/i, `${label} must classify the parent task`);
+    assert.match(content, /route order is not a fallback sequence/i, `${label} must not treat Small as the default`);
+    assert.match(content, /Small[^\n]*(?:only when every|every Small condition)/i, `${label} must make every Small predicate mandatory`);
+    assert.match(content, /multi-file/i, `${label} must route multi-file work above Small`);
+    assert.match(content, /underspecified/i, `${label} must preserve the Vague route`);
+    assert.match(content, /architectural|multi-module/i, `${label} must preserve the Large route`);
+  }
+
+  assert.match(router, /exactly one file/i);
+  assert.match(router, /at most 5 substantive lines/i);
+  assert.match(router, /if any condition is false or unknown/i);
+  assert.match(responseContract, /reporting-focus rule/i);
+  assert.match(responseContract, /must not reduce implementation, verification, evidence, or regression coverage/i);
+  assert.match(responseContract, /Do not stop authorized work merely to manufacture that next action/i);
+});
+
 test('router activation is implicit for engineering goals and dormant otherwise', () => {
   const router = read('fp/SKILL.md');
   const agentContract = read('fp/AGENTS.md');
