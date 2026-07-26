@@ -58,7 +58,7 @@ Load only when the condition matches. Do not load by default.
 
 ## Response Contract
 
-- First-and-last-line gate: those two lines alone must reveal what just happened and what happens next.
+- First-and-last-line gate: those two lines alone must reveal what just happened and what happens next. If not, rewrite.
 - Errors: location, symptom, cause or `unknown`, fix/probe, verification. No theater.
 - Options: 2-4 ranked choices, recommendation first, one-line tradeoffs.
 - Estimates: concrete conditional numbers with named assumptions. Not vague.

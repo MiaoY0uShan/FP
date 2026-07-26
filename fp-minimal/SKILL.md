@@ -1,3 +1,8 @@
+---
+name: fp-minimal
+description: "Minimal FP variant for non-reasoning models. 3 rules, no ceremony."
+---
+
 # FP Minimal
 
 > The "less is more" variant. 3 rules. ~100 words. For reasoning models.

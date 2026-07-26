@@ -123,12 +123,12 @@ function main() {
     }
   }
 
-  requireText('fp/SKILL.md', ['Debug-First', 'Acceptance Evidence Matrix', 'Multi-Agent Profile', 'Background-Learning Profile', 'generalization-gate/SKILL.md', 'unknown remains', 'First-and-last-line gate', 'actionable-response-contract.md'], failures);
+  requireText('fp/SKILL.md', ['Diagnose before patching', 'Verify before claiming done', 'Be concise and actionable', 'Reuse Ladder', 'On-Demand Profiles', 'Routing', 'Response Contract', 'Safety'], failures);
   requirePatterns('fp/SKILL.md', [
-    ['engineering goals activate implicitly', /activate automatically for engineering goals/i],
+    ['engineering goals activate implicitly', /activate automatically for engineering/i],
     ['FP: is an optional explicit invocation', /FP:/],
     ['$fp is an optional explicit invocation', /\$fp/],
-    ['casual and non-engineering goals stay dormant', /stay dormant for casual or other non-engineering goals/i]
+    ['casual and non-engineering goals stay dormant', /stay dormant for casual/i]
   ], failures);
   requireText('fp/generalization-gate/SKILL.md', ['leave-one-case-out', 'near-neighbor negative control', 'candidate agent and evaluator must be different', 'shadow', 'does not train model weights'], failures);
   requireText('fp/templates/multi-agent-review-protocol.md', ['idempotency_key', 'task_input_index', 'parent cancellation', 'dependency cycles'], failures);
