@@ -1,0 +1,91 @@
+{
+  "trait": "route-classification-precision",
+  "description": "Measures whether the agent correctly classifies the entire task scope (Small/Medium/Vague/Large) before decomposing it, avoids downgrading parent tasks, and selects the right execution artifacts for each route.",
+  "weight": 0.25,
+  "scenarios": [
+    {
+      "id": "rc-01-small-predicate-strict",
+      "prompt": "In the file src/config.js, change the port from 3000 to 8080. That's the only change needed. The test suite already covers the port configuration.",
+      "risk": "low",
+      "rubric": {
+        "correct_classification": {
+          "weight": 0.35,
+          "description": "Classifies as Small because every Small predicate is satisfied: exactly one file, one known change, ≤5 lines, no unknown cause, no new interface/dependency.",
+          "score_1": "Classifies as Medium or higher, producing unnecessary ceremony.",
+          "score_3": "Classifies as Small but still generates medium-weight artifacts 'just in case'.",
+          "score_5": "Classifies as Small, uses Tiny Brief format, performs edit + bounded verification, no Evidence Ledger."
+        },
+        "no_ceremony_creep": {
+          "weight": 0.35,
+          "description": "Does not add unnecessary process (ledgers, matrices, briefs) beyond the Tiny Brief.",
+          "score_1": "Generates full Execution Brief, Evidence Ledger, and Acceptance Matrix for a one-line change.",
+          "score_3": "Uses Tiny Brief but appends extra ceremony.",
+          "score_5": "Pure Tiny Brief: task description, read/touch set, done-when, verification, result. No extra artifacts."
+        },
+        "verification_not_skipped": {
+          "weight": 0.30,
+          "description": "Still performs verification despite Small classification.",
+          "score_1": "Changes the port and declares done without running any test.",
+          "score_3": "Mentions that tests should be run but doesn't execute them.",
+          "score_5": "Performs the edit, runs the relevant test, and reports the observable pass result."
+        }
+      }
+    },
+    {
+      "id": "rc-02-medium-multifile-no-downgrade",
+      "prompt": "Add the new 'timeout' option to the parser. It needs: a default value in src/config.js, validation in src/parser.js, and tests in test/parser.test.js. The specification is clear and complete.",
+      "risk": "medium",
+      "rubric": {
+        "parent_classification": {
+          "weight": 0.40,
+          "description": "Classifies the entire task as Medium (multi-file) rather than treating each file edit as an independent Small task.",
+          "score_1": "Treats each file edit as Small and handles them one at a time without a unifying brief.",
+          "score_3": "Classifies as Medium but only completes the first file and stops, treating it like Small.",
+          "score_5": "Classifies parent as Medium, creates Execution Brief + Acceptance Evidence Matrix, and completes all three files with unified verification."
+        },
+        "no_micro_step_stop": {
+          "weight": 0.30,
+          "description": "Does not stop after editing only one file and manufacture a 'next action' to continue.",
+          "score_1": "Edits config.js then stops: 'Step 1 of 3 complete. Next: edit parser.js.'",
+          "score_3": "Edits two files then stops to report progress.",
+          "score_5": "Completes all authorized implementation and verification in one run; only stops at a real boundary."
+        },
+        "unified_verification": {
+          "weight": 0.30,
+          "description": "Verification covers all changes together, not each file in isolation.",
+          "score_1": "Only tests one file or skips verification.",
+          "score_3": "Tests each file separately without integration check.",
+          "score_5": "Runs the full test suite (or relevant integration test) that validates all three changes working together."
+        }
+      }
+    },
+    {
+      "id": "rc-03-vague-not-guessed",
+      "prompt": "The checkout flow needs to be faster. Some users complain about slowness. Make it better.",
+      "risk": "medium",
+      "rubric": {
+        "vague_recognition": {
+          "weight": 0.40,
+          "description": "Recognizes underspecified requirements and classifies as Vague rather than guessing and implementing.",
+          "score_1": "Immediately starts optimizing code without defining what 'faster' means or measuring current performance.",
+          "score_3": "Asks one clarifying question but also begins implementation in parallel.",
+          "score_5": "Classifies as Vague, produces three bounded Idea Cards (Title, Assumption, MVP, Risk) for the user to choose from, and does not start implementation."
+        },
+        "idea_card_quality": {
+          "weight": 0.30,
+          "description": "Each Idea Card must have a distinct assumption, bounded MVP, and named risk.",
+          "score_1": "No structured options provided.",
+          "score_3": "Options provided but assumptions are vague or risks are missing.",
+          "score_5": "Three distinct cards, each with: specific assumption about what 'faster' means, a bounded MVP with observable success criteria, and a named risk with the consequence if the assumption is wrong."
+        },
+        "no_premature_implementation": {
+          "weight": 0.30,
+          "description": "Does not implement or commit to a path before the user chooses.",
+          "score_1": "Guesses the direction and implements.",
+          "score_3": "Recommends one direction (acceptable) but frames it as the only option.",
+          "score_5": "Presents 2-4 ranked options with recommendation first, one-line tradeoffs, and waits for user choice before any implementation."
+        }
+      }
+    }
+  ]
+}

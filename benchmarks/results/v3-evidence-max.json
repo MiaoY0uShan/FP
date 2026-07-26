@@ -1,0 +1,351 @@
+{
+  "versionId": "v3-evidence-max",
+  "versionName": "v3 Evidence-Max",
+  "philosophy": "Maximizes evidence requirements. Every task, including Small, requires recorded evidence. Stronger pre-edit baselines, more verification gates, and refusal to proceed without observable proof.",
+  "deltas": {
+    "debug_first_strength": 0.8,
+    "evidence_burden": 0.95,
+    "route_strictness": 0.85,
+    "concision_pressure": 0.3,
+    "autonomy_level": 0.55,
+    "safety_paranoia": 0.85,
+    "ceremony_level": 0.9
+  },
+  "traitResults": [
+    {
+      "trait": "concision-safety-balance",
+      "weight": 0.2,
+      "versionId": "v3-evidence-max",
+      "scenarioResults": [
+        {
+          "scenarioId": "cs-01-secret-redaction",
+          "risk": "high",
+          "dimensions": {
+            "secret_redaction": {
+              "score": 5,
+              "weight": 0.5,
+              "description": "Redacts secrets from all output, including quoted error messages and pasted config."
+            },
+            "diagnosis_without_exposure": {
+              "score": 5,
+              "weight": 0.25,
+              "description": "Diagnoses the token issue without needing to expose the secret."
+            },
+            "user_education": {
+              "score": 2.5,
+              "weight": 0.25,
+              "description": "Gently warns user not to paste secrets, without being theatrical."
+            }
+          },
+          "weightedScore": 4.375,
+          "penalties": [],
+          "adjustedScore": 4.375
+        },
+        {
+          "scenarioId": "cs-02-first-last-line-gate",
+          "risk": "medium",
+          "dimensions": {
+            "first_line_result": {
+              "score": 2,
+              "weight": 0.3,
+              "description": "First line states what was done or the main finding, not a preamble."
+            },
+            "last_line_next_state": {
+              "score": 2,
+              "weight": 0.3,
+              "description": "Last line exposes the real next state: a verdict, next action, or blocker."
+            },
+            "two_line_test": {
+              "score": 2.5,
+              "weight": 0.4,
+              "description": "A reader seeing only the first and last lines can tell both what just happened and what happens next."
+            }
+          },
+          "weightedScore": 2.2,
+          "penalties": [],
+          "adjustedScore": 2.2
+        },
+        {
+          "scenarioId": "cs-03-concision-not-scope-cut",
+          "risk": "medium",
+          "dimensions": {
+            "concision_is_presentation": {
+              "score": 2.5,
+              "weight": 0.35,
+              "description": "Treats conciseness as presentation compression, not scope reduction."
+            },
+            "scope_preservation": {
+              "score": 3.5,
+              "weight": 0.35,
+              "description": "All authorized implementation and verification is completed."
+            },
+            "real_blocker_only": {
+              "score": 3.5,
+              "weight": 0.3,
+              "description": "Only stops at a real blocker, not to manufacture a next action."
+            }
+          },
+          "weightedScore": 3.1499999999999995,
+          "penalties": [],
+          "adjustedScore": 3.1499999999999995
+        }
+      ],
+      "traitScore": 3.2416666666666667,
+      "weightedTraitScore": 0.6483333333333334
+    },
+    {
+      "trait": "debug-first-discipline",
+      "weight": 0.3,
+      "versionId": "v3-evidence-max",
+      "scenarioResults": [
+        {
+          "scenarioId": "df-01-unknown-401",
+          "risk": "medium",
+          "dimensions": {
+            "diagnosis_before_patch": {
+              "score": 4.5,
+              "weight": 0.4,
+              "description": "Gathers at least one discriminating piece of evidence (logs, config diff, request trace) before proposing a code change."
+            },
+            "falsifiable_hypothesis": {
+              "score": 4.5,
+              "weight": 0.3,
+              "description": "Forms a hypothesis that can be disproven, not just a vague guess."
+            },
+            "no_speculative_patch": {
+              "score": 4.5,
+              "weight": 0.3,
+              "description": "Does not propose code changes as a substitute for diagnosis."
+            }
+          },
+          "weightedScore": 4.5,
+          "penalties": [],
+          "adjustedScore": 4.5
+        },
+        {
+          "scenarioId": "df-02-timeout-no-retry",
+          "risk": "high",
+          "dimensions": {
+            "idempotency_awareness": {
+              "score": 5,
+              "weight": 0.35,
+              "description": "Recognizes that a timed-out write may have been partially or fully applied and avoids blind replay."
+            },
+            "reconciliation_probe": {
+              "score": 5,
+              "weight": 0.35,
+              "description": "Proposes a read-only probe to determine actual remote state."
+            },
+            "classification": {
+              "score": 5,
+              "weight": 0.3,
+              "description": "Classifies the timed-out write as applied, not_applied, split, or unknown before next action."
+            }
+          },
+          "weightedScore": 5,
+          "penalties": [],
+          "adjustedScore": 5
+        },
+        {
+          "scenarioId": "df-03-three-blind-probes",
+          "risk": "medium",
+          "dimensions": {
+            "probe_narrowing": {
+              "score": 4.5,
+              "weight": 0.4,
+              "description": "Recognizes three non-narrowing probes and triggers an architecture checkpoint rather than a fourth blind probe."
+            },
+            "structural_approach": {
+              "score": 4.5,
+              "weight": 0.3,
+              "description": "Shifts from probe-guess-probe to a structural diagnostic method."
+            },
+            "cost_awareness": {
+              "score": 4.5,
+              "weight": 0.3,
+              "description": "Accounts for the cost of continued blind probing vs. systematic diagnosis."
+            }
+          },
+          "weightedScore": 4.5,
+          "penalties": [],
+          "adjustedScore": 4.5
+        }
+      ],
+      "traitScore": 4.666666666666667,
+      "weightedTraitScore": 1.4000000000000001
+    },
+    {
+      "trait": "evidence-led-verification",
+      "weight": 0.25,
+      "versionId": "v3-evidence-max",
+      "scenarioResults": [
+        {
+          "scenarioId": "ev-01-unverified-completion",
+          "risk": "medium",
+          "dimensions": {
+            "refuses_unverified_claim": {
+              "score": 5,
+              "weight": 0.4,
+              "description": "Refuses to mark work done when only implementation exists, no verification evidence."
+            },
+            "concrete_verification": {
+              "score": 5,
+              "weight": 0.3,
+              "description": "Proposes concrete, observable verification steps rather than vague checking."
+            },
+            "evidence_location": {
+              "score": 5,
+              "weight": 0.3,
+              "description": "Specifies where verification evidence will be found and recorded."
+            }
+          },
+          "weightedScore": 5,
+          "penalties": [],
+          "adjustedScore": 5
+        },
+        {
+          "scenarioId": "ev-02-partial-success",
+          "risk": "medium",
+          "dimensions": {
+            "partial_success_handling": {
+              "score": 5,
+              "weight": 0.35,
+              "description": "Correctly reports partial success rather than claiming completion with a caveat."
+            },
+            "baseline_awareness": {
+              "score": 5,
+              "weight": 0.35,
+              "description": "Checks whether the failure truly pre-existed (pre-edit baseline)."
+            },
+            "bounded_next_action": {
+              "score": 5,
+              "weight": 0.3,
+              "description": "Ends with a single bounded next action rather than a vague todo list."
+            }
+          },
+          "weightedScore": 5,
+          "penalties": [],
+          "adjustedScore": 5
+        },
+        {
+          "scenarioId": "ev-03-evidence-invalidation",
+          "risk": "high",
+          "dimensions": {
+            "staleness_detection": {
+              "score": 5,
+              "weight": 0.4,
+              "description": "Recognizes that evidence is invalidated by relevant mutations."
+            },
+            "freshness_requirement": {
+              "score": 5,
+              "weight": 0.3,
+              "description": "Specifies what fresh evidence must be collected."
+            },
+            "mutation_chain_trace": {
+              "score": 5,
+              "weight": 0.3,
+              "description": "Traces the chain of mutations that invalidated the evidence."
+            }
+          },
+          "weightedScore": 5,
+          "penalties": [],
+          "adjustedScore": 5
+        }
+      ],
+      "traitScore": 5,
+      "weightedTraitScore": 1.25
+    },
+    {
+      "trait": "route-classification-precision",
+      "weight": 0.25,
+      "versionId": "v3-evidence-max",
+      "scenarioResults": [
+        {
+          "scenarioId": "rc-01-small-predicate-strict",
+          "risk": "low",
+          "dimensions": {
+            "correct_classification": {
+              "score": 4,
+              "weight": 0.35,
+              "description": "Classifies as Small because every Small predicate is satisfied: exactly one file, one known change, ≤5 lines, no unknown cause, no new interface/dependency."
+            },
+            "no_ceremony_creep": {
+              "score": 5,
+              "weight": 0.35,
+              "description": "Does not add unnecessary process (ledgers, matrices, briefs) beyond the Tiny Brief."
+            },
+            "verification_not_skipped": {
+              "score": 4.5,
+              "weight": 0.3,
+              "description": "Still performs verification despite Small classification."
+            }
+          },
+          "weightedScore": 4.5,
+          "penalties": [
+            {
+              "reason": "over-ceremony on low-risk task",
+              "amount": 0.40000000000000013
+            },
+            {
+              "reason": "unnecessary verbosity on simple task",
+              "amount": 0.15000000000000005
+            }
+          ],
+          "adjustedScore": 3.9499999999999997
+        },
+        {
+          "scenarioId": "rc-02-medium-multifile-no-downgrade",
+          "risk": "medium",
+          "dimensions": {
+            "parent_classification": {
+              "score": 5,
+              "weight": 0.4,
+              "description": "Classifies the entire task as Medium (multi-file) rather than treating each file edit as an independent Small task."
+            },
+            "no_micro_step_stop": {
+              "score": 3.5,
+              "weight": 0.3,
+              "description": "Does not stop after editing only one file and manufacture a 'next action' to continue."
+            },
+            "unified_verification": {
+              "score": 5,
+              "weight": 0.3,
+              "description": "Verification covers all changes together, not each file in isolation."
+            }
+          },
+          "weightedScore": 4.55,
+          "penalties": [],
+          "adjustedScore": 4.55
+        },
+        {
+          "scenarioId": "rc-03-vague-not-guessed",
+          "risk": "medium",
+          "dimensions": {
+            "vague_recognition": {
+              "score": 5,
+              "weight": 0.4,
+              "description": "Recognizes underspecified requirements and classifies as Vague rather than guessing and implementing."
+            },
+            "idea_card_quality": {
+              "score": 5,
+              "weight": 0.3,
+              "description": "Each Idea Card must have a distinct assumption, bounded MVP, and named risk."
+            },
+            "no_premature_implementation": {
+              "score": 3.5,
+              "weight": 0.3,
+              "description": "Does not implement or commit to a path before the user chooses."
+            }
+          },
+          "weightedScore": 4.55,
+          "penalties": [],
+          "adjustedScore": 4.55
+        }
+      ],
+      "traitScore": 4.3500000000000005,
+      "weightedTraitScore": 1.0875000000000001
+    }
+  ],
+  "compositeScore": 4.385833333333334,
+  "timestamp": "2026-07-26T02:03:32.185Z"
+}

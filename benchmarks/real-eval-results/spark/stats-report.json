@@ -1,0 +1,188 @@
+[
+  {
+    "version": "v-minimal",
+    "name": "v-minimal Less-Is-More",
+    "n": 48,
+    "meanScore": 2.9583333333333335,
+    "stdScore": 1.0842194957173648,
+    "minScore": 1,
+    "maxScore": 5,
+    "totalBlockers": 2,
+    "traitMeans": {
+      "concision-safety-balance": 4.277777777777778,
+      "cross-session-continuation": 2.3333333333333335,
+      "debug-first-discipline": 3.5,
+      "evidence-led-verification": 2.3333333333333335,
+      "live-system-operations": 2.5555555555555554,
+      "multi-agent-coordination": 2.611111111111111,
+      "provider-compatibility": 2.8333333333333335,
+      "route-classification-precision": 3.222222222222222
+    },
+    "traitStds": {
+      "concision-safety-balance": 0.9289579984923769,
+      "cross-session-continuation": 0.6992058987801011,
+      "debug-first-discipline": 1.3123346456686351,
+      "evidence-led-verification": 1.3824294235551813,
+      "live-system-operations": 0.8861067572167504,
+      "multi-agent-coordination": 0.4906533814626582,
+      "provider-compatibility": 0.40824829046386296,
+      "route-classification-precision": 1.02559828970794
+    },
+    "weightedComposite": 3.0822222222222226
+  },
+  {
+    "version": "v0",
+    "name": "v0 Baseline",
+    "n": 72,
+    "meanScore": 2.902777777777777,
+    "stdScore": 1.1620465191531946,
+    "minScore": 1,
+    "maxScore": 5,
+    "totalBlockers": 4,
+    "traitMeans": {
+      "concision-safety-balance": 4.62962962962963,
+      "cross-session-continuation": 2,
+      "debug-first-discipline": 3.037037037037037,
+      "evidence-led-verification": 2.0740740740740744,
+      "live-system-operations": 2.4444444444444446,
+      "multi-agent-coordination": 2.5555555555555554,
+      "provider-compatibility": 3.0740740740740744,
+      "route-classification-precision": 3.4074074074074074
+    },
+    "traitStds": {
+      "concision-safety-balance": 0.6758625033664689,
+      "cross-session-continuation": 0.6009252125773316,
+      "debug-first-discipline": 1.1235415786753713,
+      "evidence-led-verification": 1.4603821586772128,
+      "live-system-operations": 0.6871842709362768,
+      "multi-agent-coordination": 0.5773502691896257,
+      "provider-compatibility": 0.5471587667664501,
+      "route-classification-precision": 0.9541980020732037
+    },
+    "weightedComposite": 3.010370370370371
+  },
+  {
+    "version": "v7",
+    "name": "v7 Adaptive-Plus",
+    "n": 72,
+    "meanScore": 2.8611111111111103,
+    "stdScore": 1.1557165531278453,
+    "minScore": 1,
+    "maxScore": 5,
+    "totalBlockers": 0,
+    "traitMeans": {
+      "concision-safety-balance": 4.666666666666667,
+      "cross-session-continuation": 2.4074074074074074,
+      "debug-first-discipline": 2.9259259259259256,
+      "evidence-led-verification": 2.0740740740740744,
+      "live-system-operations": 2.592592592592593,
+      "multi-agent-coordination": 2.3333333333333335,
+      "provider-compatibility": 2.851851851851852,
+      "route-classification-precision": 3.037037037037037
+    },
+    "traitStds": {
+      "concision-safety-balance": 0.5773502691896257,
+      "cross-session-continuation": 0.8127077132404329,
+      "debug-first-discipline": 1.1152699944380406,
+      "evidence-led-verification": 1.460382158677213,
+      "live-system-operations": 0.4648111258522641,
+      "multi-agent-coordination": 0.5773502691896257,
+      "provider-compatibility": 0.7657804862272346,
+      "route-classification-precision": 1.147998795542879
+    },
+    "weightedComposite": 2.9351851851851856
+  },
+  {
+    "version": "v6",
+    "name": "v6 Adaptive-Hybrid",
+    "n": 72,
+    "meanScore": 2.7777777777777772,
+    "stdScore": 1.0147580792048048,
+    "minScore": 1,
+    "maxScore": 5,
+    "totalBlockers": 4,
+    "traitMeans": {
+      "concision-safety-balance": 3.518518518518518,
+      "cross-session-continuation": 2.4444444444444446,
+      "debug-first-discipline": 3.185185185185185,
+      "evidence-led-verification": 2.2962962962962963,
+      "live-system-operations": 2.6666666666666665,
+      "multi-agent-coordination": 2.481481481481482,
+      "provider-compatibility": 2.888888888888889,
+      "route-classification-precision": 2.740740740740741
+    },
+    "traitStds": {
+      "concision-safety-balance": 1.3653561919382786,
+      "cross-session-continuation": 0.7071067811865475,
+      "debug-first-discipline": 1.0289032876362298,
+      "evidence-led-verification": 1.4087469259006629,
+      "live-system-operations": 0.6871842709362768,
+      "multi-agent-coordination": 0.4746668747398628,
+      "provider-compatibility": 0.7637626158259733,
+      "route-classification-precision": 1.0642913367037787
+    },
+    "weightedComposite": 2.8337037037037036
+  },
+  {
+    "version": "v8",
+    "name": "v8 Fine-Calibrated",
+    "n": 72,
+    "meanScore": 2.6064814814814814,
+    "stdScore": 1.0881728507074897,
+    "minScore": 1,
+    "maxScore": 5,
+    "totalBlockers": 3,
+    "traitMeans": {
+      "concision-safety-balance": 3.8148148148148144,
+      "cross-session-continuation": 2.1481481481481484,
+      "debug-first-discipline": 2.814814814814815,
+      "evidence-led-verification": 2,
+      "live-system-operations": 2.5185185185185186,
+      "multi-agent-coordination": 2.1481481481481484,
+      "provider-compatibility": 2.4814814814814814,
+      "route-classification-precision": 2.925925925925926
+    },
+    "traitStds": {
+      "concision-safety-balance": 1.2031337682059842,
+      "cross-session-continuation": 0.7657804862272345,
+      "debug-first-discipline": 0.9444444444444444,
+      "evidence-led-verification": 1.5275252316519465,
+      "live-system-operations": 0.8351831321318283,
+      "multi-agent-coordination": 0.6478835438717001,
+      "provider-compatibility": 0.4444444444444444,
+      "route-classification-precision": 1.1027462911821782
+    },
+    "weightedComposite": 2.6862962962962964
+  },
+  {
+    "version": "v2",
+    "name": "v2 Concise-Max",
+    "n": 72,
+    "meanScore": 2.550925925925926,
+    "stdScore": 1.1922542426426033,
+    "minScore": 1,
+    "maxScore": 5,
+    "totalBlockers": 8,
+    "traitMeans": {
+      "concision-safety-balance": 4.0740740740740735,
+      "cross-session-continuation": 1.7037037037037037,
+      "debug-first-discipline": 2.4814814814814814,
+      "evidence-led-verification": 2,
+      "live-system-operations": 1.8518518518518516,
+      "multi-agent-coordination": 2.2592592592592595,
+      "provider-compatibility": 2.851851851851852,
+      "route-classification-precision": 3.185185185185185
+    },
+    "traitStds": {
+      "concision-safety-balance": 1.1027462911821782,
+      "cross-session-continuation": 0.6334307917217433,
+      "debug-first-discipline": 1.081551240773988,
+      "evidence-led-verification": 1.509230856356236,
+      "live-system-operations": 0.7657804862272345,
+      "multi-agent-coordination": 0.7954345035153529,
+      "provider-compatibility": 0.668977476599572,
+      "route-classification-precision": 0.9590375834240038
+    },
+    "weightedComposite": 2.6433333333333335
+  }
+]

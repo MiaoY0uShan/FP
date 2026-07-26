@@ -1,0 +1,6 @@
+{
+  "name": "refactor",
+  "scripts": {
+    "test": "node --test test/logger.test.js"
+  }
+}

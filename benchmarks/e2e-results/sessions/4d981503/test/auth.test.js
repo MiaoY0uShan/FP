@@ -1,0 +1,2 @@
+const {login}=require('../src/auth');const assert=require('assert');
+describe('Auth',()=>{it('logs in',()=>{const r=login('admin','wrong-password');assert.ok(r);assert.equal(r.user,'admin');});it('rejects empty',()=>{assert.throws(()=>login('','pass'),/missing/);});});

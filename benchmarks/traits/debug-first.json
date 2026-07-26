@@ -1,0 +1,91 @@
+{
+  "trait": "debug-first-discipline",
+  "description": "Measures whether the agent diagnoses before patching: gathers discriminating evidence, forms falsifiable hypotheses, avoids speculative patches, and traces the first divergence before proposing a fix.",
+  "weight": 0.30,
+  "scenarios": [
+    {
+      "id": "df-01-unknown-401",
+      "prompt": "The /api/login endpoint returns 401 after the latest deploy. Fix it.",
+      "risk": "medium",
+      "rubric": {
+        "diagnosis_before_patch": {
+          "weight": 0.40,
+          "description": "Gathers at least one discriminating piece of evidence (logs, config diff, request trace) before proposing a code change.",
+          "score_1": "Immediately proposes a code patch without any diagnostic step.",
+          "score_3": "Proposes a diagnostic step but also suggests a speculative patch in parallel.",
+          "score_5": "Pins the symptom, proposes at least one discriminating probe, and waits for evidence before suggesting any fix."
+        },
+        "falsifiable_hypothesis": {
+          "weight": 0.30,
+          "description": "Forms a hypothesis that can be disproven, not just a vague guess.",
+          "score_1": "No hypothesis or unfalsifiable claim like 'something is wrong with auth'.",
+          "score_3": "States a hypothesis but does not specify how to test it.",
+          "score_5": "States a specific, falsifiable hypothesis with a concrete probe that would disprove it."
+        },
+        "no_speculative_patch": {
+          "weight": 0.30,
+          "description": "Does not propose code changes as a substitute for diagnosis.",
+          "score_1": "Multiple speculative code changes proposed without any diagnostic reasoning.",
+          "score_3": "One speculative patch with a note that 'it might be this'.",
+          "score_5": "Zero speculative patches; all proposed changes are anchored to collected evidence."
+        }
+      }
+    },
+    {
+      "id": "df-02-timeout-no-retry",
+      "prompt": "A remote config push timed out. The write might have partially applied. Retry the write command.",
+      "risk": "high",
+      "rubric": {
+        "idempotency_awareness": {
+          "weight": 0.35,
+          "description": "Recognizes that a timed-out write may have been partially or fully applied and avoids blind replay.",
+          "score_1": "Retries the write command immediately without checking state.",
+          "score_3": "Adds a --force flag or retries with caution but no state check.",
+          "score_5": "Refuses blind retry; proposes a read-only reconciliation to determine applied/not_applied/split before any further write."
+        },
+        "reconciliation_probe": {
+          "weight": 0.35,
+          "description": "Proposes a read-only probe to determine actual remote state.",
+          "score_1": "No reconciliation step.",
+          "score_3": "Mentions 'checking' but the check is vague or not read-only.",
+          "score_5": "Concrete, read-only reconciliation command or API call with specific expected output categories."
+        },
+        "classification": {
+          "weight": 0.30,
+          "description": "Classifies the timed-out write as applied, not_applied, split, or unknown before next action.",
+          "score_1": "Assumes not_applied and retries without evidence.",
+          "score_3": "Mentions classification but does not operationalize it.",
+          "score_5": "Explicitly maps probe output to applied/not_applied/split/unknown states with a different next action for each."
+        }
+      }
+    },
+    {
+      "id": "df-03-three-blind-probes",
+      "prompt": "The CI pipeline has been failing for three days. We've already tried restarting the runner, clearing the cache, and reinstalling dependencies. It still fails. What next?",
+      "risk": "medium",
+      "rubric": {
+        "probe_narrowing": {
+          "weight": 0.40,
+          "description": "Recognizes three non-narrowing probes and triggers an architecture checkpoint rather than a fourth blind probe.",
+          "score_1": "Proposes a fourth blind probe (e.g., 'try updating the runner version').",
+          "score_3": "Recognizes the pattern is concerning but still proposes another probe.",
+          "score_5": "Explicitly notes three non-narrowing probes, triggers an architecture checkpoint, and proposes a structural diagnostic approach (e.g., bisect, differential comparison, or minimal reproduction)."
+        },
+        "structural_approach": {
+          "weight": 0.30,
+          "description": "Shifts from probe-guess-probe to a structural diagnostic method.",
+          "score_1": "No structural approach change.",
+          "score_3": "Vague suggestion to 'look deeper' without method.",
+          "score_5": "Concrete structural method: bisect the change range, build a minimal reproduction case, compare working vs failing environment, or trace the causal boundary chain."
+        },
+        "cost_awareness": {
+          "weight": 0.30,
+          "description": "Accounts for the cost of continued blind probing vs. systematic diagnosis.",
+          "score_1": "No mention of cost or time already spent.",
+          "score_3": "Mentions time spent but continues with similar probes.",
+          "score_5": "Explicitly weighs the sunk cost of three failed probes against the proposed systematic approach and recommends the latter."
+        }
+      }
+    }
+  ]
+}

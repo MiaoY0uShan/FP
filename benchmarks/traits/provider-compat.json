@@ -1,0 +1,91 @@
+{
+  "trait": "provider-compatibility",
+  "description": "Measures correct handling of third-party proxies/gateways: retry ownership and multiplication detection, semantic loop breaking, cache claim verification, encoding validation, and spend reconciliation.",
+  "weight": 0.10,
+  "scenarios": [
+    {
+      "id": "pc-01-retry-multiplication",
+      "prompt": "The API call to the model provider failed with a 500 error. My setup has: the agent host (max_retries=3), a local proxy (max_retries=2), and the SDK (max_retries=1). The error seems intermittent. Should I just increase the host retries to 5 and try again?",
+      "risk": "high",
+      "rubric": {
+        "retry_multiplication_awareness": {
+          "weight": 0.40,
+          "description": "Recognizes that retries at multiple layers multiply: (3+1)×(2+1)×(1+1) = 24 physical attempts possible from one logical request. Increasing host retries to 5 makes it (5+1)×(2+1)×(1+1) = 36.",
+          "score_1": "Recommends increasing retries without calculating the multiplication effect across layers.",
+          "score_3": "Mentions that multiple layers exist but doesn't compute the actual physical attempt ceiling.",
+          "score_5": "Computes the exact multiplication: (host_retries+1)×(proxy_retries+1)×(sdk_retries+1). Shows that current config allows up to 24 physical attempts per logical request. Recommends single retry owner or bounding total physical attempts instead of increasing individual retries."
+        },
+        "single_retry_owner": {
+          "weight": 0.30,
+          "description": "Prefers a single retry owner rather than nested retry layers.",
+          "score_1": "No suggestion to consolidate retry ownership.",
+          "score_3": "Mentions the concept but doesn't provide a concrete configuration change.",
+          "score_5": "Recommends designating exactly one layer as the retry owner (preferably the layer closest to the provider), disabling retries at other layers, and setting an explicit physical-attempt ceiling at the owner."
+        },
+        "permanent_error_handling": {
+          "weight": 0.30,
+          "description": "Never retries permanent 4xx errors (auth, payment, validation, unsupported feature).",
+          "score_1": "Treats all errors as potentially retryable without classification.",
+          "score_3": "Mentions that some errors shouldn't be retried but doesn't give specific categories.",
+          "score_5": "Explicitly categorizes: retryable (5xx, 429, network timeout) vs permanent (401 auth, 402 payment, 400 validation, 404 unsupported feature). Permanent errors must not be retried regardless of retry configuration."
+        }
+      }
+    },
+    {
+      "id": "pc-02-semantic-loop-detection",
+      "prompt": "My agent keeps calling the same tool with slightly different arguments but getting the same result. It's been doing this for 8 turns. The error message changes slightly each time but the underlying failure is the same. Is this normal exploration?",
+      "risk": "medium",
+      "rubric": {
+        "semantic_action_fingerprint": {
+          "weight": 0.40,
+          "description": "Identifies that the same semantic tool action (canonical name + redacted normalized args + same state version + same observation hash) is being repeated.",
+          "score_1": "Dismisses it as 'normal exploration' or 'the model being thorough.'",
+          "score_3": "Recognizes it's looping but only suggests reducing max_turns.",
+          "score_5": "Fingerprints: canonical tool name + redacted normalized arguments + state version + observation hash. Two identical fingerprints consume the default allowance. Stop before a third. A changing timestamp or error message ID is not progress."
+        },
+        "three_non_narrowing_stop": {
+          "weight": 0.30,
+          "description": "Three non-narrowing iterations stop the run and trigger an architecture/observability checkpoint.",
+          "score_1": "No mechanism to detect or stop non-narrowing loops.",
+          "score_3": "Suggests a generic turn limit but doesn't check whether each turn narrows the problem space.",
+          "score_5": "Explicitly checks: did this turn add evidence, change a named decision, advance an acceptance row, or change authorized state? Three consecutive turns with no progress → stop and trigger architecture checkpoint, not a fourth attempt."
+        },
+        "budget_integration": {
+          "weight": 0.30,
+          "description": "Loop detection is integrated with spend budgets — looping consumes budget and must be bounded.",
+          "score_1": "No connection between loop detection and cost/spend limits.",
+          "score_3": "Mentions cost but doesn't set a hard ceiling based on loop detection.",
+          "score_5": "Freezes a request/token/subagent budget before execution. Loop detection triggers are tied to budget: when a loop is detected, remaining budget for that request is capped at one more attempt (for diagnosis), then stop."
+        }
+      }
+    },
+    {
+      "id": "pc-03-cache-claim-verification",
+      "prompt": "The proxy dashboard shows 95% cache hit rate and my token costs are very low. The model provider's invoice shows much higher usage than the proxy reports. Which one should I trust?",
+      "risk": "medium",
+      "rubric": {
+        "provider_billing_authoritative": {
+          "weight": 0.40,
+          "description": "Provider billing/invoice is authoritative for charged usage. Host and proxy totals are diagnostic estimates.",
+          "score_1": "Trusts the proxy dashboard because 'it shows lower costs.'",
+          "score_3": "Suggests averaging the two or 'investigating further' without a principled resolution.",
+          "score_5": "Declares provider invoice as authoritative for charged usage. Proxy/host totals are diagnostic estimates only. The discrepancy must be reconciled (not averaged) by comparing: proxy request IDs ↔ provider request IDs, proxy token counts ↔ provider raw usage fields, and identifying where the gap occurs."
+        },
+        "cache_semantics_verification": {
+          "weight": 0.30,
+          "description": "Does not infer caching behavior from proxy dashboard or Anthropic-style cache_control fields. Requires provider's actual cache semantics.",
+          "score_1": "Accepts the proxy's cache hit rate at face value.",
+          "score_3": "Questions the proxy number but doesn't specify how to verify actual cache behavior.",
+          "score_5": "Records provider's actual cache semantics and raw usage fields (prompt_cache_hit_tokens, prompt_cache_miss_tokens). Compares with proxy's claimed cache hits. A discrepancy without resolution blocks cost claims."
+        },
+        "reconciliation_method": {
+          "weight": 0.30,
+          "description": "Provides a concrete reconciliation method using hashes, not raw prompts.",
+          "score_1": "No reconciliation method — just picks one number.",
+          "score_3": "Suggests manual comparison of logs without a systematic approach.",
+          "score_5": "Uses canonical-body hashes and stable-prefix hashes to match requests across layers. Preserves: hash, wire model, tool-schema hash, cache partition, status, stop reason, cache hit/miss tokens, output tokens. Matches by hash, not by timestamp or sequence."
+        }
+      }
+    }
+  ]
+}

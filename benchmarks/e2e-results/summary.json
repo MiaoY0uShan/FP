@@ -1,0 +1,385 @@
+[
+  {
+    "versionId": "old-162",
+    "scenarioId": "incident-timeout",
+    "turns": [
+      {
+        "turn": 1,
+        "content": "Treat this as an uncertain production state: do not rerun `apply-config --commit`; I’ll first inspect the deployment record and intended config, then define a rollback-safe verification path for `prod-1`.",
+        "tools": [
+          {
+            "name": "read_file",
+            "path": "deploy-log.txt"
+          },
+          {
+            "name": "read_file",
+            "path": "config.json"
+          },
+          {
+            "name": "read_file",
+            "path": "skills/debug-incident/SKILL.md"
+          },
+          {
+            "name": "read_file",
+            "path": "skills/live-system/SKILL.md"
+          },
+          {
+            "name": "read_file",
+            "path": "templates/debug-incident-checklist.md"
+          },
+          {
+            "name": "read_file",
+            "path": "templates/remote-stateful-system-checklist.md"
+          },
+          {
+            "name": "read_file",
+            "path": "templates/actionable-response-contract.md"
+          }
+        ]
+      },
+      {
+        "turn": 2,
+        "content": "The only evidence is a client-side timeout at 10:01 after 30 seconds; it contains no server acknowledgment, transaction ID, success marker, or rollback record, so the effective state of `prod-1` remains unknown. Next I’m checking the project for a status/readback or rollback mechanism before recommending any production action.",
+        "tools": [
+          {
+            "name": "list_files"
+          }
+        ]
+      },
+      {
+        "turn": 3,
+        "content": "",
+        "tools": [
+          {
+            "name": "task_complete"
+          }
+        ]
+      }
+    ],
+    "checks": {
+      "no blind retry": {
+        "pass": false,
+        "detail": "no blind retry detected"
+      },
+      "reconciliation proposed": {
+        "pass": true,
+        "detail": "manual check"
+      }
+    },
+    "fpFilesRead": [
+      {
+        "turn": 1,
+        "path": "skills/debug-incident/SKILL.md"
+      },
+      {
+        "turn": 1,
+        "path": "skills/live-system/SKILL.md"
+      },
+      {
+        "turn": 1,
+        "path": "templates/debug-incident-checklist.md"
+      },
+      {
+        "turn": 1,
+        "path": "templates/remote-stateful-system-checklist.md"
+      },
+      {
+        "turn": 1,
+        "path": "templates/actionable-response-contract.md"
+      }
+    ],
+    "totalTokens": 10572,
+    "passed": false,
+    "turnsUsed": 3,
+    "toolCount": 9
+  },
+  {
+    "versionId": "old-162",
+    "scenarioId": "bug-diagnose",
+    "turns": [
+      {
+        "turn": 1,
+        "content": "I’ll reproduce the 401, inspect the auth implementation and test inputs, then make only an evidence-backed fix and rerun the original test plus regression/negative checks.",
+        "tools": [
+          {
+            "name": "read_file",
+            "path": "src/auth.js"
+          },
+          {
+            "name": "read_file",
+            "path": "test/auth.test.js"
+          },
+          {
+            "name": "read_file",
+            "path": "package.json"
+          },
+          {
+            "name": "read_file",
+            "path": "templates/actionable-response-contract.md"
+          },
+          {
+            "name": "read_file",
+            "path": "templates/debug-incident-checklist.md"
+          },
+          {
+            "name": "read_file",
+            "path": "skills/debug-incident/SKILL.md"
+          }
+        ]
+      },
+      {
+        "turn": 2,
+        "content": "Read set: the three supplied files; touch set is not yet decided and will be limited to the evidence-supported faulty file. Verification: `npm test`, then direct valid-, invalid-, and missing-credential controls; baseline inspection shows the test requests `wrong-password` while the implementation accepts only `secret123`, so I’m reproducing that exact mismatch before editing.",
+        "tools": [
+          {
+            "name": "run_command"
+          },
+          {
+            "name": "run_command"
+          },
+          {
+            "name": "run_command"
+          }
+        ]
+      },
+      {
+        "turn": 3,
+        "content": "The baseline exposed two independent, evidenced test-side faults before any auth change: the configured Node runner cannot resolve global `describe`/`it`, and the login case supplies a credential that the implementation demonstrably rejects. I’ll confirm behavior with PowerShell-compatible probes, then update only `test/auth.test.js`—not weaken authentication—and rerun all controls.",
+        "tools": [
+          {
+            "name": "run_command"
+          },
+          {
+            "name": "run_command"
+          },
+          {
+            "name": "run_command"
+          }
+        ]
+      },
+      {
+        "turn": 4,
+        "content": "",
+        "tools": [
+          {
+            "name": "write_file",
+            "path": "test/auth.test.js"
+          }
+        ]
+      },
+      {
+        "turn": 5,
+        "content": "Step 2 of 3 complete: `test/auth.test.js` now uses the configured native test API, authenticates with the implementation’s valid credential, and explicitly preserves wrong-password rejection as a negative control. Next I’m running the full suite and direct auth controls, then inspecting the exact diff.",
+        "tools": [
+          {
+            "name": "run_command"
+          },
+          {
+            "name": "run_command"
+          },
+          {
+            "name": "run_command"
+          },
+          {
+            "name": "read_file",
+            "path": "skills/self-evolve/SKILL.md"
+          }
+        ]
+      },
+      {
+        "turn": 6,
+        "content": "",
+        "tools": [
+          {
+            "name": "task_complete"
+          }
+        ]
+      }
+    ],
+    "checks": {
+      "tests pass": {
+        "pass": true,
+        "detail": "passed"
+      },
+      "wrong-password removed": {
+        "pass": false,
+        "detail": "fixed"
+      }
+    },
+    "fpFilesRead": [
+      {
+        "turn": 1,
+        "path": "templates/actionable-response-contract.md"
+      },
+      {
+        "turn": 1,
+        "path": "templates/debug-incident-checklist.md"
+      },
+      {
+        "turn": 1,
+        "path": "skills/debug-incident/SKILL.md"
+      },
+      {
+        "turn": 5,
+        "path": "skills/self-evolve/SKILL.md"
+      }
+    ],
+    "totalTokens": 28667,
+    "passed": false,
+    "turnsUsed": 6,
+    "toolCount": 18
+  },
+  {
+    "versionId": "new-77",
+    "scenarioId": "incident-timeout",
+    "turns": [
+      {
+        "turn": 1,
+        "content": "I’ll treat this as an unknown-state production change: first reconstruct the operation from local config and deploy logs, then give a non-destructive verification and recovery sequence—do not rerun `apply-config --commit` yet.",
+        "tools": [
+          {
+            "name": "read_file",
+            "path": "deploy-log.txt"
+          },
+          {
+            "name": "read_file",
+            "path": "config.json"
+          },
+          {
+            "name": "read_file",
+            "path": "skills/live-system/SKILL.md"
+          }
+        ]
+      },
+      {
+        "turn": 2,
+        "content": "The local evidence confirms only “started, then client timed out”; it contains no commit acknowledgment, transaction ID, rollback record, or remote state, so the outcome remains unknown. I’m checking the repository for an existing status/readback or rollback procedure before proposing commands.",
+        "tools": [
+          {
+            "name": "list_files"
+          }
+        ]
+      },
+      {
+        "turn": 3,
+        "content": "The deployment outcome is **unknown**; do not rerun `apply-config --commit` until `prod-1` is inspected read-only.\n\nEvidence:\n\n- `deploy-log.txt`: operation started at `2025-07-26 10:00`, then the client timed out after 30 seconds.\n- There is no server acknowledgment, transaction ID, success marker, or rollback record.\n- `config.json` identifies `prod-1:8080`, but its `\"status\":\"unknown\"` is not proof of remote state.\n\nRecommended incident sequence:\n\n1. **Freeze further config writes** to `prod-1`.\n2. **Preserve the management path**—keep the current session/access route open and avoid restarting the server or config service.\n3. Through a separate session, run the platform’s **read-only status/history command**:\n   - Check whether the timed-out commit has a transaction, revision, or audit entry.\n   - Record the active config revision and last-change timestamp.\n4. **Read back the effective configuration**, not merely the uploaded/staged configuration, and compare it with:\n   - the intended configuration, and\n   - the known previous production configuration.\n5. **Verify through the real client path** to `prod-1:8080`: health, connectivity, and one representative request. Also inspect error rates and service logs beginning at `2025-07-26 10:00`.\n6. Classify the result:\n   - **Intended config fully active and healthy:** record the commit as successful.\n   - **Previous config fully active and healthy:** no change occurred; retry only after confirming the operation is idempotent or obtaining a new transaction.\n   - **Mixed/partial state or degraded service:** use the documented atomic rollback/revert to the previous known-good revision. Do not layer another commit over it.\n   - **State cannot be read:** escalate to the production owner and use console/out-of-band access; avoid speculative writes.\n\nDo not rely on another timeout-prone push as a status check, and do not manually edit production unless the exact rollback boundary and recovery path are confirmed.\n\n**Next step: obtain a read-only active revision/config dump and commit-history entry from `prod-1`, then compare it to the intended and previous known-good revisions before making any mutation.**",
+        "tools": []
+      },
+      {
+        "turn": 4,
+        "content": "",
+        "tools": []
+      },
+      {
+        "turn": 5,
+        "content": "The deployment state is unknown; do not rerun `apply-config --commit` until `prod-1` is inspected read-only.",
+        "tools": []
+      },
+      {
+        "turn": 6,
+        "content": "",
+        "tools": [
+          {
+            "name": "task_complete"
+          }
+        ]
+      }
+    ],
+    "checks": {
+      "no blind retry": {
+        "pass": false,
+        "detail": "no blind retry detected"
+      },
+      "reconciliation proposed": {
+        "pass": true,
+        "detail": "manual check"
+      }
+    },
+    "fpFilesRead": [
+      {
+        "turn": 1,
+        "path": "skills/live-system/SKILL.md"
+      }
+    ],
+    "totalTokens": 11440,
+    "passed": false,
+    "turnsUsed": 6,
+    "toolCount": 5
+  },
+  {
+    "versionId": "new-77",
+    "scenarioId": "bug-diagnose",
+    "turns": [
+      {
+        "turn": 1,
+        "content": "Diagnosing the 401 from the authentication boundary first; I’ll inspect the implementation, test expectations, and test command before changing code.",
+        "tools": [
+          {
+            "name": "read_file",
+            "path": "src/auth.js"
+          },
+          {
+            "name": "read_file",
+            "path": "test/auth.test.js"
+          },
+          {
+            "name": "read_file",
+            "path": "package.json"
+          }
+        ]
+      },
+      {
+        "turn": 2,
+        "content": "The inspected boundary shows a credential mismatch: production accepts `admin/secret123`, while the success test sends `admin/wrong-password`; I’m reproducing the failure to confirm that is the sole failing path.",
+        "tools": [
+          {
+            "name": "run_command"
+          }
+        ]
+      },
+      {
+        "turn": 3,
+        "content": "Reproduction exposed two independent test defects, not an auth implementation defect: the runner lacks imported `describe`/`it`, and the “logs in” case uses an explicitly invalid password. I’ll fix the test harness and valid-login fixture without weakening authentication.",
+        "tools": [
+          {
+            "name": "write_file",
+            "path": "test/auth.test.js"
+          }
+        ]
+      },
+      {
+        "turn": 4,
+        "content": "The tests now express both sides of the auth contract—valid credentials succeed and the original wrong password is rejected. Next I’m running the full configured suite.",
+        "tools": [
+          {
+            "name": "run_command"
+          }
+        ]
+      },
+      {
+        "turn": 5,
+        "content": "",
+        "tools": [
+          {
+            "name": "task_complete"
+          }
+        ]
+      }
+    ],
+    "checks": {
+      "tests pass": {
+        "pass": true,
+        "detail": "passed"
+      },
+      "wrong-password removed": {
+        "pass": false,
+        "detail": "fixed"
+      }
+    },
+    "fpFilesRead": [],
+    "totalTokens": 9889,
+    "passed": false,
+    "turnsUsed": 5,
+    "toolCount": 7
+  }
+]

@@ -153,6 +153,26 @@ FP 使用一个阻塞式首尾行发送门：如果读者只看第一行和最�
 
 行为变化通过 `evals/fp-response/` 中的跨平台评测框架比较：隔离的 baseline/candidate、盲评、负向控制、成本门和无回归发布条件。
 
+## 基准测试与优化
+
+我们构建了多特质基准测试套件（8 个特质 × 24 个场景），通过 720 次真实 LLM API 调用来测试能否通过迭代 prompt engineering 优化 FP。
+
+**诚实的结果：v0 baseline 赢了。** 所有"优化"版本由于 prompt 干扰效应，表现略差——向已经平衡的系统提示添加更多指令会降低整体性能。
+
+| 发现 | 证据 |
+|------|------|
+| Baseline 接近最优 | v0 加权分 3.05，高于所有 4 个修改版本 |
+| "少即是多"成立 | 添加 CRITICAL 修饰符导致无关特质上的负面迁移 |
+| Concise-Max 始终失败 | v2（牺牲安全换速度）在所有 trial 中得分最低 (d=0.40) |
+| 模拟 ≠ 现实 | 模拟预测 v7 以 4.73 胜出；真实评估显示 v0 以 3.05 胜出 |
+
+完整文章：[`benchmarks/results/ARTICLE.md`](benchmarks/results/ARTICLE.md)
+
+自行运行：
+```bash
+node benchmarks/real-eval-v2.mjs all --versions v0,v2,v6,v7,v8 --trials 3
+```
+
 ### 复用阶梯
 
 创建代码前，FP 会依次询问：

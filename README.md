@@ -153,6 +153,29 @@ FP now applies a blocking first-and-last-line gate: if a reader sees only those 
 
 Behavior changes are compared with the cross-platform harness in `evals/fp-response/`: isolated baseline/candidate runs, blind scoring, negative controls, cost gates, and no-regression release criteria.
 
+## Benchmarks & Optimization
+
+We ran 1,416 real LLM API calls across 3 models, 8 traits, and 24 scenarios to optimize FP through benchmark-driven iteration.
+
+**Cross-model finding:** v-final (77-line SKILL.md) wins on both reasoning models. v-minimal (3 rules) wins only on non-reasoning models. DeepSeek v4 Pro needs structure — v-minimal scored 2.46 with 7 blockers.
+
+| Model | Winner | v-final | v0 | v-minimal |
+|-------|--------|---------|-----|-----------|
+| gpt-5.3-codex-spark (non-reasoning) | v-minimal | — | 3.01 | **3.08** |
+| gpt-5.6-sol (reasoning) | v-final | **3.57** | 3.49 | 3.35 |
+| deepseek-v4-pro (reasoning) | v-final | **3.14** | 2.97 | 2.46 |
+
+**E2E multi-turn:** New SKILL.md uses 45% fewer tokens, loads 89% fewer FP template files, and triggers on-demand profiles correctly.
+
+**Templates:** Cut from 35 to 7 — dead templates were the #1 source of wasted token consumption.
+
+Read the full article: [`benchmarks/results/ARTICLE.md`](benchmarks/results/ARTICLE.md)
+
+Run the benchmark:
+```bash
+node benchmarks/real-eval-v2.mjs all --versions v0,v-final,v-minimal --trials 2 --model gpt-5.6-sol
+```
+
 ### The reuse ladder
 
 Before creating code, FP asks:

@@ -1,0 +1,95 @@
+[
+  {
+    "version": "v-final",
+    "name": "v-final 77-Line Optimized",
+    "n": 48,
+    "meanScore": 2.9791666666666674,
+    "stdScore": 1.1096103931499055,
+    "minScore": 1,
+    "maxScore": 5,
+    "totalBlockers": 2,
+    "traitMeans": {
+      "concision-safety-balance": 4.000000000000001,
+      "cross-session-continuation": 2.555555555555556,
+      "debug-first-discipline": 3.7777777777777772,
+      "evidence-led-verification": 3,
+      "live-system-operations": 2.5555555555555554,
+      "multi-agent-coordination": 2.277777777777778,
+      "provider-compatibility": 2.4444444444444446,
+      "route-classification-precision": 3.2222222222222228
+    },
+    "traitStds": {
+      "concision-safety-balance": 1.2995725793078619,
+      "cross-session-continuation": 1.4555131461166948,
+      "debug-first-discipline": 0.7503085784948502,
+      "evidence-led-verification": 1.3984117975602022,
+      "live-system-operations": 0.7200822998230955,
+      "multi-agent-coordination": 0.327730693416725,
+      "provider-compatibility": 0.5018484351393874,
+      "route-classification-precision": 0.9583937179043478
+    },
+    "weightedComposite": 3.1422222222222222
+  },
+  {
+    "version": "v0",
+    "name": "v0 Baseline",
+    "n": 48,
+    "meanScore": 2.8333333333333326,
+    "stdScore": 1.0980317658725764,
+    "minScore": 1,
+    "maxScore": 5,
+    "totalBlockers": 2,
+    "traitMeans": {
+      "concision-safety-balance": 3.1111111111111107,
+      "cross-session-continuation": 2.444444444444444,
+      "debug-first-discipline": 3.7777777777777772,
+      "evidence-led-verification": 3.1666666666666665,
+      "live-system-operations": 2.2222222222222223,
+      "multi-agent-coordination": 2.3333333333333335,
+      "provider-compatibility": 2.7222222222222228,
+      "route-classification-precision": 2.8888888888888893
+    },
+    "traitStds": {
+      "concision-safety-balance": 1.167460047694551,
+      "cross-session-continuation": 1.3109227736669,
+      "debug-first-discipline": 0.17213259316477417,
+      "evidence-led-verification": 1.224744871391589,
+      "live-system-operations": 0.7503085784948503,
+      "multi-agent-coordination": 0.699205898780101,
+      "provider-compatibility": 0.9981464302878091,
+      "route-classification-precision": 1.5587269259333494
+    },
+    "weightedComposite": 2.97
+  },
+  {
+    "version": "v-minimal",
+    "name": "v-minimal Less-Is-More",
+    "n": 48,
+    "meanScore": 2.3541666666666665,
+    "stdScore": 1.2211807834674464,
+    "minScore": 1,
+    "maxScore": 5,
+    "totalBlockers": 7,
+    "traitMeans": {
+      "concision-safety-balance": 3.1666666666666665,
+      "cross-session-continuation": 1.8333333333333333,
+      "debug-first-discipline": 2.888888888888889,
+      "evidence-led-verification": 3.055555555555556,
+      "live-system-operations": 1.9444444444444444,
+      "multi-agent-coordination": 1.9444444444444446,
+      "provider-compatibility": 2.3333333333333335,
+      "route-classification-precision": 1.6666666666666667
+    },
+    "traitStds": {
+      "concision-safety-balance": 2.0412414523193148,
+      "cross-session-continuation": 0.8096638534327412,
+      "debug-first-discipline": 0.9813067629253164,
+      "evidence-led-verification": 1.2895592126625917,
+      "live-system-operations": 0.9289579984923768,
+      "multi-agent-coordination": 0.9047201327032126,
+      "provider-compatibility": 0.966091783079296,
+      "route-classification-precision": 0.966091783079296
+    },
+    "weightedComposite": 2.4622222222222225
+  }
+]

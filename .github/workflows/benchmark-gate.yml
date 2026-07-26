@@ -1,0 +1,71 @@
+name: FP Benchmark Gate
+
+on:
+  pull_request:
+    paths:
+      - 'fp/SKILL.md'
+      - 'fp/templates/**'
+      - 'fp/skills/**'
+  push:
+    branches: [main]
+    paths:
+      - 'fp/SKILL.md'
+      - 'fp/templates/**'
+      - 'fp/skills/**'
+  workflow_dispatch:
+    inputs:
+      versions:
+        description: 'Versions to test (comma-separated)'
+        default: 'v0,v2'
+      trials:
+        description: 'Number of trials'
+        default: '2'
+
+jobs:
+  contract-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - run: node --test test/*.test.js
+      - run: node scripts/run-response-evals.mjs validate
+
+  benchmark-gate:
+    runs-on: ubuntu-latest
+    needs: contract-tests
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      
+      - name: Run benchmark (simulated — no API calls in CI)
+        run: |
+          node benchmarks/score-final.mjs 2>&1 | tee benchmarks/results/ci-result.txt
+      
+      - name: Check baseline regression
+        run: |
+          BASELINE=$(node -e "const d=require('./benchmarks/results/final-aggregate.json'); const v0=d.find(r=>r.versionId==='v0-baseline'); console.log(v0?.compositeScore||0)")
+          CANDIDATE=$(node -e "const d=require('./benchmarks/results/final-aggregate.json'); const last=d[d.length-1]; console.log(last?.compositeScore||0)")
+          echo "Baseline: $BASELINE"
+          echo "Latest: $CANDIDATE"
+          if [ "$(echo "$CANDIDATE < $BASELINE - 0.3" | bc)" -eq 1 ]; then
+            echo "❌ REGRESSION: Latest version is significantly below baseline"
+            exit 1
+          fi
+          echo "✅ Gate passed: no significant regression"
+
+  # Uncomment for real LLM eval (requires API key secret)
+  # real-eval-gate:
+  #   runs-on: ubuntu-latest
+  #   needs: contract-tests
+  #   if: github.event_name == 'workflow_dispatch'  # Manual only (costs $)
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-node@v4
+  #       with: { node-version: '20' }
+  #     - name: Run real blind eval
+  #       env:
+  #         FP_EVAL_API_KEY: ${{ secrets.FP_EVAL_API_KEY }}
+  #       run: |
+  #         node benchmarks/real-eval-v2.mjs all --versions ${{ inputs.versions }} --trials ${{ inputs.trials }}

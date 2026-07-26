@@ -1,0 +1,6 @@
+{
+  "name": "auth-test",
+  "scripts": {
+    "test": "node --test test/auth.test.js"
+  }
+}
