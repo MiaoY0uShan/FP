@@ -169,7 +169,7 @@ test('CLI main validates the frozen catalog', async () => {
 });
 test('candidate prompt injects the frozen contract while baseline remains unchanged', async () => {
   const api = await modulePromise;
-  const contract = path.join(root, 'fp', 'templates', 'actionable-response-contract.md');
+  const contract = path.join(root, 'fp', 'archive', 'templates', 'actionable-response-contract.md');
   assert.equal(api.conditionPrompt('task', 'baseline', null), 'task');
   const candidate = api.conditionPrompt('task', 'candidate', contract);
   assert.match(candidate, /First-And-Last-Line Gate/);
