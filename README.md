@@ -7,7 +7,7 @@
 <p align="center"><strong>Make coding agents finish with proof — not vibes.</strong></p>
 
 <p align="center">
-  A portable execution protocol for Codex, Claude Code, Gemini CLI, Pi, Cursor, Copilot, and other coding agents.
+  A portable execution protocol for coding agents. 77 lines. 3 core rules. On-demand profiles.
 </p>
 
 <p align="center">
@@ -19,285 +19,201 @@
 
 <p align="center">
   <a href="https://github.com/MiaoY0uShan/FP/releases/latest"><strong>Download</strong></a> ·
-  <a href="#30-second-tour">30-second tour</a> ·
-  <a href="INSTALL.md">Install guide</a> ·
-  <a href="README.zh-CN.md">中文</a>
+  <a href="#the-three-rules">3 Rules</a> ·
+  <a href="INSTALL.md">Install</a> ·
+  <a href="README.zh-CN.md">中文</a> ·
+  <a href="benchmarks/results/ARTICLE.md">Benchmarks</a>
 </p>
-
-> **The shareable version:** FP gives coding agents a risk-matched workflow: diagnose before patching, keep delegation bounded, rerun real checks, and refuse to call work done without evidence.
-
-FP activates automatically for engineering work and stays dormant for casual conversation. Small fixes stay small. Incidents restore service before refactoring. Unknown causes trigger diagnosis before edits.
-
-**No daemon. No database. No vendor lock-in.** Install the instructions, reload your agent, and work normally.
 
 ---
 
-## Why FP
+**No proof, no done.** FP activates automatically for engineering work and stays dormant for casual conversation. Three rules, on-demand profiles, zero ceremony creep.
 
-| Without FP | With FP |
-|---|---|
-| Prompt → patch → “looks fixed” | Route risk → bound scope → verify → verdict |
-| Guess at the cause and edit immediately | Find the first supported divergence before patching |
-| Spawn agents and trust their summaries | One writer, bounded tasks, fresh review, parent verification |
-| Run one happy-path test | Rerun the symptom, regression checks, and a negative control |
-| Install tools or MCPs when convenient | Show source, scope, permissions, rollback, then ask |
-| Turn one lucky result into a permanent rule | Promote patterns only after independent evidence |
+---
 
-The rule people remember:
+## The Three Rules
 
-> **No proof, no done.**
+**1. Diagnose before patching.** Gather evidence. Find root cause. Do not guess.
 
-## 30-second tour
+**2. Verify before claiming done.** Run the tests. See them pass. "Implemented" is not "done."
 
-You ask an agent:
+**3. Be concise and actionable.** First line = result. Last line = next step or verdict. No filler.
+
+For complex work, FP provides on-demand profiles: live systems, multi-agent coordination, provider compatibility, delegated execution, cross-session continuation, and more. They load only when the condition matches — not by default.
+
+> **Non-reasoning model?** Use [`fp-minimal/`](fp-minimal/SKILL.md) — just the three rules. No router, no profiles.
+
+---
+
+## Evidence-Based Design (v0.5.0)
+
+This version was optimized through **1,416 real LLM API calls** across 3 models, 8 traits, and 3 testing methods. Every design decision is backed by benchmark data.
+
+### Cross-Model Blind Eval
+
+| Model | 🥇 Winner | Score | 🥈 | Score | Key Insight |
+|-------|----------|-------|------|-------|-------------|
+| gpt-5.3-codex-spark (non-reasoning) | v-minimal | **3.08** | v0 | 3.01 | Weak models need simple instructions |
+| gpt-5.6-sol (reasoning) | v-final | **3.57** | v0 | 3.49 | Reasoning models leverage structure |
+| deepseek-v4-pro (reasoning) | v-final | **3.14** | v0 | 2.97 | DeepSeek needs structure even more (v-minimal: 2.46, 7 blockers) |
+
+**v-final (77 lines) wins on both reasoning models. v-minimal (3 rules) wins on non-reasoning models. v2 Concise-Max (sacrificing safety for speed) is always worst.**
+
+### E2E Multi-Turn (with real tools)
+
+| Metric | Old (162 lines) | New (77 lines) | Improvement |
+|--------|----------------|---------------|-------------|
+| Token consumption | 19,620 | 10,665 | **-45%** |
+| Tool calls | 14 | 6 | -57% |
+| FP template files read | 9 (3 wasted) | 1 (0 wasted) | **-89%** |
+| Profile loading | Random | On-demand ✅ | — |
+
+### Templates: 35 → 7
+
+28 templates were never referenced by any on-demand profile. They were dead weight — archive, not delete. The multi-turn test proved agents wasted tokens reading them by default.
+
+### Simulation vs. Reality
+
+Our simulation predicted v7 Adaptive-Plus would win at 4.73. Real blind eval showed the opposite — all "optimized" versions performed worse than baseline due to **prompt interference**: adding instructions to an already-balanced system prompt degrades performance. The simulation couldn't model this because it treated each instruction as an independent linear contributor.
+
+Full methodology: [`benchmarks/results/ARTICLE.md`](benchmarks/results/ARTICLE.md)
+
+---
+
+## Quick Start
 
 ```text
 Fix the intermittent authentication test.
 ```
 
-A typical agent may increase a timeout, run the test once, and say “fixed.”
+Without FP: increase timeout → run once → "looks fixed."
 
-FP changes the workflow:
+With FP: reproduce → find first divergence → bounded fix → rerun original + regression + negative control → verdict with evidence.
 
-<p align="center">
-  <img src="docs/assets/fp-demo.gif" alt="FP workflow demo: diagnose, bound, fix, verify, and finish with proof" width="100%">
-</p>
+### Install
 
-```text
-1. Reproduce the original failure.
-2. Find the first point where expected and actual behavior diverge.
-3. Make the smallest change that addresses that cause.
-4. Rerun the original failure.
-5. Run adjacent regression checks.
-6. Run a negative control to guard against over-fixing.
-7. Report one verdict with observed evidence.
+1. Download [`fp-universal-v0.5.0.zip`](https://github.com/MiaoY0uShan/FP/releases/tag/v0.5.0)
+2. Extract and run the installer
+3. Reload your agent — FP activates automatically
+
+```powershell
+.\INSTALL-FP.cmd -Verify   # Windows
+sh ./INSTALL-FP.sh --verify  # macOS / Linux
 ```
 
-For a small task, FP may produce only a few lines. For a risky change, it freezes scope, authority, rollback, and acceptance evidence before execution.
+Explicit invocations: `FP: fix the bug` or `$fp diagnose the failure`
 
-## What you get
+[Full install matrix](INSTALL.md) · [Copy-paste fallback](fp-copy-paste.md)
+
+---
+
+## Protocol
+
+| Route | Trigger | Behavior |
+|-------|---------|----------|
+| **Small** | One file, ≤5 lines, cause known, no new interface | Tiny Brief + verify |
+| **Medium** | Multi-file, >5 lines, or added tests | Execution Brief + evidence |
+| **Vague** | Requirements underspecified | Idea Cards → user picks → Medium |
+| **Large** | Architectural, multi-module, migration | Decompose → risk-reducing modules |
+
+Small is NOT the default. Multi-file = Medium minimum.
+
+### On-Demand Profiles
+
+| Condition | Profile |
+|-----------|---------|
+| Retry/loop/encoding suspect | `provider-compatibility/SKILL.md` |
+| Multi-agent, parallel writers | `templates/multi-agent-review-protocol.md` |
+| Remote/stateful target | `skills/live-system/SKILL.md` |
+| Unknown failure, diagnosis only | `skills/debug-incident/SKILL.md` |
+| Cross-session continuation | `skills/continuation/SKILL.md` |
+| Delegated execution | `delegated-execution/SKILL.md` |
+| Vague/risky/large requirements | `question-requirements/SKILL.md` |
+
+Profiles load **only when the condition matches** — never by default. This was the #1 source of wasted tokens in the old version.
+
+---
+
+## Reuse Ladder
+
+Before creating anything: does it need to exist? → already in codebase? → standard library? → native platform? → installed dependency? → one line? → only then add minimum new code.
+
+---
+
+## What You Get
 
 | Capability | What it prevents |
 |---|---|
-| **Risk-matched routing** | Turning every one-line fix into ceremony — or treating an incident like a one-line fix |
+| **Risk-matched routing** | Turning one-line fixes into ceremony — or treating incidents like one-line fixes |
 | **Debug before patch** | Speculative edits that hide the real cause |
-| **Reuse before creation** | Agent-generated abstractions, dependencies, and files that did not need to exist |
-| **Bounded delegation** | Runaway subagents, overlapping writers, and “the child said it passed” |
-| **Evidence Ledger** | Completion claims that cannot be independently checked |
-| **Provider/spend guards** | Retry multiplication, semantic loops, silent model remapping, and misleading usage totals |
-| **MCP acquisition gate** | Surprise installs, credentials, background services, or permissions |
-| **Evidence-gated learning** | Overfitting one task and silently rewriting future behavior |
+| **Reuse before creation** | Unnecessary abstractions, dependencies, files |
+| **Bounded delegation** | Runaway subagents, overlapping writers |
+| **On-demand profiles** | Token waste from loading specialized knowledge for simple tasks |
+| **First-and-last-line gate** | Responses where you can't tell what happened or what's next |
 
-## Works where you work
+---
 
-FP ships dedicated release packs or portable instruction adapters for:
+## Works Where You Work
 
-**Codex · Claude Code · Gemini CLI · Pi · GitHub Copilot CLI · Cursor · Windsurf · Cline · Roo Code · OpenCode · Kiro · Aider · GitHub Copilot Editor · and more**
+**Codex · Claude Code · Gemini CLI · Pi · GitHub Copilot · Cursor · Windsurf · Cline · Roo Code · OpenCode · Kiro · Aider · and more**
 
-All adapters delegate to one canonical router. You do not maintain a different methodology for every agent.
+One canonical router. No per-agent methodology.
 
-## Install in about a minute
+---
 
-1. Open the [latest release](https://github.com/MiaoY0uShan/FP/releases/latest).
-2. Download the asset whose name starts with `fp-universal-v`.
-3. Extract it into your project root.
-4. Run the installer and its read-only verification.
+## Run the Benchmarks
 
-### Windows
-
-```powershell
-.\INSTALL-FP.cmd
-.\INSTALL-FP.cmd -Verify
-```
-
-### macOS / Linux
-
-```sh
-sh ./INSTALL-FP.sh
-sh ./INSTALL-FP.sh --verify
-```
-
-Reload your agent. No special command is required: FP activates automatically when the goal is engineering work.
-
-Optional explicit invocations still work:
-
-```text
-FP: Fix the password reset bug and prove it with the original failing check.
-$fp Diagnose the flaky test without editing until the cause is supported.
-```
-
-[Full install matrix](INSTALL.md) · [Migration from ZeroToHero or Xskill](MIGRATION.md) · [Copy-paste fallback](fp-copy-paste.md)
-
-## The protocol
-
-FP compresses work into four routes and layers specialist profiles only when needed:
-
-| Route | Use it for | Behavior |
-|---|---|---|
-| **Urgent / High-Stakes** | Incidents, security events, protocol changes | Confirm boundaries, preserve access, restore before repairing |
-| **Read-Only Diagnosis** | Unknown failures and proactive audits | Hypothesis → discriminating probe → supported cause → authorized fix |
-| **Build** | Clear, vague, medium, or large implementation | Scale planning weight to risk; delete scope before adding code |
-| **Close** | Every task | Match evidence to acceptance, emit one verdict, stop |
-
-Profiles cover live systems, multi-agent work, provider compatibility, external context, continuation, memory graphs, codebase analysis, and background learning.
-
-## Responses that survive a skim
-
-FP now applies a blocking first-and-last-line gate: if a reader sees only those two lines, they must know both what just happened and what happens next. Otherwise the response is rewritten.
-
-- Put the answer/result and next agent-owned action in the first line; move context later and omit filler.
-- Restate active multi-step state every turn: `Step 3 of 5 complete: schema updated. Next: run the backfill script.`
-- Report errors without theater: location, symptom, cause or `unknown`, fix/probe, and verification. Never expose a real bearer token.
-- Let explanation requests expand as far as needed; ask one clarification for real ambiguity; rank 2-4 options with the recommendation first.
-- Give concrete conditional estimates when useful: about 15 minutes if tests already cover the change, about half a day if coverage must be added.
-
-Behavior changes are compared with the cross-platform harness in `evals/fp-response/`: isolated baseline/candidate runs, blind scoring, negative controls, cost gates, and no-regression release criteria.
-
-## Benchmarks & Optimization
-
-We ran 1,416 real LLM API calls across 3 models, 8 traits, and 24 scenarios to optimize FP through benchmark-driven iteration.
-
-**Cross-model finding:** v-final (77-line SKILL.md) wins on both reasoning models. v-minimal (3 rules) wins only on non-reasoning models. DeepSeek v4 Pro needs structure — v-minimal scored 2.46 with 7 blockers.
-
-| Model | Winner | v-final | v0 | v-minimal |
-|-------|--------|---------|-----|-----------|
-| gpt-5.3-codex-spark (non-reasoning) | v-minimal | — | 3.01 | **3.08** |
-| gpt-5.6-sol (reasoning) | v-final | **3.57** | 3.49 | 3.35 |
-| deepseek-v4-pro (reasoning) | v-final | **3.14** | 2.97 | 2.46 |
-
-**E2E multi-turn:** New SKILL.md uses 45% fewer tokens, loads 89% fewer FP template files, and triggers on-demand profiles correctly.
-
-**Templates:** Cut from 35 to 7 — dead templates were the #1 source of wasted token consumption.
-
-Read the full article: [`benchmarks/results/ARTICLE.md`](benchmarks/results/ARTICLE.md)
-
-Run the benchmark:
 ```bash
+# Full blind eval (requires API keys in env)
 node benchmarks/real-eval-v2.mjs all --versions v0,v-final,v-minimal --trials 2 --model gpt-5.6-sol
+
+# Simulation only (no API calls)
+node benchmarks/score-final.mjs
+
+# Multi-turn with real tools
+node benchmarks/multi-turn-harness-v2.mjs --versions v0,v-final
+
+# E2E comparison
+node benchmarks/e2e-test.mjs
 ```
 
-### The reuse ladder
+Set `FP_API_KEY` and `DEEPSEEK_API_KEY` environment variables before running real evals.
 
-Before creating code, FP asks:
-
-```text
-Does this need to exist?
-→ already in the codebase?
-→ standard library?
-→ native platform feature?
-→ installed dependency?
-→ one clear line?
-→ only then add the minimum new code
-```
-
-## Distributed, not chaotic
-
-The parent agent owns integration and the final claim. Delegated work gets a frozen envelope: goal, scope, allowed resources, forbidden actions, budget, and required evidence.
-
-```text
-fresh implementer
-→ fresh reviewer
-→ bounded fixer when needed
-→ re-review
-→ final integration review
-→ parent reruns critical checks
-```
-
-Parallelism is for work that is actually independent. Shared files keep one active writer.
-
-## Context and graphs without lock-in
-
-FP can use code-review-graph MCP for blast-radius analysis, affected flows, architecture, and test gaps. When the MCP is unavailable, the protocol falls back to local repository search and explicit impact maps.
-
-FP's own reusable knowledge uses plain Markdown, YAML frontmatter, `[[wikilink]]` edges, and zero-dependency Node.js scripts. No database is required.
-
-## Learn without memorizing the accident
-
-One successful run is an observation, not a law.
-
-```text
-observation
-→ bounded candidate
-→ independent cases
-→ negative control
-→ shadow use
-→ authorized promotion
-→ rollback if it transfers badly
-```
-
-This keeps useful learning while resisting overfitting, self-confirmation, and silent rule drift.
-
-## Trust model
-
-- FP does not expand filesystem, credential, deployment, messaging, or live-system authority.
-- Missing tools are not installed without explicit approval.
-- Another agent's summary is not completion evidence.
-- A healthy process, HTTP 200, or passing happy path is not automatically proof of function.
-- Secrets must be redacted from logs, handoffs, examples, and final answers.
-- Release assets are checksummed and validated through install, verify, and uninstall lifecycles.
+---
 
 ## FAQ
 
-### Does every task become a ceremony?
+**Does every task become ceremony?** No. Small tasks get a Tiny Brief. Profiles load on-demand — a simple bug fix loads zero FP templates.
 
-No. FP deliberately keeps small work small and adds process only when risk or ambiguity requires it.
+**Non-reasoning models?** Use `fp-minimal/SKILL.md`. Three rules. The benchmark data shows this outperforms the full protocol on weaker models.
 
-### Is FP another coding agent?
+**Why 77 lines?** Because 162 lines caused the agent to waste 45% of its tokens reading FP's own templates. The benchmark data showed exactly which parts added value and which didn't.
 
-No. FP is a portable execution protocol installed into the agent you already use.
+**Can a subagent declare done?** No. Parent owns integration and reruns critical checks.
 
-### Does FP require a specific model or provider?
+**Is this autonomous self-modifying AI?** No. Reusable changes require independent evidence, bounded evaluation, and rollback.
 
-No. It is model- and host-agnostic. Provider-specific behavior is handled through compatibility and spend guards.
+---
 
-### Can a subagent declare the whole task complete?
+## Trust Model
 
-No. The parent owns integration and reruns critical checks before claiming completion.
+- Secrets must be redacted from all output. Use `<REDACTED>`.
+- Destructive operations need explicit boundaries and confirmation.
+- Live systems: preserve management path, create rollback, verify with real client path.
+- API keys stored in OS credential store, never in plaintext config.
 
-### Does FP automatically install missing MCP servers?
-
-No. It uses an already available task-required MCP automatically, but a missing dependency gets an acquisition brief and requires approval.
-
-### Is this autonomous self-modifying AI?
-
-No. Reusable changes require independent evidence, bounded evaluation, declared promotion authority, shadow observations, and rollback.
-
-## If this resonates
-
-If you have ever watched an agent confidently say “done” before proving anything:
-
-1. **Star the repository** so you can find it again.
-2. Share this line with your team: **“No proof, no done.”**
-3. Open an issue describing the failure mode FP should handle next.
-
-Suggested share text:
-
-> FP is a portable protocol for coding agents: diagnose before patching, bound subagents, verify real outcomes, and finish with proof — not vibes.
+---
 
 ## Develop
 
-Canonical source lives in `fp/`; generated host packs live in `install/`. Never hand-edit generated packs.
-
-```text
-node scripts/lint-fp.js
-node scripts/lint-release.js
-node scripts/lint-contracts.js --ledger fp/examples/password-reset.evidence-ledger.json --brief fp/examples/password-reset.compiled-execution-brief.json
-node --test
-powershell -NoProfile -File scripts/sync-install-packs.ps1 -Check
+```bash
+node --test test/*.test.js                           # Contract tests
+node scripts/run-response-evals.mjs validate         # Eval validation
+node benchmarks/score-final.mjs                      # Simulated benchmark
 ```
-
-## Influences
-
-FP is an original implementation sharpened by studying [Superpowers](https://github.com/obra/superpowers), [Hermes Agent](https://github.com/NousResearch/hermes-agent), [Ponytail](https://github.com/DietrichGebert/ponytail), [Context7](https://github.com/upstash/context7), [Grill Me](https://github.com/mattpocock/skills/tree/main/skills/productivity/grill-me), [code-review-graph](https://github.com/tirth8205/code-review-graph), and [i-have-adhd](https://github.com/ayghri/i-have-adhd).
-
-Exact revisions, adopted behaviors, and exclusions are documented in [upstream influences](docs/upstream-influences.md). License provenance is in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
-
-Formerly Xskill. See [MIGRATION.md](MIGRATION.md).
 
 ---
 
 **Languages:** [English](README.md) · [中文](README.zh-CN.md)
 
-## License
-
-MIT. Use it, inspect it, improve it, and keep the notice.
+**License:** MIT
