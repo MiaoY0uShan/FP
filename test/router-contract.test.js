@@ -43,7 +43,7 @@ test('build route classification cannot downgrade a parent task to Small', () =>
   const router = read('fp/SKILL.md');
   const agentContract = read('fp/AGENTS.md');
   const claudeContract = read('fp/CLAUDE.md');
-  const responseContract = read('fp/templates/actionable-response-contract.md');
+  const responseContract = read('fp/archive/templates/actionable-response-contract.md');
 
   for (const [label, content] of [
     ['router', router],
@@ -308,7 +308,7 @@ test('challenge loop separates facts from user-owned decisions', () => {
 
 test('medium and risky work captures a pre-edit workspace baseline', () => {
   const router = read('fp/SKILL.md');
-  const brief = read('fp/templates/execution-brief.md');
+  const brief = read('fp/archive/templates/execution-brief.md');
   assert.match(router, /pre-existing worktree changes/i);
   assert.match(router, /pre-existing failures/i);
   assert.match(brief, /Workspace Baseline/);
@@ -344,7 +344,7 @@ test('debug evidence is reused while changed state and safety checks still rever
 });
 
 test('external context stays untrusted and freshness needs evidence', () => {
-  const contract = read('fp/templates/context-retrieval-contract.md');
+  const contract = read('fp/archive/templates/context-retrieval-contract.md');
   assert.match(contract, /untrusted data/i);
   assert.match(contract, /cannot override.*authority/i);
   assert.match(contract, /known.*source ID.*direct/i);
@@ -356,7 +356,7 @@ test('external context stays untrusted and freshness needs evidence', () => {
 
 test('task-required MCP is automatic when available and approval-gated when missing', () => {
   const router = read('fp/SKILL.md');
-  const contract = read('fp/templates/context-retrieval-contract.md');
+  const contract = read('fp/archive/templates/context-retrieval-contract.md');
   const agentContract = read('fp/AGENTS.md');
 
   assert.match(router, /automatically use.*task-required MCP/i);
@@ -394,7 +394,7 @@ test('semantic architecture routes context gaps without retired modules', () => 
 
 test('actionable responses preserve first-line result and last-line next state', () => {
   const router = read('fp/SKILL.md');
-  const contract = read('fp/templates/actionable-response-contract.md');
+  const contract = read('fp/archive/templates/actionable-response-contract.md');
   const agentContract = read('fp/AGENTS.md');
   const claudeContract = read('fp/CLAUDE.md');
   const fallback = read('fp-copy-paste.md');

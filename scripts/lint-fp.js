@@ -132,7 +132,7 @@ function main() {
   ], failures);
   requireText('fp/generalization-gate/SKILL.md', ['leave-one-case-out', 'near-neighbor negative control', 'candidate agent and evaluator must be different', 'shadow', 'does not train model weights'], failures);
   requireText('fp/templates/multi-agent-review-protocol.md', ['idempotency_key', 'task_input_index', 'parent cancellation', 'dependency cycles'], failures);
-  requireText('fp/templates/actionable-response-contract.md', ['First-And-Last-Line Gate', 'what just happened', 'what happens next', 'otherwise rewrite', 'agent ownership', '2–4 ranked options', 'one short blocking clarification'], failures);
+  requireText('fp/archive/templates/actionable-response-contract.md', ['First-And-Last-Line Gate', 'what just happened', 'what happens next', 'otherwise rewrite', 'agent ownership', '2–4 ranked options', 'one short blocking clarification'], failures);
   requireText('evals/fp-response/rubric.md', ['Authority and safety', 'Evidence fidelity', 'first and last lines', 'Release Gate'], failures);
   requireText('evals/fp-response/README.md', ['shell: false', 'blind', 'same pinned runner', 'negative'], failures);
   requireText('THIRD_PARTY_NOTICES.md', ['superpowers', 'hermes-agent', 'ponytail', 'context7', 'mattpocock/skills', 'code-review-graph', 'i-have-adhd'], failures);
