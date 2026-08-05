@@ -4,7 +4,7 @@
 
 <h1 align="center">FP — Finish with Proof</h1>
 
-<p align="center"><strong>85 lines. 4 rules. Your agent stops guessing and starts proving.</strong></p>
+<p align="center"><strong>4 rules. Development discipline. Your agent stops guessing and starts proving.</strong></p>
 
 <p align="center">
   <a href="https://github.com/MiaoY0uShan/FP/stargazers"><img src="https://img.shields.io/github/stars/MiaoY0uShan/FP?style=social" alt="GitHub stars"></a>
@@ -154,19 +154,13 @@ Profiles load **only when triggered**. A simple bug fix loads zero extra files. 
 
 ---
 
-## Reuse Ladder
-
-Before writing new code: Does it need to exist? → Already in the codebase? → Standard library? → Platform native? → Installed dependency? → One-liner? → Only then: minimum new code.
-
----
-
 ## FAQ
 
 **Does every task become ceremony?** No. Small tasks get a tiny brief — one sentence of context, then fix and verify. Profiles are on-demand. A simple bug fix reads zero FP templates.
 
 **Non-reasoning models?** Use [`fp-minimal/`](fp-minimal/SKILL.md) — just the four rules, no router. Benchmark-proven to outperform the full protocol on weaker models.
 
-**Why exactly 85 lines?** Because we tried 77, 85, 86, and 89. The data showed that 85 is the ceiling — adding even one sentence triggers measurable prompt interference. Everything above 85 lines lives in on-demand modules.
+**Why did the core grow past 85 lines?** The v0.5.0 benchmark proved 85 lines was optimal for the four core rules + router. v0.5.2 adds development discipline (research-first, module boundaries, doc sync, pre-commit cleanup) directly into the core — a user-driven decision to prioritize always-on discipline over the benchmark-proven line ceiling.
 
 **Can a subagent declare done?** No. Parent owns integration and reruns critical checks.
 

@@ -1,6 +1,6 @@
 {
   "name": "fp",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "contextFileName": "GEMINI.md",
   "description": "FP router, Idea Cards, and execution brief discipline for Gemini CLI."
 }

@@ -32,7 +32,7 @@ Before following any FP procedure: host built-in → host configuration (hooks, 
 
 ## Skill Interop
 
-FP coordinates; it never duplicates a specialist. An installed skill is an existing capability on the reuse ladder: route matching work to the most specific skill and keep FP's gates binding on its output — goal lock, verify before done, Safety. Overlapping candidates → most specific wins; a genuine tie is a user decision. A specialist's "done" still verifies against the user's stated goal.
+FP coordinates; it never duplicates a specialist. Route matching work to the most specific skill and keep FP's gates binding on its output — goal lock, verify before done, Safety. Overlapping candidates → most specific wins; a genuine tie is a user decision. A specialist's "done" still verifies against the user's stated goal.
 
 ## Routing (Light)
 
@@ -46,10 +46,6 @@ Classify the whole task before decomposing. Route order is not a fallback.
 | **Large** | Architectural, multi-module, breaking, migration-heavy | Decompose into risk-reducing modules |
 
 Small is NOT the default. If ANY Small predicate is false → route up. Multi-file = Medium minimum.
-
-## Reuse Ladder
-
-Before creating anything: does it need to exist? → already in codebase? → standard library? → native platform? → installed dependency? → one line? → only then add minimum new code.
 
 ## Safety
 

@@ -50,14 +50,6 @@ test('router v0.5.0 has safety rules', () => {
   assert.match(router, /create rollback/);
 });
 
-test('router v0.5.0 has reuse ladder', () => {
-  const router = read('fp/SKILL.md');
-  assert.match(router, /Reuse Ladder/);
-  assert.match(router, /does it need to exist/);
-  assert.match(router, /already in codebase/);
-  assert.match(router, /standard library/);
-});
-
 test('router v0.5.0 has response contract', () => {
   const router = read('fp/SKILL.md');
   assert.match(router, /First-and-last-line gate/);
@@ -141,4 +133,16 @@ test('goal lock binds modules to the stated goal', () => {
   const lesson = read('fp/lessons-learned/L005-goal-substitution-under-difficulty.md');
   assert.match(lesson, /## Status\r?\n\r?\nobservation/);
   assert.match(lesson, /never substitute|silent substitution/i);
+});
+
+test('router has development discipline sections in Chinese', () => {
+  const router = read('fp/SKILL.md');
+  assert.match(router, /底层开发思维/);
+  assert.match(router, /杜绝闭门造车/);
+  assert.match(router, /模块边界/);
+  assert.match(router, /拆分是新功能开发前的设计动作/);
+  assert.match(router, /文档同步/);
+  assert.match(router, /文档同步属于开发收尾的一部分/);
+  assert.match(router, /临时残留代码清理/);
+  assert.match(router, /Agent（代理程序）应自行清理/);
 });

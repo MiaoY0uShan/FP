@@ -42,10 +42,6 @@ Classify every task before decomposing:
 
 Small is NOT the default. Multi-file = Medium minimum.
 
-## Reuse Ladder
-
-Before creating anything: need exist? → codebase? → stdlib? → native platform? → installed dep? → one line? → minimum new code.
-
 ## Skill Interop
 
 Coordinate, don't duplicate: when a more specific skill or tool covers the task, use it and keep FP's gates (goal lock, verify before done, safety) binding on its output.

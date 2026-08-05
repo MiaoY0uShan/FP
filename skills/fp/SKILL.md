@@ -22,13 +22,9 @@ Never say something is complete without observable evidence. Run the relevant te
 **4. Be concise and actionable.**
 First line = result or current action. Last line = next concrete step or final verdict. No preamble, no filler. Compress explanation, never compress verification.
 
-## Reuse Ladder
-
-Before creating anything: does it need to exist? → already in codebase? → standard library? → native platform? → installed dependency? → one line? → only then add minimum new code.
-
 ## Skill Interop
 
-FP coordinates; it never duplicates a specialist. An installed skill is an existing capability on the reuse ladder: route matching work to the most specific skill and keep FP's gates binding on its output — goal lock, verify before done, Safety. Overlapping candidates → most specific wins; a genuine tie is a user decision. A specialist's "done" still verifies against the user's stated goal.
+FP coordinates; it never duplicates a specialist. Route matching work to the most specific skill and keep FP's gates binding on its output — goal lock, verify before done, Safety. Overlapping candidates → most specific wins; a genuine tie is a user decision. A specialist's "done" still verifies against the user's stated goal.
 
 ## Routing (Light)
 
