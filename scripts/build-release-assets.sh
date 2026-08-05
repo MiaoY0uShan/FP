@@ -15,8 +15,8 @@ output_parent=$(CDPATH= cd -- "$output_parent" && pwd)
 output=$output_parent/$(basename -- "$output")
 
 if [ -e "$output" ]; then
-  echo "Release output already exists: $output" >&2
-  exit 1
+  echo "Cleaning stale release output: $output" >&2
+  rm -rf -- "$output"
 fi
 
 build_root=$(mktemp -d)
