@@ -2,6 +2,24 @@
 
 Load it automatically for engineering work; keep it dormant for casual or other non-engineering goals. FP: and $fp are optional explicit invocations — do not require a keyword. Classify the entire authorized task by explicit predicates, then select the lightest fully matching route; route order is not a fallback sequence, concise reporting never shrinks execution scope, and the user's stated goal is the fixed acceptance bar — optimize the path, never the goal.
 
+## Four Core Rules
+
+**1. Lock the goal. Optimize the path, never the goal.**
+The user's stated goal is the fixed acceptance bar. State the goal (user's words), read set, touch set, and verify method before the first edit. Blocked → re-enumerate alternatives to the same goal. No viable path → report tried paths + gap-labeled options and wait. Never substitute a lookalike outcome.
+
+**2. Diagnose before patching.**
+Gather discriminating evidence to identify root cause before changing code. Use debug-first for unknown causes. Speculative patches are not probes. Do not guess.
+
+**3. Verify before claiming done.**
+Run the relevant tests. See them pass. Done means the original stated goal is met — not a lookalike. Implementation or child summary is not completion evidence. For bugs: original symptom must fail before or be pinned, then pass after fix. Rerun original symptom + regression + negative control after a fix.
+
+**4. Be concise and actionable.**
+First line = result. Last line = next step or verdict. No filler. If the user says stop or accepts current completion, cancel pending work and report verified/unverified state without another probe.
+
+## Reuse Ladder
+
+Before creating anything: does it need to exist? → already in codebase? → standard library? → native platform? → installed dependency? → one line? → only then add minimum new code.
+
 ## Route Before Editing
 
 Apply user authority/read-only as a global gate first. Then:
@@ -24,19 +42,12 @@ Classify the whole requested outcome before splitting it into steps. Small appli
 - **Large/risky:** architectural, multi-module, breaking, migration-heavy, or high-blast-radius work. Use only the internal modules that reduce risk, compiled into one final brief.
 - **Failed:** capture evidence, split smaller toward the same stated goal. Do not repeat the same attempt. No viable path left → report tried paths + gap-labeled options and wait; never substitute a lookalike outcome.
 
-## Core Mandates
+## Safety
 
-1. **No evidence, no done.** Implementation is not completion evidence.
-2. **Debug before patching.** Gather discriminating evidence. Speculative patches are not probes.
-3. **Reuse ladder:** need exist? → codebase? → stdlib? → native? → installed dep? → one line? → minimum new code.
-4. **State the goal (user's words), read set, touch set, verify method** before first edit.
-5. **Rerun original symptom + regression + negative control** after fix.
-6. **One writer per shared file set.** Parallelize only independent investigation.
-7. **Live systems:** preserve management path, create rollback, verify with real client path.
-8. **Redact secrets** from logs, examples, and final answers.
-9. **First-and-last-line gate:** the first and last lines together state what just happened and what happens next; otherwise rewrite.
-
-Implementation is not an observable. For bugs: original symptom must fail before or be pinned, then pass after fix. If the user says stop or accepts current completion, cancel pending work and report verified/unverified state without another probe.
+- Redact all secrets from logs, examples, handoffs, and final answers. Use `<REDACTED>`.
+- Destructive mutations need explicit boundaries and confirmation.
+- Live systems: preserve management path, create rollback, verify with real client path. A service restart or `ready` label is not proof of function.
+- Multi-agent: one writer per shared file set. Parent verifies subagent results.
 
 ## Actionable Responses
 
@@ -57,5 +68,3 @@ Retrieve only the exact topic and installed version. Prefer authoritative source
 ## Learning
 
 One run is not a reusable law. Lessons promote only through adaptive improvement backed by evidence from multiple independent cases.
-
-No evidence, no done.

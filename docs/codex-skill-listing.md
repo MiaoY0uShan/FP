@@ -32,7 +32,7 @@ cp -r FP/install/codex/.agents/skills/fp ~/.agents/skills/fp
 cp -r FP/install/codex/.agents your-project/
 ```
 
-Or from release zip: `fp-codex-v0.5.0.zip`
+Or from release zip: `fp-codex-v0.5.1.zip`
 
 ## Quick Start
 

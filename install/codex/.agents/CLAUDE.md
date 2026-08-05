@@ -4,6 +4,24 @@ FP activates automatically when the user's goal is engineering work: build, chan
 
 The FP skill must be loaded via the Skill tool for its full router and templates. This CLAUDE.md is a lightweight reference for environments where the skill bundle is not installed or cannot be loaded.
 
+## Four Core Rules
+
+**1. Lock the goal. Optimize the path, never the goal.**
+The user's stated goal is the fixed acceptance bar. State the goal (user's words), read set, touch set, and verify method before the first edit. Blocked → re-enumerate alternatives to the same goal. No viable path → report tried paths + gap-labeled options and wait. Never substitute a lookalike outcome.
+
+**2. Diagnose before patching.**
+Gather discriminating evidence to identify root cause before changing code. Use debug-first for unknown causes. Speculative patches are not probes. Do not guess.
+
+**3. Verify before claiming done.**
+Run the relevant tests. See them pass. Done means the original stated goal is met — not a lookalike. Implementation or child summary is not completion evidence. Rerun original symptom + regression + negative control after a fix. Reuse supported evidence only when another probe changes a named decision or fills a named acceptance row; otherwise stop.
+
+**4. Be concise and actionable.**
+First line = result. Last line = next step or verdict. No filler. After declared checks pass, emit one verdict. A user stop cancels pending work and is reported without another probe.
+
+## Reuse Ladder
+
+Before creating anything: does it need to exist? → already in codebase? → standard library? → native platform? → installed dependency? → one line? → only then add minimum new code.
+
 ## Route Before Editing
 
 Apply user authority and read-only limits as a global gate first. Then:
@@ -35,25 +53,14 @@ After multiple fixes across a target or fleet:
 3. For cross-target work, verify each dependency edge from the consumer side.
 4. Produce a single `repair-verdict` block. Missing items stay as open, not silent.
 
-## Core Rules
+## Safety
 
-1. **No evidence, no done.** Implementation or child summary is not completion evidence.
-2. **Debug before patching.** Gather discriminating evidence before changing code. Speculative patches are not probes.
-3. **Reuse before creation:** need to exist? → already in codebase? → stdlib? → native platform? → installed dep? → one line? → only then add minimum new code.
-4. **State the goal (user's words), read set, touch set, verify method** before the first edit.
-5. **Rerun original symptom + regression + negative control** after a fix.
-6. **One active writer per shared file set.** Ordinary parallelism is for independent investigation or review. Writing children require delegated execution, and a later fresh fixer receives paths only after a serial lease handoff.
-7. **Live systems**: preserve management path, create rollback point, inspect desired/generated/effective state, verify with real client path. A service restart or `ready` label is not proof of function.
-8. **Redact secrets** from logs, examples, handoffs, and final answers.
-9. **Reuse supported evidence**: another diagnostic probe must change a named decision or fill a named acceptance row; otherwise stop. Relevant mutations and declared safety checks still require fresh evidence.
-10. **Stop means stop**: after declared checks pass, emit one verdict. A user stop cancels pending work and is reported without another probe.
-11. **Use required MCPs safely**: call an already-available task-required MCP automatically within current authority. If missing, show exact source/version/scope/permissions/rollback and obtain explicit approval before download or installation.
-12. **Graph-Aware Memory Updates:** When updating a schema card or promoted lesson, run `node fp/contracts/memory-graph.js blast-radius <nodeId>` to check the blast-radius set (cards that reference the updated card via `related-schemas` or `[[wikilink]]`). For hub cards (in_degree >= 3), confirm the update is safe before finalizing. The memory graph is a zero-dependency script — no install required.
-13. **First-and-last-line gate:** for user-facing engineering responses, the first and last lines together must reveal both what just happened and what happens next; otherwise rewrite. Load `fp/archive/templates/actionable-response-contract.md` for the full rules.
-
-After a timeout or transport failure following a possible remote mutation, do not replay the write. Perform one bounded read-only reconciliation and classify `applied | not_applied | split | unknown` first.
-
-MCP availability never expands write, credential, deployment, messaging, or live-system authority. Installation approval does not imply login, secret disclosure, configuration changes, restarts, or a resident service; ask separately unless the current task already authorizes the exact action.
+- Redact all secrets from logs, examples, handoffs, and final answers. Use `<REDACTED>`.
+- Destructive mutations need explicit boundaries and confirmation.
+- Live systems: preserve management path, create rollback point, inspect desired/generated/effective state, verify with real client path. A service restart or `ready` label is not proof of function.
+- Multi-agent: one writer per shared file set. Parent verifies subagent results.
+- Use required MCPs safely: call an already-available task-required MCP automatically within current authority. If missing, show exact source/version/scope/permissions/rollback and obtain explicit approval before download or installation. MCP availability never expands write, credential, deployment, messaging, or live-system authority. Installation approval does not imply login, secret disclosure, configuration changes, restarts, or a resident service; ask separately unless the current task already authorizes the exact action.
+- After a timeout or transport failure following a possible remote mutation, do not replay the write. Perform one bounded read-only reconciliation and classify `applied | not_applied | split | unknown` first.
 
 ## Actionable Responses
 
@@ -79,7 +86,7 @@ One run is not a reusable law. Lessons are promoted only through adaptive improv
 
 ## Memory Graph
 
-Schema cards and lesson cards form a typed graph: `[[wikilink]]` references in lessons and `related-schemas` YAML frontmatter in schema cards are edges. Use `fp/contracts/memory-graph.js` (zero-dependency Node.js script) to build the graph, compute blast radius before updates, find relevant clusters by keyword, detect hub/bridge cards, and run incremental diffs. Load `fp/archive/templates/memory-graph-traversal.md` for the full agent protocol.
+Schema cards and lesson cards form a typed graph: `[[wikilink]]` references in lessons and `related-schemas` YAML frontmatter in schema cards are edges. Use `fp/contracts/memory-graph.js` (zero-dependency Node.js script) to build the graph, compute blast radius before updates, find relevant clusters by keyword, detect hub/bridge cards, and run incremental diffs. When updating a schema card or promoted lesson, check the blast-radius set first; for hub cards (in_degree >= 3), confirm the update is safe before finalizing. Load `fp/archive/templates/memory-graph-traversal.md` for the full agent protocol.
 
 Card writing follows Zettelkasten conventions: atomicity, bidirectional links, Folgezettel sequences (`next`/`previous` edges), MOC (Map of Content) index cards, and the refinement pipeline (fleeting → literature → permanent). Load `fp/archive/templates/zettelkasten-conventions.md` for conventions.
 

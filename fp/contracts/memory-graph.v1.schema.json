@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://raw.githubusercontent.com/MiaoY0uShan/FP/v0.4.5/fp/contracts/memory-graph.v1.schema.json",
+  "$id": "https://raw.githubusercontent.com/MiaoY0uShan/FP/v0.5.1/fp/contracts/memory-graph.v1.schema.json",
   "title": "FP Memory Graph v1",
   "description": "Typed graph linking schema cards, lesson cards, and evidence ledgers. Nodes and edges support blast-radius traversal, cluster detection, hub scoring, and incremental update. Structural validation only; cross-field, path, hash, and edge-reference rules are enforced by memory-graph.js.",
   "type": "object",
