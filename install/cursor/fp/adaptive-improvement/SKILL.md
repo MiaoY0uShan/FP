@@ -17,7 +17,7 @@ Without an Evidence Ledger, return `Decision: reject — no evidence`.
 
 1. Classify the run: pass, fail, blocked, or partial.
 2. Extract the concrete observation and its evidence reference.
-3. Identify what worked, failed, drifted, or wasted context/scope.
+3. Identify what worked, failed, drifted, or wasted context/scope. Flag any on-demand profile that was loaded but changed no decision and filled no acceptance row — mark it `observe_more` for description revision.
 4. Check whether it is repeated, clearly prevents a severe failure, or measurably improves verification/scope/context.
 5. Choose one bounded change: local observation, checklist/template, schema candidate, skill-patch candidate, or automation candidate.
 6. State what the change could make worse.

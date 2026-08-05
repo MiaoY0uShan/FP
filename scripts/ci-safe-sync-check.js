@@ -9,59 +9,21 @@ const crypto = require('crypto');
 const root = path.resolve(__dirname, '..');
 const source = path.join(root, 'fp');
 
-const targets = [
-  "install/codex/.agents/skills/fp/references/fp",
-  "install/claude-code/.claude/skills/fp/references/fp",
-  "install/gemini-cli/fp/fp",
-  "install/github-copilot-cli/fp",
-  "install/cursor/fp",
-  "install/windsurf/fp",
-  "install/cline/fp",
-  "install/roo-code/fp",
-  "install/opencode/fp",
-  "install/kiro/fp",
-  "install/github-copilot-editor/fp",
-  "install/aider/fp",
-  "install/universal/.fp-package/payload/fp"
-];
+// Target lists live in scripts/sync-manifest.json — the single source of truth
+// shared with scripts/sync-install-packs.ps1. Edit the manifest, not this file.
+const manifest = JSON.parse(fs.readFileSync(path.join(__dirname, 'sync-manifest.json'), 'utf8'));
 
-const noFrontmatterTargets = [
-  "install/windsurf/.windsurf/rules/fp.md",
-  "install/roo-code/.roo/rules/fp.md",
-  "install/cline/.clinerules/fp.md",
-  "install/universal/.fp-package/payload/.windsurf/rules/fp.md",
-  "install/universal/.fp-package/payload/.roo/rules/fp.md",
-  "install/universal/.fp-package/payload/.clinerules/fp.md",
-  "install/universal/.fp-package/payload/.qoder/rules/fp.md",
-  "install/universal/.fp-package/payload/.agents/rules/fp.md"
-];
+const targets = manifest.fpTreeTargets;
+const noFrontmatterTargets = manifest.noFrontmatterTargets;
 
 const claudeMdSource = path.join(root, 'fp', 'CLAUDE.md');
-const claudeMdTargets = [
-  "install/universal/.fp-package/payload/.claude/CLAUDE.md",
-  "install/claude-code/.claude/CLAUDE.md",
-  "install/codex/.agents/CLAUDE.md"
-];
+const claudeMdTargets = manifest.claudeMdTargets;
 
 const testSource = path.join(root, 'TEST_FP.md');
-const testTargets = [
-  "install/codex/TEST_FP.md",
-  "install/claude-code/TEST_FP.md",
-  "install/gemini-cli/TEST_FP.md",
-  "install/github-copilot-cli/TEST_FP.md",
-  "install/cursor/TEST_FP.md",
-  "install/windsurf/TEST_FP.md",
-  "install/cline/TEST_FP.md",
-  "install/roo-code/TEST_FP.md",
-  "install/opencode/TEST_FP.md",
-  "install/kiro/TEST_FP.md",
-  "install/github-copilot-editor/TEST_FP.md",
-  "install/aider/TEST_FP.md",
-  "install/universal/.fp-package/payload/TEST_FP.md"
-];
+const testTargets = manifest.testFpTargets;
 
-const copyPasteSource = path.join(root, 'fp-copy-paste.md');
-const copyPasteTarget = path.join(root, 'dist', 'fp-copy-paste.md');
+const copyPasteSource = path.join(root, manifest.copyPaste.source);
+const copyPasteTarget = path.join(root, manifest.copyPaste.target);
 
 function sha256(filePath) {
   return crypto.createHash('sha256').update(fs.readFileSync(filePath)).digest('hex');
@@ -95,7 +57,7 @@ function compareDirectory(left, right) {
 let failures = 0;
 
 // canonical metadata (LICENSE, THIRD_PARTY_NOTICES, VERSION)
-for (const f of ['LICENSE', 'THIRD_PARTY_NOTICES.md', 'VERSION']) {
+for (const f of manifest.canonicalMetadata) {
   const src = path.join(root, f);
   const dst = path.join(source, f);
   if (sha256(src) !== sha256(dst)) {

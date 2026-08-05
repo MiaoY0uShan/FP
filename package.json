@@ -1,0 +1,34 @@
+{
+  "name": "@miaoy0ushan/fp",
+  "version": "0.5.0",
+  "description": "FP — Finish with Proof. A portable execution protocol for coding agents. 85 lines, 4 core rules, on-demand profiles.",
+  "keywords": [
+    "pi-package",
+    "coding-agent",
+    "skill",
+    "execution-protocol",
+    "agent-engineering",
+    "prompt-engineering",
+    "finish-with-proof",
+    "fp"
+  ],
+  "author": "MiaoY0uShan",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MiaoY0uShan/FP"
+  },
+  "homepage": "https://github.com/MiaoY0uShan/FP#readme",
+  "pi": {
+    "skills": [
+      "./skills"
+    ]
+  },
+  "files": [
+    "skills/",
+    "fp-minimal/",
+    "README.md",
+    "README.zh-CN.md",
+    "CHANGELOG.md"
+  ]
+}

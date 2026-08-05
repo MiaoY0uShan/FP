@@ -7,28 +7,14 @@ $ErrorActionPreference = "Stop"
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $source = Join-Path $repoRoot "fp"
 
-$targets = @(
-    "install/codex/.agents/skills/fp/references/fp",
-    "install/claude-code/.claude/skills/fp/references/fp",
-    "install/gemini-cli/fp/fp",
-    "install/github-copilot-cli/fp",
-    "install/cursor/fp",
-    "install/windsurf/fp",
-    "install/cline/fp",
-    "install/roo-code/fp",
-    "install/opencode/fp",
-    "install/kiro/fp",
-    "install/github-copilot-editor/fp",
-    "install/aider/fp",
-    "install/universal/.fp-package/payload/fp"
-)
+# Target lists live in scripts/sync-manifest.json — the single source of truth
+# shared with scripts/ci-safe-sync-check.js. Edit the manifest, not this file.
+$manifest = Get-Content -LiteralPath (Join-Path $PSScriptRoot "sync-manifest.json") -Raw | ConvertFrom-Json
+
+$targets = @($manifest.fpTreeTargets)
 
 $claudeMdSource = Join-Path $repoRoot "fp/CLAUDE.md"
-$claudeMdTargets = @(
-    "install/universal/.fp-package/payload/.claude/CLAUDE.md",
-    "install/claude-code/.claude/CLAUDE.md",
-    "install/codex/.agents/CLAUDE.md"
-)
+$claudeMdTargets = @($manifest.claudeMdTargets)
 
 $alwaysAppliedSource = Join-Path $repoRoot "fp/CLAUDE.md"
 
@@ -45,33 +31,10 @@ $alwaysAppliedSource = Join-Path $repoRoot "fp/CLAUDE.md"
 # full routing body + tool-specific frontmatter; check mode verifies they are
 # in sync with fp/CLAUDE.md (ignoring their frontmatter).
 # Sync mode propagates CLAUDE.md to no-frontmatter files too.
-$noFrontmatterTargets = @(
-    "install/windsurf/.windsurf/rules/fp.md",
-    "install/roo-code/.roo/rules/fp.md",
-    "install/cline/.clinerules/fp.md",
-    "install/universal/.fp-package/payload/.windsurf/rules/fp.md",
-    "install/universal/.fp-package/payload/.roo/rules/fp.md",
-    "install/universal/.fp-package/payload/.clinerules/fp.md",
-    "install/universal/.fp-package/payload/.qoder/rules/fp.md",
-    "install/universal/.fp-package/payload/.agents/rules/fp.md"
-)
+$noFrontmatterTargets = @($manifest.noFrontmatterTargets)
 
 $testSource = Join-Path $repoRoot "TEST_FP.md"
-$testTargets = @(
-    "install/codex/TEST_FP.md",
-    "install/claude-code/TEST_FP.md",
-    "install/gemini-cli/TEST_FP.md",
-    "install/github-copilot-cli/TEST_FP.md",
-    "install/cursor/TEST_FP.md",
-    "install/windsurf/TEST_FP.md",
-    "install/cline/TEST_FP.md",
-    "install/roo-code/TEST_FP.md",
-    "install/opencode/TEST_FP.md",
-    "install/kiro/TEST_FP.md",
-    "install/github-copilot-editor/TEST_FP.md",
-    "install/aider/TEST_FP.md",
-    "install/universal/.fp-package/payload/TEST_FP.md"
-)
+$testTargets = @($manifest.testFpTargets)
 
 function Get-RelativePath {
     param([string] $Path)
@@ -125,11 +88,9 @@ if (-not (Test-Path -LiteralPath $source)) {
     throw "Missing source directory: $source"
 }
 
-$canonicalMetadata = @(
-    @{ Source = (Join-Path $repoRoot "LICENSE"); Target = (Join-Path $source "LICENSE") },
-    @{ Source = (Join-Path $repoRoot "THIRD_PARTY_NOTICES.md"); Target = (Join-Path $source "THIRD_PARTY_NOTICES.md") },
-    @{ Source = (Join-Path $repoRoot "VERSION"); Target = (Join-Path $source "VERSION") }
-)
+$canonicalMetadata = @($manifest.canonicalMetadata | ForEach-Object {
+    @{ Source = (Join-Path $repoRoot $_); Target = (Join-Path $source $_) }
+})
 
 foreach ($entry in $canonicalMetadata) {
     if ($Check) {
@@ -189,8 +150,8 @@ foreach ($targetRelative in $testTargets) {
     Write-Host "synced: $targetRelative"
 }
 
-$copyPasteSource = Join-Path $repoRoot "fp-copy-paste.md"
-$copyPasteTarget = Join-Path $repoRoot "dist/fp-copy-paste.md"
+$copyPasteSource = Join-Path $repoRoot $manifest.copyPaste.source
+$copyPasteTarget = Join-Path $repoRoot $manifest.copyPaste.target
 
 if ($Check) {
     if (-not (Test-Path -LiteralPath $copyPasteTarget)) {

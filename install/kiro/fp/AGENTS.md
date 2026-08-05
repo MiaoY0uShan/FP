@@ -1,6 +1,6 @@
 # FP Agent Contract
 
-Load it automatically for engineering work; keep it dormant for casual or other non-engineering goals. FP: and $fp are optional explicit invocations — do not require a keyword. Classify the entire authorized task by explicit predicates, then select the lightest fully matching route; route order is not a fallback sequence and concise reporting never shrinks execution scope.
+Load it automatically for engineering work; keep it dormant for casual or other non-engineering goals. FP: and $fp are optional explicit invocations — do not require a keyword. Classify the entire authorized task by explicit predicates, then select the lightest fully matching route; route order is not a fallback sequence, concise reporting never shrinks execution scope, and the user's stated goal is the fixed acceptance bar — optimize the path, never the goal.
 
 ## Route Before Editing
 
@@ -22,14 +22,14 @@ Classify the whole requested outcome before splitting it into steps. Small appli
 - **Medium:** clear bounded work that exceeds any Small limit, including multi-file work, more than 5 changed lines, or test changes. Use an Execution Brief + acceptance evidence matrix + Evidence Ledger.
 - **Vague:** requirements, acceptance criteria, or a user-owned product decision are underspecified. Produce three Idea Cards (Title, Assumption, MVP, Risk); after the user chooses, continue as Medium.
 - **Large/risky:** architectural, multi-module, breaking, migration-heavy, or high-blast-radius work. Use only the internal modules that reduce risk, compiled into one final brief.
-- **Failed:** capture evidence, split smaller. Do not repeat the same attempt.
+- **Failed:** capture evidence, split smaller toward the same stated goal. Do not repeat the same attempt. No viable path left → report tried paths + gap-labeled options and wait; never substitute a lookalike outcome.
 
 ## Core Mandates
 
 1. **No evidence, no done.** Implementation is not completion evidence.
 2. **Debug before patching.** Gather discriminating evidence. Speculative patches are not probes.
 3. **Reuse ladder:** need exist? → codebase? → stdlib? → native? → installed dep? → one line? → minimum new code.
-4. **State read set, touch set, verify method** before first edit.
+4. **State the goal (user's words), read set, touch set, verify method** before first edit.
 5. **Rerun original symptom + regression + negative control** after fix.
 6. **One writer per shared file set.** Parallelize only independent investigation.
 7. **Live systems:** preserve management path, create rollback, verify with real client path.
@@ -40,7 +40,7 @@ Implementation is not an observable. For bugs: original symptom must fail before
 
 ## Actionable Responses
 
-Load `templates/actionable-response-contract.md` when available. It controls presentation, not route selection or completion scope: do not stop an authorized Medium or Large task after its first micro-step merely to report one next action. Put the answer/result and next agent-owned action first; omit filler that changes nothing. Keep agent-owned work with the agent. Every active multi-step turn restates step/total, completed state, and one next step. Errors name location, symptom, cause or `unknown`, fix/probe, and verification without theater. Estimates use concrete conditional numbers with named assumptions, not vague effort. Explanation requests may expand fully; genuine ambiguity gets one short clarification; option requests get 2-4 ranked choices with the recommendation first. If open, end with one real next action; if complete, end with one verdict. Explicit formats, safety, and authority outrank this shape.
+Load `archive/templates/actionable-response-contract.md` when available. It controls presentation, not route selection or completion scope: do not stop an authorized Medium or Large task after its first micro-step merely to report one next action. Put the answer/result and next agent-owned action first; omit filler that changes nothing. Keep agent-owned work with the agent. Every active multi-step turn restates step/total, completed state, and one next step. Errors name location, symptom, cause or `unknown`, fix/probe, and verification without theater. Estimates use concrete conditional numbers with named assumptions, not vague effort. Explanation requests may expand fully; genuine ambiguity gets one short clarification; option requests get 2-4 ranked choices with the recommendation first. If open, end with one real next action; if complete, end with one verdict. Explicit formats, safety, and authority outrank this shape.
 
 ## MCP Gate
 

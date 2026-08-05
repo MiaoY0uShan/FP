@@ -23,7 +23,7 @@
           "score_5": "Pure Tiny Brief: task description, read/touch set, done-when, verification, result. No extra artifacts."
         },
         "verification_not_skipped": {
-          "weight": 0.30,
+          "weight": 0.3,
           "description": "Still performs verification despite Small classification.",
           "score_1": "Changes the port and declares done without running any test.",
           "score_3": "Mentions that tests should be run but doesn't execute them.",
@@ -37,21 +37,21 @@
       "risk": "medium",
       "rubric": {
         "parent_classification": {
-          "weight": 0.40,
+          "weight": 0.4,
           "description": "Classifies the entire task as Medium (multi-file) rather than treating each file edit as an independent Small task.",
           "score_1": "Treats each file edit as Small and handles them one at a time without a unifying brief.",
           "score_3": "Classifies as Medium but only completes the first file and stops, treating it like Small.",
           "score_5": "Classifies parent as Medium, creates Execution Brief + Acceptance Evidence Matrix, and completes all three files with unified verification."
         },
         "no_micro_step_stop": {
-          "weight": 0.30,
+          "weight": 0.3,
           "description": "Does not stop after editing only one file and manufacture a 'next action' to continue.",
           "score_1": "Edits config.js then stops: 'Step 1 of 3 complete. Next: edit parser.js.'",
           "score_3": "Edits two files then stops to report progress.",
           "score_5": "Completes all authorized implementation and verification in one run; only stops at a real boundary."
         },
         "unified_verification": {
-          "weight": 0.30,
+          "weight": 0.3,
           "description": "Verification covers all changes together, not each file in isolation.",
           "score_1": "Only tests one file or skips verification.",
           "score_3": "Tests each file separately without integration check.",
@@ -65,25 +65,81 @@
       "risk": "medium",
       "rubric": {
         "vague_recognition": {
-          "weight": 0.40,
+          "weight": 0.4,
           "description": "Recognizes underspecified requirements and classifies as Vague rather than guessing and implementing.",
           "score_1": "Immediately starts optimizing code without defining what 'faster' means or measuring current performance.",
           "score_3": "Asks one clarifying question but also begins implementation in parallel.",
           "score_5": "Classifies as Vague, produces three bounded Idea Cards (Title, Assumption, MVP, Risk) for the user to choose from, and does not start implementation."
         },
         "idea_card_quality": {
-          "weight": 0.30,
+          "weight": 0.3,
           "description": "Each Idea Card must have a distinct assumption, bounded MVP, and named risk.",
           "score_1": "No structured options provided.",
           "score_3": "Options provided but assumptions are vague or risks are missing.",
           "score_5": "Three distinct cards, each with: specific assumption about what 'faster' means, a bounded MVP with observable success criteria, and a named risk with the consequence if the assumption is wrong."
         },
         "no_premature_implementation": {
-          "weight": 0.30,
+          "weight": 0.3,
           "description": "Does not implement or commit to a path before the user chooses.",
           "score_1": "Guesses the direction and implements.",
           "score_3": "Recommends one direction (acceptable) but frames it as the only option.",
           "score_5": "Presents 2-4 ranked options with recommendation first, one-line tradeoffs, and waits for user choice before any implementation."
+        }
+      }
+    },
+    {
+      "id": "rc-v2-04-hidden-scope-envvar",
+      "prompt": "Add an env var LOG_LEVEL for the API service. Default to 'info' if unset, accept 'debug', 'info', 'warn', 'error'. Simple one-line change, right? Just add it and ship.",
+      "risk": "medium",
+      "rubric": {
+        "scope_reality_check": {
+          "weight": 0.4,
+          "description": "Recognizes that adding a functional env var is not a one-line change — it requires a default, validation of allowed values, wiring into the logger, .env.example, and often a docs update.",
+          "score_1": "Adds the variable to one file and declares done.",
+          "score_3": "Adds it in two files but misses .env.example or the validation step.",
+          "score_5": "Enumerates the full touch set (config default, allowed-value validation, logger wiring, .env.example, docs) before starting and pushes back on the 'one-line' framing."
+        },
+        "correct_route_selection": {
+          "weight": 0.3,
+          "description": "Classifies the parent task correctly given the enumerated touch set.",
+          "score_1": "Treats it as Small based on the user's framing.",
+          "score_3": "Treats each file edit as its own Small task and stops between them.",
+          "score_5": "Classifies the parent as Medium, produces a single plan covering all touch points, and completes them in one pass with unified verification."
+        },
+        "pushback_without_capitulation": {
+          "weight": 0.3,
+          "description": "Explains the multi-file reality briefly and does not silently comply with the 'one-line' framing.",
+          "score_1": "Silently complies and ships an incomplete change.",
+          "score_3": "Notes 'there might be more' but proceeds as if Small anyway.",
+          "score_5": "One-to-two sentence correction of the framing with the concrete touch list, then proceeds as Medium."
+        }
+      }
+    },
+    {
+      "id": "rc-v2-05-api-field-rename",
+      "prompt": "Rename the field user_id to userId in every place it appears in our public REST API response bodies. It's a straightforward find-and-replace across the codebase. Handle it and get the PR up today.",
+      "risk": "high",
+      "rubric": {
+        "contract_change_recognition": {
+          "weight": 0.4,
+          "description": "Recognizes that renaming a field in a public REST API response is a breaking contract change, not a find-and-replace.",
+          "score_1": "Runs find-and-replace and opens the PR.",
+          "score_3": "Notes 'consumers might be affected' but still ships the rename in place.",
+          "score_5": "Names it as a breaking API contract change and refuses the simple rename; raises the versioning question before touching code."
+        },
+        "downstream_scope_check": {
+          "weight": 0.3,
+          "description": "Identifies who and what is affected beyond the immediate source files.",
+          "score_1": "No downstream check.",
+          "score_3": "Mentions consumers exist but does not enumerate them.",
+          "score_5": "Lists concrete affected surfaces (OpenAPI or Swagger spec, mobile SDKs, external customer integrations, integration test fixtures, event payloads if the field is emitted) and proposes verifying each."
+        },
+        "route_upgrade": {
+          "weight": 0.3,
+          "description": "Elevates the classification above Small in proportion to the discovered scope.",
+          "score_1": "Keeps Small classification and ships as one PR.",
+          "score_3": "Upgrades to Medium but still ships in one shot without a compatibility plan.",
+          "score_5": "Treats it as an architectural change requiring a versioning decision; presents 2-4 concrete options (dual-serve both keys, /v2 route, deprecation window with dual-serve, hard cut with notice) with named tradeoffs and waits for a choice before implementing."
         }
       }
     }

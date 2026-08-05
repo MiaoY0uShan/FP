@@ -63,15 +63,15 @@ A schema memory card captures a reusable pattern for a class of work:
 7. Identify stop conditions that would prevent drift.
 8. Decide whether to create, update, or reject the schema.
 9. Keep the schema short enough to be reused in a future execution brief.
-10. If the schema relates to other schema or lesson cards, populate the `related-schemas` YAML frontmatter with typed edges before finalizing. Use `templates/memory-graph-traversal.md` to check blast-radius effects.
+10. If the schema relates to other schema or lesson cards, populate the `related-schemas` YAML frontmatter with typed edges before finalizing. Use `archive/templates/memory-graph-traversal.md` to check blast-radius effects.
 11. Populate the `task-types` YAML frontmatter with 3-5 keywords that describe the class of work. These keywords enable cluster retrieval via `memory-graph.js`. Use compact, grep-friendly terms: prefer `["bug", "validation", "auth"]` over `["validation logic for authentication tokens"]`.
 12. If this is a Map of Content (MOC), set `is_moc: true`, leave `task-types` empty, and use `informs` edges to list sub-cards. Create a MOC when 3 or more existing cards share a theme.
 13. For Folgezettel sequences, use `next` and `previous` edges to capture the narrative order of your thinking. These are NOT semantic edges — they capture trajectory, not argument structure.
-14. Follow the Zettelkasten conventions in `templates/zettelkasten-conventions.md`: atomicity (one pattern per card), bidirectional links, MOC at N≥3, refinement pipeline, serendipity traversal, and card size constraints.
+14. Follow the Zettelkasten conventions in `archive/templates/zettelkasten-conventions.md`: atomicity (one pattern per card), bidirectional links, MOC at N≥3, refinement pipeline, serendipity traversal, and card size constraints.
 
 ## Graph-Aware Retrieval
 
-When the task context justifies it (multi-module, risk of missed dependencies, or update to an existing schema), use the memory graph traversal protocol (`templates/memory-graph-traversal.md`) to expand retrieval beyond the directly-matched schema.
+When the task context justifies it (multi-module, risk of missed dependencies, or update to an existing schema), use the memory graph traversal protocol (`archive/templates/memory-graph-traversal.md`) to expand retrieval beyond the directly-matched schema.
 
 Build the graph snapshot before querying:
 ```bash

@@ -1,24 +1,24 @@
 [
   {
-    "versionId": "v0",
-    "scenarioId": "auth-fix",
-    "sessionId": "b64a3b12",
-    "projectDir": "C:\\Users\\fp\\Desktop\\github\\fpskill\\benchmarks\\multi-turn-results\\sessions-v2\\b64a3b12",
+    "versionId": "v-tf2",
+    "scenarioId": "smallest-diff-feature",
+    "sessionId": "ff60b35e",
+    "projectDir": "C:\\Users\\fp\\Desktop\\github\\fpskill\\benchmarks\\multi-turn-results\\sessions-v2\\ff60b35e",
     "turns": [
       {
         "turn": 1,
-        "content": "Step 1 of 3: diagnosing the 401 by inspecting the auth implementation, test, package configuration, and current test failure.",
+        "content": "I’ll inspect the formatter and existing tests, add a focused regression test first, then make the minimal implementation change and run the suite.",
         "toolCalls": [
           {
             "name": "read_file",
             "args": {
-              "path": "src/auth.js"
+              "path": "src/format.js"
             }
           },
           {
             "name": "read_file",
             "args": {
-              "path": "test/auth.test.js"
+              "path": "test/format.test.js"
             }
           },
           {
@@ -26,287 +26,76 @@
             "args": {
               "path": "package.json"
             }
-          },
-          {
-            "name": "run_command",
-            "args": {
-              "command": "npm test"
-            }
           }
         ],
         "toolResults": [
           {
             "name": "read_file",
-            "result": "function login(username, password) {\n  if (!username || !password) throw new Error('Missing credentials');\n  if (username === 'admin' && password === 'secret123') {\n    return { token: 'tok_' + Date.now(), user: username };\n  }\n  return null;\n}\nmodule.exports = { login };"
+            "result": "function formatName(user) {\n  var s = '';\n  if (user.title) { s = s + user.title + ' '; }\n  s = s + user.first;\n  if (user.last) { s = s + ' ' + user.last; }\n  if (user.suffix) { s = s + ', ' + user.suffix; }\n  return s;\n}\nmodule.exports = { formatName };"
           },
           {
             "name": "read_file",
-            "result": "const { login } = require('../src/auth');\nconst assert = require('assert');\n\ndescribe('Auth', () => {\n  it('should login with valid credentials', () => {\n    const result = login('admin', 'wrong-password');  // BUG: should be 'secret123'\n    assert.ok(result, 'Expected login to succeed with valid cr"
+            "result": "const { describe, it } = require('node:test');\nconst assert = require('assert');\nconst { formatName } = require('../src/format');\n\ndescribe('formatName', () => {\n  it('formats first and last', () => {\n    assert.equal(formatName({ first: 'Ada', last: 'Lovelace' }), 'Ada Lovelace');\n  });\n  it('inclu"
           },
           {
             "name": "read_file",
-            "result": "{\n  \"name\": \"auth-test\",\n  \"scripts\": {\n    \"test\": \"node --test test/auth.test.js\"\n  }\n}"
-          },
-          {
-            "name": "run_command",
-            "result": "\n> test\n> node --test test/auth.test.js\n\nC:\\Users\\fp\\Desktop\\github\\fpskill\\benchmarks\\multi-turn-results\\sessions-v2\\b64a3b12\\test\\auth.test.js:4\ndescribe('Auth', () => {\n^\n\nReferenceError: describe is not defined\n    at Object.<anonymous> (C:\\Users\\fp\\Desktop\\github\\fpskill\\benchmarks\\multi-turn-r"
+            "result": "{\n  \"name\": \"formatter\",\n  \"scripts\": {\n    \"test\": \"node --test test/format.test.js\"\n  }\n}"
           }
         ]
       },
       {
         "turn": 2,
-        "content": "Step 1 of 3 complete: `login` correctly accepts `admin`/`secret123`; the test has two defects—missing Node test-runner imports and the “valid credentials” case passes `wrong-password`. Next: patch only the test.",
+        "content": "Step 1 of 3 complete: current behavior and style confirmed. Next: add the middle-name regression test and observe it fail before changing source.",
         "toolCalls": [
           {
             "name": "write_file",
             "args": {
-              "path": "test/auth.test.js",
-              "content": "const { login } = require('../src/auth');\nconst assert = require('assert');\nconst { describe, it } = require('node:test');\n\ndescribe('Auth', () => {\n  it('should login with valid credentials', () => {\n    const result = login('admin', 'secret123');\n    assert.ok(result, 'Expected login to succeed with valid credentials');\n    assert.equal(result.user, 'admin');\n  });\n  it('should reject empty username', () => {\n    assert.throws(() => login('', 'pass'), /Missing credentials/);\n  });\n});\n"
+              "path": "test/format.test.js",
+              "content": "const { describe, it } = require('node:test');\nconst assert = require('assert');\nconst { formatName } = require('../src/format');\n\ndescribe('formatName', () => {\n  it('formats first and last', () => {\n    assert.equal(formatName({ first: 'Ada', last: 'Lovelace' }), 'Ada Lovelace');\n  });\n  it('includes middle name', () => {\n    assert.equal(formatName({ first: 'Ada', middle: 'Byron', last: 'Lovelace' }), 'Ada Byron Lovelace');\n  });\n  it('includes title and suffix', () => {\n    assert.equal(formatName({ title: 'Dr.', first: 'Ada', last: 'Lovelace', suffix: 'PhD' }), 'Dr. Ada Lovelace, PhD');\n  });\n});\n"
             }
           }
         ],
         "toolResults": [
           {
             "name": "write_file",
-            "result": "OK: wrote 492 bytes to test/auth.test.js"
+            "result": "OK: wrote 609 bytes to test/format.test.js"
           }
         ]
       },
       {
         "turn": 3,
-        "content": "Step 2 of 3 complete: corrected the test harness and valid-credential fixture without changing `src/auth.js`. Next: run the full test command for verification.",
-        "toolCalls": [
-          {
-            "name": "run_command",
-            "args": {
-              "command": "npm test"
-            }
-          }
-        ],
-        "toolResults": [
-          {
-            "name": "run_command",
-            "result": "\n> test\n> node --test test/auth.test.js\n\n▶ Auth\n  ✔ should login with valid credentials (0.7369ms)\n  ✔ should reject empty username (0.393ms)\n✔ Auth (2.0703ms)\nℹ tests 2\nℹ suites 1\nℹ pass 2\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 75.9677\n\nExit code: 0"
-          }
-        ]
-      },
-      {
-        "turn": 4,
         "content": "",
         "toolCalls": [
           {
-            "name": "task_complete",
-            "args": {
-              "files_changed": [
-                "test/auth.test.js"
-              ],
-              "tests_passed": 2,
-              "tests_total": 2,
-              "verdict": "pass — diagnosed two test-side defects: Node's test globals were not imported, and the valid-login test supplied `wrong-password` instead of `secret123`. Updated only the test; `npm test` now passes 2/2 tests."
-            }
-          }
-        ],
-        "toolResults": [
-          {
-            "name": "task_complete",
-            "result": "{\"acknowledged\":true,\"files_changed\":[\"test/auth.test.js\"],\"tests_passed\":2,\"tests_total\":2,\"verdict\":\"pass — diagnosed two test-side defects: Node's test globals were not imported, and the valid-login test supplied `wrong-password` instead of `secret123`. Updated only the test; `npm test` now passe"
-          }
-        ]
-      }
-    ],
-    "checks": {
-      "all tests pass": {
-        "pass": true,
-        "detail": "▶ Auth\n  ✔ should login with valid credentials (0.7261ms)\n  ✔ should reject empty username (0.3883ms)\n✔ Auth (2.053ms)\nℹ tests 2\nℹ suites 1\nℹ pass 2\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 77.5614\n"
-      },
-      "bug is fixed": {
-        "pass": true,
-        "detail": "correct password found"
-      }
-    },
-    "completeVerdict": {
-      "files_changed": [
-        "test/auth.test.js"
-      ],
-      "tests_passed": 2,
-      "tests_total": 2,
-      "verdict": "pass — diagnosed two test-side defects: Node's test globals were not imported, and the valid-login test supplied `wrong-password` instead of `secret123`. Updated only the test; `npm test` now passes 2/2 tests."
-    },
-    "passed": true,
-    "turnsUsed": 4,
-    "totalTokens": 8934
-  },
-  {
-    "versionId": "v0",
-    "scenarioId": "refactor-extract",
-    "sessionId": "c5b8d501",
-    "projectDir": "C:\\Users\\fp\\Desktop\\github\\fpskill\\benchmarks\\multi-turn-results\\sessions-v2\\c5b8d501",
-    "turns": [
-      {
-        "turn": 1,
-        "content": "Step 1 of 4: I’ll inspect the existing logger, consumers, and tests to preserve the current contract before refactoring.",
-        "toolCalls": [
-          {
-            "name": "read_file",
-            "args": {
-              "path": "src/logger.js"
-            }
-          },
-          {
-            "name": "read_file",
-            "args": {
-              "path": "src/app.js"
-            }
-          },
-          {
-            "name": "read_file",
-            "args": {
-              "path": "src/worker.js"
-            }
-          },
-          {
-            "name": "read_file",
-            "args": {
-              "path": "test/logger.test.js"
-            }
-          },
-          {
-            "name": "read_file",
-            "args": {
-              "path": "package.json"
-            }
-          }
-        ],
-        "toolResults": [
-          {
-            "name": "read_file",
-            "result": "class Logger {\n  constructor(level = 'info') { this.level = level; }\n  log(msg) { if (this.level !== 'silent') console.log('[LOG]', msg); }\n  error(msg) { console.error('[ERR]', msg); }\n  warn(msg) { if (this.level !== 'silent') console.warn('[WARN]', msg); }\n  setLevel(level) { this.level = level; "
-          },
-          {
-            "name": "read_file",
-            "result": "const { Logger } = require('./logger');\nconst log = new Logger('info');\nfunction run() { log.log('App started'); log.warn('Config missing'); log.error('DB connection failed'); }\nmodule.exports = { run };"
-          },
-          {
-            "name": "read_file",
-            "result": "const { Logger } = require('./logger');\nconst log = new Logger('silent');\nfunction process() { log.log('Worker processing'); log.error('Queue full'); }\nmodule.exports = { process };"
-          },
-          {
-            "name": "read_file",
-            "result": "const { Logger } = require('../src/logger');\nconst assert = require('assert');\ndescribe('Logger', () => {\n  it('should create logger with default level', () => {\n    const l = new Logger();\n    assert.equal(l.level, 'info');\n  });\n  it('should support silent level', () => {\n    const l = new Logger("
-          },
-          {
-            "name": "read_file",
-            "result": "{\n  \"name\": \"refactor\",\n  \"scripts\": {\n    \"test\": \"node --test test/logger.test.js\"\n  }\n}"
-          }
-        ]
-      },
-      {
-        "turn": 2,
-        "content": "Step 1 of 4 complete: the contract is four methods (`log`, `error`, `warn`, `setLevel`), with direct `Logger` construction in both consumers. Next I’ll add an abstract CommonJS interface, make `Logger` extend it, and annotate consumers against `ILogger` without changing runtime behavior.",
-        "toolCalls": [
-          {
-            "name": "write_file",
-            "args": {
-              "path": "src/ilogger.js",
-              "content": "class ILogger {\n  constructor() {\n    if (new.target === ILogger) {\n      throw new TypeError('ILogger is an interface and cannot be instantiated directly');\n    }\n  }\n\n  log(msg) { throw new Error('log(msg) must be implemented'); }\n  error(msg) { throw new Error('error(msg) must be implemented'); }\n  warn(msg) { throw new Error('warn(msg) must be implemented'); }\n  setLevel(level) { throw new Error('setLevel(level) must be implemented'); }\n}\n\nmodule.exports = { ILogger };\n"
-            }
-          },
-          {
-            "name": "write_file",
-            "args": {
-              "path": "src/logger.js",
-              "content": "const { ILogger } = require('./ilogger');\n\nclass Logger extends ILogger {\n  constructor(level = 'info') {\n    super();\n    this.level = level;\n  }\n\n  log(msg) { if (this.level !== 'silent') console.log('[LOG]', msg); }\n  error(msg) { console.error('[ERR]', msg); }\n  warn(msg) { if (this.level !== 'silent') console.warn('[WARN]', msg); }\n  setLevel(level) { this.level = level; }\n}\n\nmodule.exports = { Logger };\n"
-            }
-          },
-          {
-            "name": "write_file",
-            "args": {
-              "path": "src/app.js",
-              "content": "const { Logger } = require('./logger');\n\n/** @type {import('./ilogger').ILogger} */\nconst log = new Logger('info');\n\nfunction run() { log.log('App started'); log.warn('Config missing'); log.error('DB connection failed'); }\n\nmodule.exports = { run };\n"
-            }
-          },
-          {
-            "name": "write_file",
-            "args": {
-              "path": "src/worker.js",
-              "content": "const { Logger } = require('./logger');\n\n/** @type {import('./ilogger').ILogger} */\nconst log = new Logger('silent');\n\nfunction process() { log.log('Worker processing'); log.error('Queue full'); }\n\nmodule.exports = { process };\n"
-            }
-          },
-          {
-            "name": "write_file",
-            "args": {
-              "path": "test/logger.test.js",
-              "content": "const { ILogger } = require('../src/ilogger');\nconst { Logger } = require('../src/logger');\nconst assert = require('assert');\n\ndescribe('Logger', () => {\n  it('should implement ILogger', () => {\n    const l = new Logger();\n    assert.ok(l instanceof ILogger);\n  });\n\n  it('should create logger with default level', () => {\n    const l = new Logger();\n    assert.equal(l.level, 'info');\n  });\n\n  it('should support silent level', () => {\n    const l = new Logger('silent');\n    assert.equal(l.level, 'silent');\n  });\n\n  it('should not instantiate ILogger directly', () => {\n    assert.throws(() => new ILogger(), /cannot be instantiated directly/);\n  });\n});\n"
-            }
-          }
-        ],
-        "toolResults": [
-          {
-            "name": "write_file",
-            "result": "OK: wrote 478 bytes to src/ilogger.js"
-          },
-          {
-            "name": "write_file",
-            "result": "OK: wrote 413 bytes to src/logger.js"
-          },
-          {
-            "name": "write_file",
-            "result": "OK: wrote 250 bytes to src/app.js"
-          },
-          {
-            "name": "write_file",
-            "result": "OK: wrote 228 bytes to src/worker.js"
-          },
-          {
-            "name": "write_file",
-            "result": "OK: wrote 658 bytes to test/logger.test.js"
-          }
-        ]
-      },
-      {
-        "turn": 3,
-        "content": "Step 3 of 4 complete: `ILogger` now defines the contract, `Logger` implements it, and both consumers are typed to the interface; interface-focused tests were added. Next I’ll run the full test command and smoke-load both consumers.",
-        "toolCalls": [
-          {
             "name": "run_command",
             "args": {
               "command": "npm test"
             }
-          },
-          {
-            "name": "run_command",
-            "args": {
-              "command": "node -e \"require('./src/app'); require('./src/worker'); const {ILogger}=require('./src/ilogger'); const {Logger}=require('./src/logger'); if (!(new Logger() instanceof ILogger)) process.exit(1); console.log('consumer/interface smoke test passed')\""
-            }
           }
         ],
         "toolResults": [
           {
             "name": "run_command",
-            "result": "\n> test\n> node --test test/logger.test.js\n\nC:\\Users\\fp\\Desktop\\github\\fpskill\\benchmarks\\multi-turn-results\\sessions-v2\\c5b8d501\\test\\logger.test.js:5\ndescribe('Logger', () => {\n^\n\nReferenceError: describe is not defined\n    at Object.<anonymous> (C:\\Users\\fp\\Desktop\\github\\fpskill\\benchmarks\\multi-"
-          },
-          {
-            "name": "run_command",
-            "result": "consumer/interface smoke test passed\n\nExit code: 0"
+            "result": "\n> test\n> node --test test/format.test.js\n\n▶ formatName\n  ✔ formats first and last (0.6978ms)\n  ✖ includes middle name (0.9067ms)\n  ✔ includes title and suffix (0.1346ms)\n✖ formatName (2.7811ms)\nℹ tests 3\nℹ suites 1\nℹ pass 2\nℹ fail 1\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 79.8823\n\n✖ failin"
           }
         ]
       },
       {
         "turn": 4,
-        "content": "Step 4 of 4 found a test-harness issue: `package.json` uses Node’s test runner, but the test file relied on undefined global `describe`/`it`; the implementation smoke test passed. I’ll import those APIs from `node:test`, then rerun verification.",
+        "content": "Step 2 of 3 complete: the new test fails as expected (`Ada Lovelace` vs `Ada Byron Lovelace`). Next: add the single conditional in `formatName` and rerun all tests.",
         "toolCalls": [
           {
             "name": "write_file",
             "args": {
-              "path": "test/logger.test.js",
-              "content": "const { describe, it } = require('node:test');\nconst { ILogger } = require('../src/ilogger');\nconst { Logger } = require('../src/logger');\nconst assert = require('assert');\n\ndescribe('Logger', () => {\n  it('should implement ILogger', () => {\n    const l = new Logger();\n    assert.ok(l instanceof ILogger);\n  });\n\n  it('should create logger with default level', () => {\n    const l = new Logger();\n    assert.equal(l.level, 'info');\n  });\n\n  it('should support silent level', () => {\n    const l = new Logger('silent');\n    assert.equal(l.level, 'silent');\n  });\n\n  it('should not instantiate ILogger directly', () => {\n    assert.throws(() => new ILogger(), /cannot be instantiated directly/);\n  });\n});\n"
+              "path": "src/format.js",
+              "content": "function formatName(user) {\n  var s = '';\n  if (user.title) { s = s + user.title + ' '; }\n  s = s + user.first;\n  if (user.middle) { s = s + ' ' + user.middle; }\n  if (user.last) { s = s + ' ' + user.last; }\n  if (user.suffix) { s = s + ', ' + user.suffix; }\n  return s;\n}\nmodule.exports = { formatName };\n"
             }
           }
         ],
         "toolResults": [
           {
             "name": "write_file",
-            "result": "OK: wrote 705 bytes to test/logger.test.js"
+            "result": "OK: wrote 306 bytes to src/format.js"
           }
         ]
       },
@@ -319,22 +108,12 @@
             "args": {
               "command": "npm test"
             }
-          },
-          {
-            "name": "run_command",
-            "args": {
-              "command": "node -e \"const app=require('./src/app'); const worker=require('./src/worker'); if (typeof app.run !== 'function' || typeof worker.process !== 'function') process.exit(1); console.log('consumer exports verified')\""
-            }
           }
         ],
         "toolResults": [
           {
             "name": "run_command",
-            "result": "\n> test\n> node --test test/logger.test.js\n\n▶ Logger\n  ✔ should implement ILogger (0.7138ms)\n  ✔ should create logger with default level (0.1396ms)\n  ✔ should support silent level (0.1172ms)\n  ✔ should not instantiate ILogger directly (0.3995ms)\n✔ Logger (2.3764ms)\nℹ tests 4\nℹ suites 1\nℹ pass 4\nℹ fai"
-          },
-          {
-            "name": "run_command",
-            "result": "consumer exports verified\n\nExit code: 0"
+            "result": "\n> test\n> node --test test/format.test.js\n\n▶ formatName\n  ✔ formats first and last (0.7378ms)\n  ✔ includes middle name (0.1286ms)\n  ✔ includes title and suffix (0.1203ms)\n✔ formatName (2.0027ms)\nℹ tests 3\nℹ suites 1\nℹ pass 3\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 78.0671\n\nExit cod"
           }
         ]
       },
@@ -346,380 +125,19 @@
             "name": "task_complete",
             "args": {
               "files_changed": [
-                "src/ilogger.js",
-                "src/logger.js",
-                "src/app.js",
-                "src/worker.js",
-                "test/logger.test.js"
-              ],
-              "tests_passed": 4,
-              "tests_total": 4,
-              "verdict": "pass — ILogger was extracted as a non-instantiable interface contract; Logger extends and implements it; app and worker reference ILogger via JSDoc while retaining Logger construction; npm test passes 4/4 and consumer exports smoke verification passes."
-            }
-          }
-        ],
-        "toolResults": [
-          {
-            "name": "task_complete",
-            "result": "{\"acknowledged\":true,\"files_changed\":[\"src/ilogger.js\",\"src/logger.js\",\"src/app.js\",\"src/worker.js\",\"test/logger.test.js\"],\"tests_passed\":4,\"tests_total\":4,\"verdict\":\"pass — ILogger was extracted as a non-instantiable interface contract; Logger extends and implements it; app and worker reference ILo"
-          }
-        ]
-      }
-    ],
-    "checks": {
-      "tests pass": {
-        "pass": true,
-        "detail": "passed"
-      },
-      "interface file created": {
-        "pass": true,
-        "detail": "exists"
-      },
-      "all callers updated": {
-        "pass": true,
-        "detail": "both updated"
-      }
-    },
-    "completeVerdict": {
-      "files_changed": [
-        "src/ilogger.js",
-        "src/logger.js",
-        "src/app.js",
-        "src/worker.js",
-        "test/logger.test.js"
-      ],
-      "tests_passed": 4,
-      "tests_total": 4,
-      "verdict": "pass — ILogger was extracted as a non-instantiable interface contract; Logger extends and implements it; app and worker reference ILogger via JSDoc while retaining Logger construction; npm test passes 4/4 and consumer exports smoke verification passes."
-    },
-    "passed": true,
-    "turnsUsed": 6,
-    "totalTokens": 18819
-  },
-  {
-    "versionId": "v-minimal",
-    "scenarioId": "auth-fix",
-    "sessionId": "73d9e1eb",
-    "projectDir": "C:\\Users\\fp\\Desktop\\github\\fpskill\\benchmarks\\multi-turn-results\\sessions-v2\\73d9e1eb",
-    "turns": [
-      {
-        "turn": 1,
-        "content": "",
-        "toolCalls": [
-          {
-            "name": "read_file",
-            "args": {
-              "path": "src/auth.js"
-            }
-          },
-          {
-            "name": "read_file",
-            "args": {
-              "path": "test/auth.test.js"
-            }
-          },
-          {
-            "name": "read_file",
-            "args": {
-              "path": "package.json"
-            }
-          },
-          {
-            "name": "run_command",
-            "args": {
-              "command": "npm test"
-            }
-          }
-        ],
-        "toolResults": [
-          {
-            "name": "read_file",
-            "result": "function login(username, password) {\n  if (!username || !password) throw new Error('Missing credentials');\n  if (username === 'admin' && password === 'secret123') {\n    return { token: 'tok_' + Date.now(), user: username };\n  }\n  return null;\n}\nmodule.exports = { login };"
-          },
-          {
-            "name": "read_file",
-            "result": "const { login } = require('../src/auth');\nconst assert = require('assert');\n\ndescribe('Auth', () => {\n  it('should login with valid credentials', () => {\n    const result = login('admin', 'wrong-password');  // BUG: should be 'secret123'\n    assert.ok(result, 'Expected login to succeed with valid cr"
-          },
-          {
-            "name": "read_file",
-            "result": "{\n  \"name\": \"auth-test\",\n  \"scripts\": {\n    \"test\": \"node --test test/auth.test.js\"\n  }\n}"
-          },
-          {
-            "name": "run_command",
-            "result": "\n> test\n> node --test test/auth.test.js\n\nC:\\Users\\fp\\Desktop\\github\\fpskill\\benchmarks\\multi-turn-results\\sessions-v2\\73d9e1eb\\test\\auth.test.js:4\ndescribe('Auth', () => {\n^\n\nReferenceError: describe is not defined\n    at Object.<anonymous> (C:\\Users\\fp\\Desktop\\github\\fpskill\\benchmarks\\multi-turn-r"
-          }
-        ]
-      },
-      {
-        "turn": 2,
-        "content": "Diagnosis: `login` correctly accepts `admin` / `secret123`. The test supplies `wrong-password`, so its “valid credentials” case is invalid. Additionally, the configured `node --test` runner does not provide global `describe`/`it`, causing the suite to fail before reaching the assertion. I’ll fix both issues in the test, leaving the login implementation unchanged.",
-        "toolCalls": [
-          {
-            "name": "write_file",
-            "args": {
-              "path": "test/auth.test.js",
-              "content": "const { describe, it } = require('node:test');\nconst { login } = require('../src/auth');\nconst assert = require('assert');\n\ndescribe('Auth', () => {\n  it('should login with valid credentials', () => {\n    const result = login('admin', 'secret123');\n    assert.ok(result, 'Expected login to succeed with valid credentials');\n    assert.equal(result.user, 'admin');\n  });\n  it('should reject empty username', () => {\n    assert.throws(() => login('', 'pass'), /Missing credentials/);\n  });\n});\n"
-            }
-          }
-        ],
-        "toolResults": [
-          {
-            "name": "write_file",
-            "result": "OK: wrote 492 bytes to test/auth.test.js"
-          }
-        ]
-      },
-      {
-        "turn": 3,
-        "content": "",
-        "toolCalls": [
-          {
-            "name": "run_command",
-            "args": {
-              "command": "npm test"
-            }
-          }
-        ],
-        "toolResults": [
-          {
-            "name": "run_command",
-            "result": "\n> test\n> node --test test/auth.test.js\n\n▶ Auth\n  ✔ should login with valid credentials (0.7371ms)\n  ✔ should reject empty username (0.3952ms)\n✔ Auth (2.0563ms)\nℹ tests 2\nℹ suites 1\nℹ pass 2\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 71.4946\n\nExit code: 0"
-          }
-        ]
-      },
-      {
-        "turn": 4,
-        "content": "",
-        "toolCalls": [
-          {
-            "name": "task_complete",
-            "args": {
-              "files_changed": [
-                "test/auth.test.js"
-              ],
-              "tests_passed": 2,
-              "tests_total": 2,
-              "verdict": "pass — diagnosed two test-side issues: the valid-login test used `wrong-password` instead of `secret123`, and `describe`/`it` were not imported for the Node test runner. Fixed the test only; `src/auth.js` remains unchanged. `npm test` now passes 2/2 tests."
-            }
-          }
-        ],
-        "toolResults": [
-          {
-            "name": "task_complete",
-            "result": "{\"acknowledged\":true,\"files_changed\":[\"test/auth.test.js\"],\"tests_passed\":2,\"tests_total\":2,\"verdict\":\"pass — diagnosed two test-side issues: the valid-login test used `wrong-password` instead of `secret123`, and `describe`/`it` were not imported for the Node test runner. Fixed the test only; `src/a"
-          }
-        ]
-      }
-    ],
-    "checks": {
-      "all tests pass": {
-        "pass": true,
-        "detail": "▶ Auth\n  ✔ should login with valid credentials (0.7028ms)\n  ✔ should reject empty username (0.4374ms)\n✔ Auth (2.0676ms)\nℹ tests 2\nℹ suites 1\nℹ pass 2\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 76.9103\n"
-      },
-      "bug is fixed": {
-        "pass": true,
-        "detail": "correct password found"
-      }
-    },
-    "completeVerdict": {
-      "files_changed": [
-        "test/auth.test.js"
-      ],
-      "tests_passed": 2,
-      "tests_total": 2,
-      "verdict": "pass — diagnosed two test-side issues: the valid-login test used `wrong-password` instead of `secret123`, and `describe`/`it` were not imported for the Node test runner. Fixed the test only; `src/auth.js` remains unchanged. `npm test` now passes 2/2 tests."
-    },
-    "passed": true,
-    "turnsUsed": 4,
-    "totalTokens": 5183
-  },
-  {
-    "versionId": "v-minimal",
-    "scenarioId": "refactor-extract",
-    "sessionId": "d08cb5ac",
-    "projectDir": "C:\\Users\\fp\\Desktop\\github\\fpskill\\benchmarks\\multi-turn-results\\sessions-v2\\d08cb5ac",
-    "turns": [
-      {
-        "turn": 1,
-        "content": "",
-        "toolCalls": [
-          {
-            "name": "read_file",
-            "args": {
-              "path": "src/logger.js"
-            }
-          },
-          {
-            "name": "read_file",
-            "args": {
-              "path": "src/app.js"
-            }
-          },
-          {
-            "name": "read_file",
-            "args": {
-              "path": "src/worker.js"
-            }
-          },
-          {
-            "name": "read_file",
-            "args": {
-              "path": "test/logger.test.js"
-            }
-          },
-          {
-            "name": "read_file",
-            "args": {
-              "path": "package.json"
-            }
-          }
-        ],
-        "toolResults": [
-          {
-            "name": "read_file",
-            "result": "class Logger {\n  constructor(level = 'info') { this.level = level; }\n  log(msg) { if (this.level !== 'silent') console.log('[LOG]', msg); }\n  error(msg) { console.error('[ERR]', msg); }\n  warn(msg) { if (this.level !== 'silent') console.warn('[WARN]', msg); }\n  setLevel(level) { this.level = level; "
-          },
-          {
-            "name": "read_file",
-            "result": "const { Logger } = require('./logger');\nconst log = new Logger('info');\nfunction run() { log.log('App started'); log.warn('Config missing'); log.error('DB connection failed'); }\nmodule.exports = { run };"
-          },
-          {
-            "name": "read_file",
-            "result": "const { Logger } = require('./logger');\nconst log = new Logger('silent');\nfunction process() { log.log('Worker processing'); log.error('Queue full'); }\nmodule.exports = { process };"
-          },
-          {
-            "name": "read_file",
-            "result": "const { Logger } = require('../src/logger');\nconst assert = require('assert');\ndescribe('Logger', () => {\n  it('should create logger with default level', () => {\n    const l = new Logger();\n    assert.equal(l.level, 'info');\n  });\n  it('should support silent level', () => {\n    const l = new Logger("
-          },
-          {
-            "name": "read_file",
-            "result": "{\n  \"name\": \"refactor\",\n  \"scripts\": {\n    \"test\": \"node --test test/logger.test.js\"\n  }\n}"
-          }
-        ]
-      },
-      {
-        "turn": 2,
-        "content": "",
-        "toolCalls": [
-          {
-            "name": "run_command",
-            "args": {
-              "command": "npm test"
-            }
-          }
-        ],
-        "toolResults": [
-          {
-            "name": "run_command",
-            "result": "\n> test\n> node --test test/logger.test.js\n\nC:\\Users\\fp\\Desktop\\github\\fpskill\\benchmarks\\multi-turn-results\\sessions-v2\\d08cb5ac\\test\\logger.test.js:3\ndescribe('Logger', () => {\n^\n\nReferenceError: describe is not defined\n    at Object.<anonymous> (C:\\Users\\fp\\Desktop\\github\\fpskill\\benchmarks\\multi-"
-          }
-        ]
-      },
-      {
-        "turn": 3,
-        "content": "",
-        "toolCalls": [
-          {
-            "name": "write_file",
-            "args": {
-              "path": "src/ilogger.js",
-              "content": "class ILogger {\n  log(msg) { throw new Error('ILogger.log must be implemented'); }\n  error(msg) { throw new Error('ILogger.error must be implemented'); }\n  warn(msg) { throw new Error('ILogger.warn must be implemented'); }\n  setLevel(level) { throw new Error('ILogger.setLevel must be implemented'); }\n}\n\nmodule.exports = { ILogger };\n"
-            }
-          },
-          {
-            "name": "write_file",
-            "args": {
-              "path": "src/logger.js",
-              "content": "const { ILogger } = require('./ilogger');\n\nclass Logger extends ILogger {\n  constructor(level = 'info') {\n    super();\n    this.level = level;\n  }\n\n  log(msg) { if (this.level !== 'silent') console.log('[LOG]', msg); }\n  error(msg) { console.error('[ERR]', msg); }\n  warn(msg) { if (this.level !== 'silent') console.warn('[WARN]', msg); }\n  setLevel(level) { this.level = level; }\n}\n\nmodule.exports = { Logger };\n"
-            }
-          },
-          {
-            "name": "write_file",
-            "args": {
-              "path": "src/app.js",
-              "content": "const { Logger } = require('./logger');\n\n/**\n * Run the application with an ILogger implementation.\n * @param {import('./ilogger').ILogger} log\n */\nfunction run(log = new Logger('info')) {\n  log.log('App started');\n  log.warn('Config missing');\n  log.error('DB connection failed');\n}\n\nmodule.exports = { run };\n"
-            }
-          },
-          {
-            "name": "write_file",
-            "args": {
-              "path": "src/worker.js",
-              "content": "const { Logger } = require('./logger');\n\n/**\n * Process work with an ILogger implementation.\n * @param {import('./ilogger').ILogger} log\n */\nfunction process(log = new Logger('silent')) {\n  log.log('Worker processing');\n  log.error('Queue full');\n}\n\nmodule.exports = { process };\n"
-            }
-          },
-          {
-            "name": "write_file",
-            "args": {
-              "path": "test/logger.test.js",
-              "content": "const { describe, it } = require('node:test');\nconst assert = require('node:assert/strict');\nconst { ILogger } = require('../src/ilogger');\nconst { Logger } = require('../src/logger');\n\ndescribe('Logger', () => {\n  it('should create logger with default level', () => {\n    const l = new Logger();\n    assert.equal(l.level, 'info');\n  });\n\n  it('should support silent level', () => {\n    const l = new Logger('silent');\n    assert.equal(l.level, 'silent');\n  });\n\n  it('should implement ILogger', () => {\n    assert.ok(new Logger() instanceof ILogger);\n  });\n});\n"
-            }
-          }
-        ],
-        "toolResults": [
-          {
-            "name": "write_file",
-            "result": "OK: wrote 335 bytes to src/ilogger.js"
-          },
-          {
-            "name": "write_file",
-            "result": "OK: wrote 413 bytes to src/logger.js"
-          },
-          {
-            "name": "write_file",
-            "result": "OK: wrote 311 bytes to src/app.js"
-          },
-          {
-            "name": "write_file",
-            "result": "OK: wrote 280 bytes to src/worker.js"
-          },
-          {
-            "name": "write_file",
-            "result": "OK: wrote 562 bytes to test/logger.test.js"
-          }
-        ]
-      },
-      {
-        "turn": 4,
-        "content": "",
-        "toolCalls": [
-          {
-            "name": "run_command",
-            "args": {
-              "command": "npm test"
-            }
-          }
-        ],
-        "toolResults": [
-          {
-            "name": "run_command",
-            "result": "\n> test\n> node --test test/logger.test.js\n\n▶ Logger\n  ✔ should create logger with default level (0.6894ms)\n  ✔ should support silent level (0.1109ms)\n  ✔ should implement ILogger (0.1515ms)\n✔ Logger (1.9159ms)\nℹ tests 3\nℹ suites 1\nℹ pass 3\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 74"
-          }
-        ]
-      },
-      {
-        "turn": 5,
-        "content": "",
-        "toolCalls": [
-          {
-            "name": "task_complete",
-            "args": {
-              "files_changed": [
-                "src/ilogger.js",
-                "src/logger.js",
-                "src/app.js",
-                "src/worker.js",
-                "test/logger.test.js"
+                "src/format.js",
+                "test/format.test.js"
               ],
               "tests_passed": 3,
               "tests_total": 3,
-              "verdict": "pass — extracted ILogger, made Logger extend it, injected ILogger-compatible loggers into app and worker, fixed node:test imports, and confirmed all 3 tests pass."
+              "verdict": "pass — formatName now inserts a present middle name between first and last; existing first/last and title/suffix tests still pass. Verified with `npm test`: 3/3 tests passed."
             }
           }
         ],
         "toolResults": [
           {
             "name": "task_complete",
-            "result": "{\"acknowledged\":true,\"files_changed\":[\"src/ilogger.js\",\"src/logger.js\",\"src/app.js\",\"src/worker.js\",\"test/logger.test.js\"],\"tests_passed\":3,\"tests_total\":3,\"verdict\":\"pass — extracted ILogger, made Logger extend it, injected ILogger-compatible loggers into app and worker, fixed node:test imports, an"
+            "result": "{\"acknowledged\":true,\"files_changed\":[\"src/format.js\",\"test/format.test.js\"],\"tests_passed\":3,\"tests_total\":3,\"verdict\":\"pass — formatName now inserts a present middle name between first and last; existing first/last and title/suffix tests still pass. Verified with `npm test`: 3/3 tests passed.\"}"
           }
         ]
       }
@@ -727,428 +145,28 @@
     "checks": {
       "tests pass": {
         "pass": true,
-        "detail": "passed"
+        "detail": "▶ formatName\n  ✔ formats first and last (0.6989ms)\n  ✔ includes middle name (0.1205ms)\n  ✔ includes title and suffix (0.116ms)\n✔ formatName (1.9226ms)\nℹ tests 3\nℹ suites 1\nℹ pass 3\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 99.6414\n"
       },
-      "interface file created": {
+      "middle name works (behavioral)": {
         "pass": true,
-        "detail": "exists"
+        "detail": "A B C produced"
       },
-      "all callers updated": {
+      "existing lines preserved (no drive-by rewrite)": {
         "pass": true,
-        "detail": "both updated"
+        "detail": "all original lines intact"
       }
     },
     "completeVerdict": {
       "files_changed": [
-        "src/ilogger.js",
-        "src/logger.js",
-        "src/app.js",
-        "src/worker.js",
-        "test/logger.test.js"
+        "src/format.js",
+        "test/format.test.js"
       ],
       "tests_passed": 3,
       "tests_total": 3,
-      "verdict": "pass — extracted ILogger, made Logger extend it, injected ILogger-compatible loggers into app and worker, fixed node:test imports, and confirmed all 3 tests pass."
-    },
-    "passed": true,
-    "turnsUsed": 5,
-    "totalTokens": 8311
-  },
-  {
-    "versionId": "v-final",
-    "scenarioId": "auth-fix",
-    "sessionId": "07e9d071",
-    "projectDir": "C:\\Users\\fp\\Desktop\\github\\fpskill\\benchmarks\\multi-turn-results\\sessions-v2\\07e9d071",
-    "turns": [
-      {
-        "turn": 1,
-        "content": "Step 1 of 3: diagnosing the 401 by inspecting the auth code, test, package configuration, and current test output.",
-        "toolCalls": [
-          {
-            "name": "read_file",
-            "args": {
-              "path": "src/auth.js"
-            }
-          },
-          {
-            "name": "read_file",
-            "args": {
-              "path": "test/auth.test.js"
-            }
-          },
-          {
-            "name": "read_file",
-            "args": {
-              "path": "package.json"
-            }
-          },
-          {
-            "name": "run_command",
-            "args": {
-              "command": "npm test"
-            }
-          }
-        ],
-        "toolResults": [
-          {
-            "name": "read_file",
-            "result": "function login(username, password) {\n  if (!username || !password) throw new Error('Missing credentials');\n  if (username === 'admin' && password === 'secret123') {\n    return { token: 'tok_' + Date.now(), user: username };\n  }\n  return null;\n}\nmodule.exports = { login };"
-          },
-          {
-            "name": "read_file",
-            "result": "const { login } = require('../src/auth');\nconst assert = require('assert');\n\ndescribe('Auth', () => {\n  it('should login with valid credentials', () => {\n    const result = login('admin', 'wrong-password');  // BUG: should be 'secret123'\n    assert.ok(result, 'Expected login to succeed with valid cr"
-          },
-          {
-            "name": "read_file",
-            "result": "{\n  \"name\": \"auth-test\",\n  \"scripts\": {\n    \"test\": \"node --test test/auth.test.js\"\n  }\n}"
-          },
-          {
-            "name": "run_command",
-            "result": "\n> test\n> node --test test/auth.test.js\n\nC:\\Users\\fp\\Desktop\\github\\fpskill\\benchmarks\\multi-turn-results\\sessions-v2\\07e9d071\\test\\auth.test.js:4\ndescribe('Auth', () => {\n^\n\nReferenceError: describe is not defined\n    at Object.<anonymous> (C:\\Users\\fp\\Desktop\\github\\fpskill\\benchmarks\\multi-turn-r"
-          }
-        ]
-      },
-      {
-        "turn": 2,
-        "content": "Step 1 of 3 complete: `login` correctly accepts `admin`/`secret123`; the test has two defects—Node test globals are not imported, and it passes `wrong-password`. Step 2: repair only the test.",
-        "toolCalls": [
-          {
-            "name": "write_file",
-            "args": {
-              "path": "test/auth.test.js",
-              "content": "const { describe, it } = require('node:test');\nconst { login } = require('../src/auth');\nconst assert = require('assert');\n\ndescribe('Auth', () => {\n  it('should login with valid credentials', () => {\n    const result = login('admin', 'secret123');\n    assert.ok(result, 'Expected login to succeed with valid credentials');\n    assert.equal(result.user, 'admin');\n  });\n  it('should reject empty username', () => {\n    assert.throws(() => login('', 'pass'), /Missing credentials/);\n  });\n});\n"
-            }
-          }
-        ],
-        "toolResults": [
-          {
-            "name": "write_file",
-            "result": "OK: wrote 492 bytes to test/auth.test.js"
-          }
-        ]
-      },
-      {
-        "turn": 3,
-        "content": "Step 2 of 3 complete: the test now uses Node’s test API and the valid credential defined by the implementation. Step 3: run the full test suite.",
-        "toolCalls": [
-          {
-            "name": "run_command",
-            "args": {
-              "command": "npm test"
-            }
-          }
-        ],
-        "toolResults": [
-          {
-            "name": "run_command",
-            "result": "\n> test\n> node --test test/auth.test.js\n\n▶ Auth\n  ✔ should login with valid credentials (0.7291ms)\n  ✔ should reject empty username (0.3899ms)\n✔ Auth (2.0514ms)\nℹ tests 2\nℹ suites 1\nℹ pass 2\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 72.229\n\nExit code: 0"
-          }
-        ]
-      },
-      {
-        "turn": 4,
-        "content": "",
-        "toolCalls": [
-          {
-            "name": "task_complete",
-            "args": {
-              "files_changed": [
-                "test/auth.test.js"
-              ],
-              "tests_passed": 2,
-              "tests_total": 2,
-              "verdict": "pass — diagnosed two test-side defects: missing imports for Node's describe/it test API and an invalid password in the valid-login case. Corrected the test without changing src/auth.js; npm test now passes 2/2."
-            }
-          }
-        ],
-        "toolResults": [
-          {
-            "name": "task_complete",
-            "result": "{\"acknowledged\":true,\"files_changed\":[\"test/auth.test.js\"],\"tests_passed\":2,\"tests_total\":2,\"verdict\":\"pass — diagnosed two test-side defects: missing imports for Node's describe/it test API and an invalid password in the valid-login case. Corrected the test without changing src/auth.js; npm test no"
-          }
-        ]
-      }
-    ],
-    "checks": {
-      "all tests pass": {
-        "pass": true,
-        "detail": "▶ Auth\n  ✔ should login with valid credentials (0.7649ms)\n  ✔ should reject empty username (0.3909ms)\n✔ Auth (2.1254ms)\nℹ tests 2\nℹ suites 1\nℹ pass 2\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 74.1108\n"
-      },
-      "bug is fixed": {
-        "pass": true,
-        "detail": "correct password found"
-      }
-    },
-    "completeVerdict": {
-      "files_changed": [
-        "test/auth.test.js"
-      ],
-      "tests_passed": 2,
-      "tests_total": 2,
-      "verdict": "pass — diagnosed two test-side defects: missing imports for Node's describe/it test API and an invalid password in the valid-login case. Corrected the test without changing src/auth.js; npm test now passes 2/2."
-    },
-    "passed": true,
-    "turnsUsed": 4,
-    "totalTokens": 8967
-  },
-  {
-    "versionId": "v-final",
-    "scenarioId": "refactor-extract",
-    "sessionId": "2423e643",
-    "projectDir": "C:\\Users\\fp\\Desktop\\github\\fpskill\\benchmarks\\multi-turn-results\\sessions-v2\\2423e643",
-    "turns": [
-      {
-        "turn": 1,
-        "content": "Step 1 of 4: I’ll inspect the current logger API and its consumers before making the refactor.",
-        "toolCalls": [
-          {
-            "name": "read_file",
-            "args": {
-              "path": "src/logger.js"
-            }
-          },
-          {
-            "name": "read_file",
-            "args": {
-              "path": "src/app.js"
-            }
-          },
-          {
-            "name": "read_file",
-            "args": {
-              "path": "src/worker.js"
-            }
-          },
-          {
-            "name": "read_file",
-            "args": {
-              "path": "test/logger.test.js"
-            }
-          },
-          {
-            "name": "read_file",
-            "args": {
-              "path": "package.json"
-            }
-          }
-        ],
-        "toolResults": [
-          {
-            "name": "read_file",
-            "result": "class Logger {\n  constructor(level = 'info') { this.level = level; }\n  log(msg) { if (this.level !== 'silent') console.log('[LOG]', msg); }\n  error(msg) { console.error('[ERR]', msg); }\n  warn(msg) { if (this.level !== 'silent') console.warn('[WARN]', msg); }\n  setLevel(level) { this.level = level; "
-          },
-          {
-            "name": "read_file",
-            "result": "const { Logger } = require('./logger');\nconst log = new Logger('info');\nfunction run() { log.log('App started'); log.warn('Config missing'); log.error('DB connection failed'); }\nmodule.exports = { run };"
-          },
-          {
-            "name": "read_file",
-            "result": "const { Logger } = require('./logger');\nconst log = new Logger('silent');\nfunction process() { log.log('Worker processing'); log.error('Queue full'); }\nmodule.exports = { process };"
-          },
-          {
-            "name": "read_file",
-            "result": "const { Logger } = require('../src/logger');\nconst assert = require('assert');\ndescribe('Logger', () => {\n  it('should create logger with default level', () => {\n    const l = new Logger();\n    assert.equal(l.level, 'info');\n  });\n  it('should support silent level', () => {\n    const l = new Logger("
-          },
-          {
-            "name": "read_file",
-            "result": "{\n  \"name\": \"refactor\",\n  \"scripts\": {\n    \"test\": \"node --test test/logger.test.js\"\n  }\n}"
-          }
-        ]
-      },
-      {
-        "turn": 2,
-        "content": "Step 1 of 4 complete: `Logger` exposes `log`, `error`, `warn`, and `setLevel`; consumers are directly coupled to the concrete class. Next: add an abstract contract and inject `ILogger`-compatible instances while preserving default behavior.",
-        "toolCalls": [
-          {
-            "name": "write_file",
-            "args": {
-              "path": "src/ilogger.js",
-              "content": "class ILogger {\n  log(_msg) { throw new Error('ILogger.log must be implemented'); }\n  error(_msg) { throw new Error('ILogger.error must be implemented'); }\n  warn(_msg) { throw new Error('ILogger.warn must be implemented'); }\n  setLevel(_level) { throw new Error('ILogger.setLevel must be implemented'); }\n}\n\nmodule.exports = { ILogger };\n"
-            }
-          },
-          {
-            "name": "write_file",
-            "args": {
-              "path": "src/logger.js",
-              "content": "const { ILogger } = require('./ilogger');\n\nclass Logger extends ILogger {\n  constructor(level = 'info') {\n    super();\n    this.level = level;\n  }\n\n  log(msg) { if (this.level !== 'silent') console.log('[LOG]', msg); }\n  error(msg) { console.error('[ERR]', msg); }\n  warn(msg) { if (this.level !== 'silent') console.warn('[WARN]', msg); }\n  setLevel(level) { this.level = level; }\n}\n\nmodule.exports = { Logger };\n"
-            }
-          },
-          {
-            "name": "write_file",
-            "args": {
-              "path": "src/app.js",
-              "content": "const { Logger } = require('./logger');\n\n/** @typedef {import('./ilogger').ILogger} ILogger */\n\nconst defaultLogger = new Logger('info');\n\n/** @param {ILogger} [log] */\nfunction run(log = defaultLogger) {\n  log.log('App started');\n  log.warn('Config missing');\n  log.error('DB connection failed');\n}\n\nmodule.exports = { run };\n"
-            }
-          },
-          {
-            "name": "write_file",
-            "args": {
-              "path": "src/worker.js",
-              "content": "const { Logger } = require('./logger');\n\n/** @typedef {import('./ilogger').ILogger} ILogger */\n\nconst defaultLogger = new Logger('silent');\n\n/** @param {ILogger} [log] */\nfunction process(log = defaultLogger) {\n  log.log('Worker processing');\n  log.error('Queue full');\n}\n\nmodule.exports = { process };\n"
-            }
-          },
-          {
-            "name": "write_file",
-            "args": {
-              "path": "test/logger.test.js",
-              "content": "const { ILogger } = require('../src/ilogger');\nconst { Logger } = require('../src/logger');\nconst assert = require('assert');\n\ndescribe('Logger', () => {\n  it('should implement ILogger', () => {\n    assert.ok(new Logger() instanceof ILogger);\n  });\n\n  it('should create logger with default level', () => {\n    const l = new Logger();\n    assert.equal(l.level, 'info');\n  });\n\n  it('should support silent level', () => {\n    const l = new Logger('silent');\n    assert.equal(l.level, 'silent');\n  });\n});\n"
-            }
-          }
-        ],
-        "toolResults": [
-          {
-            "name": "write_file",
-            "result": "OK: wrote 339 bytes to src/ilogger.js"
-          },
-          {
-            "name": "write_file",
-            "result": "OK: wrote 413 bytes to src/logger.js"
-          },
-          {
-            "name": "write_file",
-            "result": "OK: wrote 327 bytes to src/app.js"
-          },
-          {
-            "name": "write_file",
-            "result": "OK: wrote 303 bytes to src/worker.js"
-          },
-          {
-            "name": "write_file",
-            "result": "OK: wrote 503 bytes to test/logger.test.js"
-          }
-        ]
-      },
-      {
-        "turn": 3,
-        "content": "Step 3 of 4 complete: `ILogger` is defined, `Logger` extends it, and app/worker now accept interface-compatible logger dependencies with existing defaults. Next: run the full test command and a consumer smoke test.",
-        "toolCalls": [
-          {
-            "name": "run_command",
-            "args": {
-              "command": "npm test"
-            }
-          },
-          {
-            "name": "run_command",
-            "args": {
-              "command": "node -e \"const { run } = require('./src/app'); const { process: work } = require('./src/worker'); const calls=[]; const mock={log:m=>calls.push(['log',m]),warn:m=>calls.push(['warn',m]),error:m=>calls.push(['error',m]),setLevel:()=>{}}; run(mock); work(mock); if(calls.length!==5) throw new Error('Expected 5 calls, got '+calls.length); console.log('consumer injection smoke test passed')\""
-            }
-          }
-        ],
-        "toolResults": [
-          {
-            "name": "run_command",
-            "result": "\n> test\n> node --test test/logger.test.js\n\nC:\\Users\\fp\\Desktop\\github\\fpskill\\benchmarks\\multi-turn-results\\sessions-v2\\2423e643\\test\\logger.test.js:5\ndescribe('Logger', () => {\n^\n\nReferenceError: describe is not defined\n    at Object.<anonymous> (C:\\Users\\fp\\Desktop\\github\\fpskill\\benchmarks\\multi-"
-          },
-          {
-            "name": "run_command",
-            "result": "consumer injection smoke test passed\n\nExit code: 0"
-          }
-        ]
-      },
-      {
-        "turn": 4,
-        "content": "Step 4 of 4 found a test-harness issue: `package.json` uses Node’s test runner, but the test file did not import `describe`/`it`; the consumer injection smoke test passed. Next: add the required `node:test` import and rerun all verification.",
-        "toolCalls": [
-          {
-            "name": "write_file",
-            "args": {
-              "path": "test/logger.test.js",
-              "content": "const { describe, it } = require('node:test');\nconst { ILogger } = require('../src/ilogger');\nconst { Logger } = require('../src/logger');\nconst assert = require('assert');\n\ndescribe('Logger', () => {\n  it('should implement ILogger', () => {\n    assert.ok(new Logger() instanceof ILogger);\n  });\n\n  it('should create logger with default level', () => {\n    const l = new Logger();\n    assert.equal(l.level, 'info');\n  });\n\n  it('should support silent level', () => {\n    const l = new Logger('silent');\n    assert.equal(l.level, 'silent');\n  });\n});\n"
-            }
-          }
-        ],
-        "toolResults": [
-          {
-            "name": "write_file",
-            "result": "OK: wrote 550 bytes to test/logger.test.js"
-          }
-        ]
-      },
-      {
-        "turn": 5,
-        "content": "",
-        "toolCalls": [
-          {
-            "name": "run_command",
-            "args": {
-              "command": "npm test"
-            }
-          },
-          {
-            "name": "run_command",
-            "args": {
-              "command": "node -e \"const { ILogger } = require('./src/ilogger'); const { Logger } = require('./src/logger'); const { run } = require('./src/app'); const { process: work } = require('./src/worker'); if (!(new Logger() instanceof ILogger)) throw new Error('Logger does not implement ILogger'); const calls=[]; const mock={log:m=>calls.push(['log',m]),warn:m=>calls.push(['warn',m]),error:m=>calls.push(['error',m]),setLevel:()=>{}}; run(mock); work(mock); if(calls.length!==5) throw new Error('Expected 5 calls, got '+calls.length); console.log('interface and consumer verification passed')\""
-            }
-          }
-        ],
-        "toolResults": [
-          {
-            "name": "run_command",
-            "result": "\n> test\n> node --test test/logger.test.js\n\n▶ Logger\n  ✔ should implement ILogger (0.699ms)\n  ✔ should create logger with default level (0.1399ms)\n  ✔ should support silent level (0.1074ms)\n✔ Logger (1.8965ms)\nℹ tests 3\nℹ suites 1\nℹ pass 3\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 74."
-          },
-          {
-            "name": "run_command",
-            "result": "interface and consumer verification passed\n\nExit code: 0"
-          }
-        ]
-      },
-      {
-        "turn": 6,
-        "content": "",
-        "toolCalls": [
-          {
-            "name": "task_complete",
-            "args": {
-              "files_changed": [
-                "src/ilogger.js",
-                "src/logger.js",
-                "src/app.js",
-                "src/worker.js",
-                "test/logger.test.js"
-              ],
-              "tests_passed": 3,
-              "tests_total": 3,
-              "verdict": "pass — Logger extends ILogger; app and worker accept injected ILogger-compatible dependencies while retaining their default Logger instances; npm test passes 3/3 and the consumer injection smoke test passes."
-            }
-          }
-        ],
-        "toolResults": [
-          {
-            "name": "task_complete",
-            "result": "{\"acknowledged\":true,\"files_changed\":[\"src/ilogger.js\",\"src/logger.js\",\"src/app.js\",\"src/worker.js\",\"test/logger.test.js\"],\"tests_passed\":3,\"tests_total\":3,\"verdict\":\"pass — Logger extends ILogger; app and worker accept injected ILogger-compatible dependencies while retaining their default Logger in"
-          }
-        ]
-      }
-    ],
-    "checks": {
-      "tests pass": {
-        "pass": true,
-        "detail": "passed"
-      },
-      "interface file created": {
-        "pass": true,
-        "detail": "exists"
-      },
-      "all callers updated": {
-        "pass": true,
-        "detail": "both updated"
-      }
-    },
-    "completeVerdict": {
-      "files_changed": [
-        "src/ilogger.js",
-        "src/logger.js",
-        "src/app.js",
-        "src/worker.js",
-        "test/logger.test.js"
-      ],
-      "tests_passed": 3,
-      "tests_total": 3,
-      "verdict": "pass — Logger extends ILogger; app and worker accept injected ILogger-compatible dependencies while retaining their default Logger instances; npm test passes 3/3 and the consumer injection smoke test passes."
+      "verdict": "pass — formatName now inserts a present middle name between first and last; existing first/last and title/suffix tests still pass. Verified with `npm test`: 3/3 tests passed."
     },
     "passed": true,
     "turnsUsed": 6,
-    "totalTokens": 18987
+    "totalTokens": 15745
   }
 ]

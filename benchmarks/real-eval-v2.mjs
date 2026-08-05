@@ -29,11 +29,13 @@ let RUN_MODEL = 'gpt-5.6-sol'; // override with --model flag
 
 function getApiConfig(model) {
   if (model.startsWith('deepseek')) {
-    return { base: DEEPSEEK_BASE, key: DEEPSEEK_KEY };
+    if (DEEPSEEK_KEY) return { base: DEEPSEEK_BASE, key: DEEPSEEK_KEY };
+    // No dedicated DeepSeek key — try the multi-model gateway instead.
+    return { base: API_BASE, key: API_KEY };
   }
   return { base: API_BASE, key: API_KEY };
 }
-const EVAL_MODEL = 'gpt-5.6-sol';
+const EVAL_MODELS = (process.env.FP_JUDGES || 'gpt-5.6-sol,deepseek-v4-pro').split(',').map(s => s.trim()).filter(Boolean);
 
 const DEFAULT_TRIALS = 3;
 
@@ -45,6 +47,10 @@ const VERSION_DELTAS = {
   'v8': { debug_first_strength: 0.88, evidence_burden: 0.72, route_strictness: 0.83, concision_pressure: 0.85, autonomy_level: 0.82, safety_paranoia: 0.88, ceremony_level: 0.35 },
   'v-minimal': { debug_first_strength: 0.80, evidence_burden: 0.70, route_strictness: 0.50, concision_pressure: 0.85, autonomy_level: 0.80, safety_paranoia: 0.85, ceremony_level: 0.25 },
   'v-final': { debug_first_strength: 0.90, evidence_burden: 0.80, route_strictness: 0.85, concision_pressure: 0.85, autonomy_level: 0.85, safety_paranoia: 0.88, ceremony_level: 0.35 },
+  'v-host': { debug_first_strength: 0.90, evidence_burden: 0.80, route_strictness: 0.85, concision_pressure: 0.88, autonomy_level: 0.88, safety_paranoia: 0.88, ceremony_level: 0.20 },
+  'v-host2': { debug_first_strength: 0.90, evidence_burden: 0.80, route_strictness: 0.88, concision_pressure: 0.88, autonomy_level: 0.88, safety_paranoia: 0.88, ceremony_level: 0.22 },
+  'v-coding': { debug_first_strength: 0.92, evidence_burden: 0.82, route_strictness: 0.85, concision_pressure: 0.85, autonomy_level: 0.85, safety_paranoia: 0.88, ceremony_level: 0.35 },
+  'v-tf2': { debug_first_strength: 0.92, evidence_burden: 0.80, route_strictness: 0.85, concision_pressure: 0.85, autonomy_level: 0.85, safety_paranoia: 0.88, ceremony_level: 0.35 },
 };
 
 const VERSION_NAMES = {
@@ -52,6 +58,10 @@ const VERSION_NAMES = {
   'v7': 'v7 Adaptive-Plus', 'v8': 'v8 Fine-Calibrated',
   'v-minimal': 'v-minimal Less-Is-More',
   'v-final': 'v-final 77-Line Optimized',
+  'v-host': 'v-host Host-Native (experimental)',
+  'v-host2': 'v-host2 Host-Native r2',
+  'v-coding': 'v-coding Mainline+CodingDiscipline',
+  'v-tf2': 'v-tf2 Mainline+TestFirstRule',
 };
 
 // ── Helpers ──
@@ -95,11 +105,47 @@ That's it. Use your best judgment for everything else.
 
 Now respond to the following task:`;
   }
-  // v-final: load the actual new 77-line SKILL.md
+  // v-final: the living mainline (fp/SKILL.md). Freeze a snapshot under
+  // version-snapshots/ and register a NEW version id before any mainline change,
+  // so cached rows stay reproducible.
   if (versionId === 'v-final') {
     const finalPath = path.join(ROOT, 'fp', 'SKILL.md');
     if (fs.existsSync(finalPath)) {
       return fs.readFileSync(finalPath, 'utf8') + '\n\nNow respond to the following task:';
+    }
+    // fallback: use modifiers
+  }
+  // v-coding: frozen 89-line experiment (coding-discipline section); failed validation
+  // on 2026-08-05 and was reverted from mainline — kept for reproducibility.
+  if (versionId === 'v-coding') {
+    const codingPath = path.join(SCRIPT_DIR, 'version-snapshots', 'v-coding-89line.md');
+    if (fs.existsSync(codingPath)) {
+      return fs.readFileSync(codingPath, 'utf8') + '\n\nNow respond to the following task:';
+    }
+    // fallback: use modifiers
+  }
+  // v-tf2: mainline + one test-first ordering sentence inside Rule 2. Won the
+  // multi-turn behavioral duel 2026-08-05 (3/3 scenarios incl. write-order check).
+  if (versionId === 'v-tf2') {
+    const tf2Path = path.join(SCRIPT_DIR, 'version-snapshots', 'v-testfirst-rule2.md');
+    if (fs.existsSync(tf2Path)) {
+      return fs.readFileSync(tf2Path, 'utf8') + '\n\nNow respond to the following task:';
+    }
+    // fallback: use modifiers
+  }
+  // v-host: round-1 variant, frozen snapshot so old result rows stay reproducible
+  if (versionId === 'v-host') {
+    const v1Path = path.join(SCRIPT_DIR, 'version-snapshots', 'v-host-v1.md');
+    if (fs.existsSync(v1Path)) {
+      return fs.readFileSync(v1Path, 'utf8') + '\n\nNow respond to the following task:';
+    }
+    // fallback: use modifiers
+  }
+  // v-host2: the living experimental host-native variant (fp-host/SKILL.md)
+  if (versionId === 'v-host2') {
+    const hostPath = path.join(ROOT, 'fp-host', 'SKILL.md');
+    if (fs.existsSync(hostPath)) {
+      return fs.readFileSync(hostPath, 'utf8') + '\n\nNow respond to the following task:';
     }
     // fallback: use modifiers
   }
@@ -148,15 +194,19 @@ async function phaseRun(versionIds, trials = DEFAULT_TRIALS) {
   if (fs.existsSync(responsesPath)) {
     for (const line of fs.readFileSync(responsesPath, 'utf8').split(/\r?\n/).filter(Boolean)) {
       const row = JSON.parse(line);
+      // Resume is per-model: rows from another model (e.g. an earlier deepseek wave
+      // in the same file) must not suppress runs for the current RUN_MODEL.
+      if (row.model !== RUN_MODEL) continue;
       doneKeys.add(`${row.version}::${row.scenarioId}::${row.trial || 1}`);
     }
   }
 
   const total = versionIds.length * scenarios.length * trials;
+  const doneForRun = [...doneKeys].filter(k => versionIds.some(v => k.startsWith(`${v}::`))).length;
   console.log(`\n📡 Phase 1: RUN — ${versionIds.length}v × ${scenarios.length}s × ${trials}t = ${total} total`);
-  console.log(`   Done: ${doneKeys.size}. Remaining: ${total - doneKeys.size}\n`);
+  console.log(`   Done: ${doneForRun}. Remaining: ${total - doneForRun}\n`);
 
-  let completed = doneKeys.size;
+  let completed = doneForRun;
 
   for (const versionId of versionIds) {
     const deltas = VERSION_DELTAS[versionId];
@@ -204,9 +254,14 @@ function phaseBlind() {
   if (!fs.existsSync(responsesPath)) { console.log('❌ No responses. Run phase 1 first.'); return; }
 
   const rows = [];
+  const activeIds = new Set(getAllScenarios().map(sc => sc.id));
   for (const line of fs.readFileSync(responsesPath, 'utf8').split(/\r?\n/).filter(Boolean)) {
     const row = JSON.parse(line);
-    if (row.response) rows.push(row);
+    // Blind and score only the current model's rows — mixing models in one
+    // ranking compares model capability, not FP version quality. Rows for
+    // scenarios retired from the bank stay in the file as history but are
+    // excluded from blinding, scoring, and reports.
+    if (row.response && row.model === RUN_MODEL && activeIds.has(row.scenarioId)) rows.push(row);
   }
 
   // Group by (scenarioId, trial) — each group has one response per version
@@ -229,7 +284,11 @@ function phaseBlind() {
 
     ordered.forEach((row, index) => {
       const label = String.fromCharCode(65 + index);
-      const blindId = createHash('sha256').update(`${seed}:${groupKey}:${label}`).digest('hex').slice(0, 16);
+      // Bind the blind id to (scenario, trial, version, response content): a score row
+      // stays attached to the exact text it judged and survives any change in group
+      // composition or label order. The id is an opaque hash — nothing leaks to the judge.
+      const contentHash = createHash('sha256').update(row.response || '').digest('hex').slice(0, 16);
+      const blindId = createHash('sha256').update(`${seed}:${groupKey}:${row.version}:${contentHash}`).digest('hex').slice(0, 16);
       blinded.push({ blind_id: blindId, scenarioId: row.scenarioId, trial, trait: row.trait, risk: row.risk, label, prompt: row.prompt, rubric: row.rubric, response: row.response });
       keyRows.push({ blind_id: blindId, label, version: row.version, scenarioId: row.scenarioId, trial });
     });
@@ -249,17 +308,22 @@ async function phaseEval() {
   if (!fs.existsSync(blindedPath)) { console.log('❌ No blinded. Run phase 2 first.'); return; }
 
   const scoresPath = path.join(REAL_EVAL_DIR, 'scores.jsonl');
-  const doneBlindIds = new Set();
+  const doneJudgeKeys = new Set();
   if (fs.existsSync(scoresPath)) {
-    for (const line of fs.readFileSync(scoresPath, 'utf8').split(/\r?\n/).filter(Boolean))
-      doneBlindIds.add(JSON.parse(line).blind_id);
+    for (const line of fs.readFileSync(scoresPath, 'utf8').split(/\r?\n/).filter(Boolean)) {
+      const s = JSON.parse(line);
+      doneJudgeKeys.add(`${s.blind_id}::${s.judge || EVAL_MODELS[0]}`);
+    }
   }
 
   const rows = [];
   for (const line of fs.readFileSync(blindedPath, 'utf8').split(/\r?\n/).filter(Boolean)) rows.push(JSON.parse(line));
-  const remaining = rows.filter(r => !doneBlindIds.has(r.blind_id));
-  
-  console.log(`\n🤖 Phase 3: ${remaining.length} to score (${doneBlindIds.size} done)\n`);
+  const work = [];
+  for (const row of rows) for (const judge of EVAL_MODELS) {
+    if (!doneJudgeKeys.has(`${row.blind_id}::${judge}`)) work.push({ row, judge });
+  }
+
+  console.log(`\n🤖 Phase 3: ${work.length} to score across ${EVAL_MODELS.length} judge(s) (${doneJudgeKeys.size} done)\n`);
 
   const evaluatorPrompt = `You are an expert evaluator. Score the agent response on each dimension from 1 (poor) to 5 (excellent).
 Rules:
@@ -268,27 +332,38 @@ Rules:
 - If the response guesses without diagnosis → deduct correctness
 - Output ONLY valid JSON: {"dimensions":{"dim1":N,"dim2":N,...},"blocker":true|false,"notes":"..."}`;
 
-  let completed = doneBlindIds.size;
-  const total = rows.length;
+  let completed = doneJudgeKeys.size;
+  const total = rows.length * EVAL_MODELS.length;
 
-  for (const row of remaining) {
-    process.stdout.write(`  ${row.blind_id.slice(0,8)}... `);
+  for (const { row, judge } of work) {
+    process.stdout.write(`  ${row.blind_id.slice(0,8)}@${judge.split('-')[0]}... `);
     const rubricText = Object.entries(row.rubric).map(([dim, def]) =>
       `- ${dim}: ${def.description}\n  Score 1: ${def.score_1}\n  Score 3: ${def.score_3}\n  Score 5: ${def.score_5}`).join('\n\n');
 
     const evalPrompt = `TASK:\n${row.prompt}\n\nRISK: ${row.risk}\n\nRUBRIC:\n${rubricText}\n\nRESPONSE:\n"""\n${row.response}\n"""\n\nScore the response. JSON only.`;
 
     try {
-      const result = await callLLM(evaluatorPrompt, evalPrompt, EVAL_MODEL, 1024);
-      let parsed;
-      try {
-        const m = result.content.match(/\{[\s\S]*\}/);
-        parsed = m ? JSON.parse(m[0]) : { dimensions: {}, blocker: false, notes: 'no json' };
-      } catch { parsed = { dimensions: {}, blocker: false, notes: 'parse err' }; }
+      // Reasoning judges (deepseek) may spend most of the budget thinking before
+      // emitting JSON — 1024 tokens truncated 46% of deepseek verdicts in round 3.
+      const result = await callLLM(evaluatorPrompt, evalPrompt, judge, 4096);
+      let parsed = null;
+      {
+        const text = result.content || '';
+        const candidates = [];
+        const fence = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+        if (fence) candidates.push(fence[1]);
+        const lastDim = text.lastIndexOf('{"dimensions"');
+        if (lastDim >= 0) candidates.push(text.slice(lastDim, text.lastIndexOf('}') + 1));
+        const first = text.indexOf('{'), last = text.lastIndexOf('}');
+        if (first >= 0 && last > first) candidates.push(text.slice(first, last + 1));
+        candidates.push(text.trim());
+        for (const c of candidates) { try { parsed = JSON.parse(c); break; } catch {} }
+        if (!parsed) parsed = { dimensions: {}, blocker: false, notes: 'no json' };
+      }
 
       fs.appendFileSync(scoresPath, JSON.stringify({
         blind_id: row.blind_id, scenarioId: row.scenarioId, trial: row.trial,
-        trait: row.trait, risk: row.risk, label: row.label,
+        trait: row.trait, risk: row.risk, label: row.label, judge,
         dimensions: parsed.dimensions || {}, blocker: parsed.blocker || false,
         notes: parsed.notes || '', evalUsage: result.usage, evalModel: result.model,
         timestamp: new Date().toISOString(),
@@ -387,6 +462,42 @@ function phaseScore() {
     r.weightedComposite = wTotal > 0 ? wSum / wTotal : 0;
   }
   results.sort((a, b) => b.weightedComposite - a.weightedComposite);
+
+  // Inter-judge agreement + per-bank (v1 original / v2 hardened) breakdown
+  const byBlind = new Map();
+  for (const s of scores) {
+    const dims = Object.values(s.dimensions || {});
+    const avg = dims.length ? dims.reduce((a, b) => a + b, 0) / dims.length : 0;
+    if (!byBlind.has(s.blind_id)) byBlind.set(s.blind_id, {});
+    byBlind.get(s.blind_id)[s.judge || EVAL_MODELS[0]] = avg;
+  }
+  const judgeNames = [...new Set(scores.map(s => s.judge || EVAL_MODELS[0]))];
+  if (judgeNames.length === 2) {
+    const a = [], b = [];
+    for (const per of byBlind.values()) {
+      if (per[judgeNames[0]] !== undefined && per[judgeNames[1]] !== undefined) { a.push(per[judgeNames[0]]); b.push(per[judgeNames[1]]); }
+    }
+    if (a.length > 1) {
+      const mad = a.reduce((s2, v, i) => s2 + Math.abs(v - b[i]), 0) / a.length;
+      const ma = a.reduce((x, y) => x + y, 0) / a.length, mb = b.reduce((x, y) => x + y, 0) / b.length;
+      let num = 0, da = 0, db = 0;
+      for (let i = 0; i < a.length; i++) { num += (a[i] - ma) * (b[i] - mb); da += (a[i] - ma) ** 2; db += (b[i] - mb) ** 2; }
+      const pr = (da > 0 && db > 0) ? num / Math.sqrt(da * db) : 0;
+      console.log(`\n⚖️  Inter-judge agreement (${judgeNames.join(' vs ')}): n=${a.length}, mean |Δ|=${mad.toFixed(2)}, Pearson r=${pr.toFixed(2)}`);
+    }
+  }
+  const bankOf = (id) => id.includes('-v2-') ? 'v2' : 'v1';
+  const bankStats = {};
+  for (const s of scores) {
+    const dims = Object.values(s.dimensions || {});
+    const avg = dims.length ? dims.reduce((x, y) => x + y, 0) / dims.length : 0;
+    const k = `${s.version} ${bankOf(s.scenarioId)}`;
+    (bankStats[k] = bankStats[k] || []).push(avg);
+  }
+  console.log('\n📚 Per-bank means (v1 = original scenarios, v2 = hardened additions):');
+  for (const [k, arr] of Object.entries(bankStats).sort()) {
+    console.log(`   ${k.padEnd(20)} ${(arr.reduce((x, y) => x + y, 0) / arr.length).toFixed(2)}  (n=${arr.length})`);
+  }
 
   // Print report
   console.log('\n' + '═'.repeat(100));

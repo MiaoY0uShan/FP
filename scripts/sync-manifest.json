@@ -1,0 +1,57 @@
+{
+  "$comment": "Single source of truth for install-pack sync targets. Consumed by scripts/sync-install-packs.ps1 (write mode + -Check) and scripts/ci-safe-sync-check.js (portable check). Edit this file, never inline lists in the scripts.",
+  "canonicalMetadata": [
+    "LICENSE",
+    "THIRD_PARTY_NOTICES.md",
+    "VERSION"
+  ],
+  "fpTreeTargets": [
+    "install/codex/.agents/skills/fp/references/fp",
+    "install/claude-code/.claude/skills/fp/references/fp",
+    "install/gemini-cli/fp/fp",
+    "install/github-copilot-cli/fp",
+    "install/cursor/fp",
+    "install/windsurf/fp",
+    "install/cline/fp",
+    "install/roo-code/fp",
+    "install/opencode/fp",
+    "install/kiro/fp",
+    "install/github-copilot-editor/fp",
+    "install/aider/fp",
+    "install/universal/.fp-package/payload/fp"
+  ],
+  "testFpTargets": [
+    "install/codex/TEST_FP.md",
+    "install/claude-code/TEST_FP.md",
+    "install/gemini-cli/TEST_FP.md",
+    "install/github-copilot-cli/TEST_FP.md",
+    "install/cursor/TEST_FP.md",
+    "install/windsurf/TEST_FP.md",
+    "install/cline/TEST_FP.md",
+    "install/roo-code/TEST_FP.md",
+    "install/opencode/TEST_FP.md",
+    "install/kiro/TEST_FP.md",
+    "install/github-copilot-editor/TEST_FP.md",
+    "install/aider/TEST_FP.md",
+    "install/universal/.fp-package/payload/TEST_FP.md"
+  ],
+  "copyPaste": {
+    "source": "fp-copy-paste.md",
+    "target": "dist/fp-copy-paste.md"
+  },
+  "noFrontmatterTargets": [
+    "install/windsurf/.windsurf/rules/fp.md",
+    "install/roo-code/.roo/rules/fp.md",
+    "install/cline/.clinerules/fp.md",
+    "install/universal/.fp-package/payload/.windsurf/rules/fp.md",
+    "install/universal/.fp-package/payload/.roo/rules/fp.md",
+    "install/universal/.fp-package/payload/.clinerules/fp.md",
+    "install/universal/.fp-package/payload/.qoder/rules/fp.md",
+    "install/universal/.fp-package/payload/.agents/rules/fp.md"
+  ],
+  "claudeMdTargets": [
+    "install/universal/.fp-package/payload/.claude/CLAUDE.md",
+    "install/claude-code/.claude/CLAUDE.md",
+    "install/codex/.agents/CLAUDE.md"
+  ]
+}

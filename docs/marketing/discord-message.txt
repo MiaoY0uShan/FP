@@ -1,0 +1,11 @@
+FP — Finish with Proof: 让你的 Pi agent 用证据收尾，而不是凭感觉
+
+85行 | 4条规则 | 按需profiles
+安装: npm i @miaoy0ushan/fp 或 pi install npm:@miaoy0ushan/fp
+
+盲评冠军: GPT-5.6 3.57 | DeepSeek 3.14
+Token消耗 -45% | 工具调用 -57%
+
+GitHub: https://github.com/MiaoY0uShan/FP
+npm: https://www.npmjs.com/package/@miaoy0ushan/fp
+ChatGPT GPT: https://chatgpt.com/g/g-6a660acb6f788191b426f01b55ca34d6-fp-coding-engineer

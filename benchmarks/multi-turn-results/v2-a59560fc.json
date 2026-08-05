@@ -1,0 +1,144 @@
+{
+  "versionId": "v0",
+  "scenarioId": "smallest-diff-feature",
+  "sessionId": "a59560fc",
+  "projectDir": "C:\\Users\\fp\\Desktop\\github\\fpskill\\benchmarks\\multi-turn-results\\sessions-v2\\a59560fc",
+  "turns": [
+    {
+      "turn": 1,
+      "content": "",
+      "toolCalls": [
+        {
+          "name": "read_file",
+          "args": {
+            "path": "src/format.js"
+          }
+        },
+        {
+          "name": "read_file",
+          "args": {
+            "path": "test/format.test.js"
+          }
+        },
+        {
+          "name": "read_file",
+          "args": {
+            "path": "package.json"
+          }
+        }
+      ],
+      "toolResults": [
+        {
+          "name": "read_file",
+          "result": "function formatName(user) {\n  var s = '';\n  if (user.title) { s = s + user.title + ' '; }\n  s = s + user.first;\n  if (user.last) { s = s + ' ' + user.last; }\n  if (user.suffix) { s = s + ', ' + user.suffix; }\n  return s;\n}\nmodule.exports = { formatName };"
+        },
+        {
+          "name": "read_file",
+          "result": "const { describe, it } = require('node:test');\nconst assert = require('assert');\nconst { formatName } = require('../src/format');\n\ndescribe('formatName', () => {\n  it('formats first and last', () => {\n    assert.equal(formatName({ first: 'Ada', last: 'Lovelace' }), 'Ada Lovelace');\n  });\n  it('inclu"
+        },
+        {
+          "name": "read_file",
+          "result": "{\n  \"name\": \"formatter\",\n  \"scripts\": {\n    \"test\": \"node --test test/format.test.js\"\n  }\n}"
+        }
+      ]
+    },
+    {
+      "turn": 2,
+      "content": "",
+      "toolCalls": [
+        {
+          "name": "write_file",
+          "args": {
+            "path": "src/format.js",
+            "content": "function formatName(user) {\n  var s = '';\n  if (user.title) { s = s + user.title + ' '; }\n  s = s + user.first;\n  if (user.middle) { s = s + ' ' + user.middle; }\n  if (user.last) { s = s + ' ' + user.last; }\n  if (user.suffix) { s = s + ', ' + user.suffix; }\n  return s;\n}\nmodule.exports = { formatName };\n"
+          }
+        },
+        {
+          "name": "write_file",
+          "args": {
+            "path": "test/format.test.js",
+            "content": "const { describe, it } = require('node:test');\nconst assert = require('assert');\nconst { formatName } = require('../src/format');\n\ndescribe('formatName', () => {\n  it('formats first and last', () => {\n    assert.equal(formatName({ first: 'Ada', last: 'Lovelace' }), 'Ada Lovelace');\n  });\n  it('includes middle name', () => {\n    assert.equal(formatName({ first: 'Ada', middle: 'Byron', last: 'Lovelace' }), 'Ada Byron Lovelace');\n  });\n  it('includes title and suffix', () => {\n    assert.equal(formatName({ title: 'Dr.', first: 'Ada', last: 'Lovelace', suffix: 'PhD' }), 'Dr. Ada Lovelace, PhD');\n  });\n});\n"
+          }
+        }
+      ],
+      "toolResults": [
+        {
+          "name": "write_file",
+          "result": "OK: wrote 306 bytes to src/format.js"
+        },
+        {
+          "name": "write_file",
+          "result": "OK: wrote 609 bytes to test/format.test.js"
+        }
+      ]
+    },
+    {
+      "turn": 3,
+      "content": "",
+      "toolCalls": [
+        {
+          "name": "run_command",
+          "args": {
+            "command": "npm test"
+          }
+        }
+      ],
+      "toolResults": [
+        {
+          "name": "run_command",
+          "result": "\n> test\n> node --test test/format.test.js\n\n▶ formatName\n  ✔ formats first and last (0.7453ms)\n  ✔ includes middle name (0.1219ms)\n  ✔ includes title and suffix (0.1205ms)\n✔ formatName (2.0583ms)\nℹ tests 3\nℹ suites 1\nℹ pass 3\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 81.4555\n\nExit cod"
+        }
+      ]
+    },
+    {
+      "turn": 4,
+      "content": "",
+      "toolCalls": [
+        {
+          "name": "task_complete",
+          "args": {
+            "files_changed": [
+              "src/format.js",
+              "test/format.test.js"
+            ],
+            "tests_passed": 3,
+            "tests_total": 3,
+            "verdict": "pass — formatName now inserts a present middle name between first and last; existing first/last and title/suffix tests still pass, along with the new middle-name test."
+          }
+        }
+      ],
+      "toolResults": [
+        {
+          "name": "task_complete",
+          "result": "{\"acknowledged\":true,\"files_changed\":[\"src/format.js\",\"test/format.test.js\"],\"tests_passed\":3,\"tests_total\":3,\"verdict\":\"pass — formatName now inserts a present middle name between first and last; existing first/last and title/suffix tests still pass, along with the new middle-name test.\"}"
+        }
+      ]
+    }
+  ],
+  "checks": {
+    "tests pass": {
+      "pass": true,
+      "detail": "▶ formatName\n  ✔ formats first and last (0.6999ms)\n  ✔ includes middle name (0.1308ms)\n  ✔ includes title and suffix (0.1345ms)\n✔ formatName (1.966ms)\nℹ tests 3\nℹ suites 1\nℹ pass 3\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 85.4269\n"
+    },
+    "middle name works (behavioral)": {
+      "pass": true,
+      "detail": "A B C produced"
+    },
+    "existing lines preserved (no drive-by rewrite)": {
+      "pass": true,
+      "detail": "all original lines intact"
+    }
+  },
+  "completeVerdict": {
+    "files_changed": [
+      "src/format.js",
+      "test/format.test.js"
+    ],
+    "tests_passed": 3,
+    "tests_total": 3,
+    "verdict": "pass — formatName now inserts a present middle name between first and last; existing first/last and title/suffix tests still pass, along with the new middle-name test."
+  },
+  "passed": true,
+  "turnsUsed": 4,
+  "totalTokens": 4279
+}

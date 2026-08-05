@@ -5,7 +5,7 @@ description: "Use only when routed by FP after MVP scope is defined to choose th
 
 # FP: Optimize Path
 
-Choose the smallest stable path that can produce verified progress.
+Choose the smallest stable path that reaches the stated goal with verified progress.
 
 Then compile the selected route into the final **Execution Brief**.
 
@@ -66,10 +66,11 @@ Do not use this skill to redesign the product goal or expand the MVP.
 
 ## Core principle
 
-> Choose the smallest stable path that can produce verified progress.
+> Choose the smallest stable path that reaches the stated goal with verified progress.
 
 A good path is:
 
+- one that lands on the stated goal, not a nearby outcome
 - small enough to execute safely
 - stable enough to avoid avoidable failure
 - easy to verify
@@ -92,7 +93,7 @@ need -> existing code -> standard library -> native platform
 -> installed dependency -> one line -> minimum new implementation
 ```
 
-Reject a path that adds a dependency, wrapper, helper, module, or configuration layer while an earlier rung works. Earlier does not mean shorter at the expense of security, data integrity, accessibility, rollback, or verifiability.
+Reject a path that adds a dependency, wrapper, helper, module, or configuration layer while an earlier rung works. Earlier does not mean shorter at the expense of security, data integrity, accessibility, rollback, or verifiability. Shorter never means abandoning the stated goal.
 
 ### 1. Small-batch quick response
 
@@ -212,6 +213,7 @@ Each path should have:
 - reuse rung and any justified new entity
 
 Do not generate paths that violate explicit non-goals.
+A path that lands short of the stated goal is not a candidate — record it as blocked, with its gap.
 
 ### 3. Evaluate candidate paths
 
@@ -231,7 +233,7 @@ Prefer paths that are smaller, more reversible, and easier to verify.
 
 Choose one selected path.
 
-If no path is safe, return `Decision: ask_user` or recommend `shorten-iteration`.
+If the selected path becomes blocked, re-enumerate candidates to the same stated goal. If no path is safe or no viable path remains, return `Decision: ask_user` with the tried paths and gap-labeled options, or recommend `shorten-iteration`. Do not shrink the goal to keep a path alive.
 
 ### 5. Define the small-batch slice
 
@@ -439,6 +441,7 @@ Also include a machine-readable JSON block when useful.
 - Do not expand the MVP.
 - Do not choose a path that lacks verification.
 - Do not choose the fastest path if it is not reversible or testable.
+- Do not select a path that lands short of the stated goal; that is a blocked report, not a route.
 - Do not add just-in-case systems. Add only minimal safety buffers.
 - Stop at the first safe reuse-ladder rung that satisfies the acceptance evidence.
 - Prefer small-batch, working, low-waste increments.

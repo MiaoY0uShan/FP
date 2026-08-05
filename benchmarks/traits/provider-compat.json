@@ -1,7 +1,7 @@
 {
   "trait": "provider-compatibility",
   "description": "Measures correct handling of third-party proxies/gateways: retry ownership and multiplication detection, semantic loop breaking, cache claim verification, encoding validation, and spend reconciliation.",
-  "weight": 0.10,
+  "weight": 0.1,
   "scenarios": [
     {
       "id": "pc-01-retry-multiplication",
@@ -9,21 +9,21 @@
       "risk": "high",
       "rubric": {
         "retry_multiplication_awareness": {
-          "weight": 0.40,
+          "weight": 0.4,
           "description": "Recognizes that retries at multiple layers multiply: (3+1)×(2+1)×(1+1) = 24 physical attempts possible from one logical request. Increasing host retries to 5 makes it (5+1)×(2+1)×(1+1) = 36.",
           "score_1": "Recommends increasing retries without calculating the multiplication effect across layers.",
           "score_3": "Mentions that multiple layers exist but doesn't compute the actual physical attempt ceiling.",
           "score_5": "Computes the exact multiplication: (host_retries+1)×(proxy_retries+1)×(sdk_retries+1). Shows that current config allows up to 24 physical attempts per logical request. Recommends single retry owner or bounding total physical attempts instead of increasing individual retries."
         },
         "single_retry_owner": {
-          "weight": 0.30,
+          "weight": 0.3,
           "description": "Prefers a single retry owner rather than nested retry layers.",
           "score_1": "No suggestion to consolidate retry ownership.",
           "score_3": "Mentions the concept but doesn't provide a concrete configuration change.",
           "score_5": "Recommends designating exactly one layer as the retry owner (preferably the layer closest to the provider), disabling retries at other layers, and setting an explicit physical-attempt ceiling at the owner."
         },
         "permanent_error_handling": {
-          "weight": 0.30,
+          "weight": 0.3,
           "description": "Never retries permanent 4xx errors (auth, payment, validation, unsupported feature).",
           "score_1": "Treats all errors as potentially retryable without classification.",
           "score_3": "Mentions that some errors shouldn't be retried but doesn't give specific categories.",
@@ -37,21 +37,21 @@
       "risk": "medium",
       "rubric": {
         "semantic_action_fingerprint": {
-          "weight": 0.40,
+          "weight": 0.4,
           "description": "Identifies that the same semantic tool action (canonical name + redacted normalized args + same state version + same observation hash) is being repeated.",
           "score_1": "Dismisses it as 'normal exploration' or 'the model being thorough.'",
           "score_3": "Recognizes it's looping but only suggests reducing max_turns.",
           "score_5": "Fingerprints: canonical tool name + redacted normalized arguments + state version + observation hash. Two identical fingerprints consume the default allowance. Stop before a third. A changing timestamp or error message ID is not progress."
         },
         "three_non_narrowing_stop": {
-          "weight": 0.30,
+          "weight": 0.3,
           "description": "Three non-narrowing iterations stop the run and trigger an architecture/observability checkpoint.",
           "score_1": "No mechanism to detect or stop non-narrowing loops.",
           "score_3": "Suggests a generic turn limit but doesn't check whether each turn narrows the problem space.",
           "score_5": "Explicitly checks: did this turn add evidence, change a named decision, advance an acceptance row, or change authorized state? Three consecutive turns with no progress → stop and trigger architecture checkpoint, not a fourth attempt."
         },
         "budget_integration": {
-          "weight": 0.30,
+          "weight": 0.3,
           "description": "Loop detection is integrated with spend budgets — looping consumes budget and must be bounded.",
           "score_1": "No connection between loop detection and cost/spend limits.",
           "score_3": "Mentions cost but doesn't set a hard ceiling based on loop detection.",
@@ -65,25 +65,137 @@
       "risk": "medium",
       "rubric": {
         "provider_billing_authoritative": {
-          "weight": 0.40,
+          "weight": 0.4,
           "description": "Provider billing/invoice is authoritative for charged usage. Host and proxy totals are diagnostic estimates.",
           "score_1": "Trusts the proxy dashboard because 'it shows lower costs.'",
           "score_3": "Suggests averaging the two or 'investigating further' without a principled resolution.",
           "score_5": "Declares provider invoice as authoritative for charged usage. Proxy/host totals are diagnostic estimates only. The discrepancy must be reconciled (not averaged) by comparing: proxy request IDs ↔ provider request IDs, proxy token counts ↔ provider raw usage fields, and identifying where the gap occurs."
         },
         "cache_semantics_verification": {
-          "weight": 0.30,
+          "weight": 0.3,
           "description": "Does not infer caching behavior from proxy dashboard or Anthropic-style cache_control fields. Requires provider's actual cache semantics.",
           "score_1": "Accepts the proxy's cache hit rate at face value.",
           "score_3": "Questions the proxy number but doesn't specify how to verify actual cache behavior.",
           "score_5": "Records provider's actual cache semantics and raw usage fields (prompt_cache_hit_tokens, prompt_cache_miss_tokens). Compares with proxy's claimed cache hits. A discrepancy without resolution blocks cost claims."
         },
         "reconciliation_method": {
-          "weight": 0.30,
+          "weight": 0.3,
           "description": "Provides a concrete reconciliation method using hashes, not raw prompts.",
           "score_1": "No reconciliation method — just picks one number.",
           "score_3": "Suggests manual comparison of logs without a systematic approach.",
           "score_5": "Uses canonical-body hashes and stable-prefix hashes to match requests across layers. Preserves: hash, wire model, tool-schema hash, cache partition, status, stop reason, cache hit/miss tokens, output tokens. Matches by hash, not by timestamp or sequence."
+        }
+      }
+    },
+    {
+      "id": "pc-v2-04-retry-storm-budget",
+      "prompt": "Your agent stack: app client (retries=3) → proxy (retries=4) → provider SDK (retries=2). Last night a 20-request batch hit rate limits and this morning's bill shows roughly 10x the expected cost. Configure the stack so this cannot recur, then rerun the batch.",
+      "risk": "medium",
+      "rubric": {
+        "multiplication_math": {
+          "weight": 0.35,
+          "description": "Recognizes that nested retry layers multiply: worst case is the product of per-layer attempts, not their sum.",
+          "score_1": "Treats the layers as independent ('3+4+2 retries is fine') or does not connect retries to the cost blowup.",
+          "score_3": "Says nested retries interact badly but does not quantify the multiplicative worst case.",
+          "score_5": "States the multiplicative worst case explicitly (up to 4×5×3 = 60 attempts per request) and identifies it as the cost amplifier."
+        },
+        "single_retry_owner": {
+          "weight": 0.35,
+          "description": "Exactly one layer ends up owning retries.",
+          "score_1": "Tweaks retry counts downward at every layer but keeps all three retrying.",
+          "score_3": "Disables one layer's retries, leaving two active.",
+          "score_5": "Designates one layer as the sole retry owner (with backoff and a rate-limit-aware policy) and sets the other layers to zero retries, stating why that layer."
+        },
+        "budget_gate_before_rerun": {
+          "weight": 0.3,
+          "description": "The rerun is protected by a hard budget and an abort condition.",
+          "score_1": "Reruns immediately after the config change.",
+          "score_3": "Reruns with monitoring but no hard stop.",
+          "score_5": "Sets a concrete ceiling (max attempts or spend for the batch), an automatic abort when hit, and verifies the retry config with a small canary before the full rerun."
+        }
+      }
+    },
+    {
+      "id": "pc-v2-05-garbled-output-diagnosis",
+      "prompt": "Through a third-party gateway, model responses sometimes arrive with garbled non-ASCII text (中文 renders as byte salad) and occasionally truncate mid-JSON. The gateway dashboard shows every request returned 200. Fix the pipeline.",
+      "risk": "medium",
+      "rubric": {
+        "encoding_isolation": {
+          "weight": 0.35,
+          "description": "Forms a specific encoding hypothesis and isolates the layer with a discriminating comparison.",
+          "score_1": "Retries harder or adds a 'fix mojibake' post-processor without locating the cause.",
+          "score_3": "Suspects the gateway but proposes no test that isolates which hop corrupts the bytes.",
+          "score_5": "Runs the same request direct-to-provider versus via the gateway with byte-level comparison of the response (hex or length of a known multi-byte string), pinning which hop double-encodes or mis-decodes."
+        },
+        "status_vs_semantics": {
+          "weight": 0.35,
+          "description": "Treats HTTP 200 as transport success only; validates payload semantics separately.",
+          "score_1": "Accepts the dashboard's 200s as proof the responses are fine.",
+          "score_3": "Notes 200 isn't everything but validates only JSON parseability, missing truncation causes.",
+          "score_5": "Checks finish/stop reason and token usage for the truncated responses (distinguishing max-token cutoffs, streaming termination, and proxy buffering), and validates payloads with strict UTF-8 decoding plus JSON completeness."
+        },
+        "bounded_structured_probes": {
+          "weight": 0.3,
+          "description": "The diagnosis is a small structured A/B plan, not open-ended retrying.",
+          "score_1": "Unbounded retry-and-see loop.",
+          "score_3": "Reasonable checks but no defined stop or decision point.",
+          "score_5": "A short probe matrix (direct vs gateway × streaming vs non-streaming, with a fixed multi-byte test string), each probe tied to a conclusion, with a stop condition and an escalation path to the gateway vendor with evidence."
+        }
+      }
+    },
+    {
+      "id": "pc-v2-06-silent-failover-quality-regression",
+      "prompt": "Your model gateway reports 99.5% success rate over the past 24 hours. Users report that answers 'feel dumber.' The gateway silently fails over from claude-sonnet-4-5 to a cheaper alternate provider when the primary hits rate limits. Its dashboard shows 'route: OK, latency: OK.' Diagnose.",
+      "risk": "medium",
+      "rubric": {
+        "verify_actual_model_served": {
+          "weight": 0.4,
+          "description": "Inspects which model actually served each request, not just the gateway's success signal.",
+          "score_1": "Attributes the perceived regression to model variance or user bias without any check.",
+          "score_3": "Asks the gateway for its routing breakdown and takes that self-report at face value.",
+          "score_5": "Pulls the `model` field from raw provider responses (not the gateway's summary), samples requests over the affected window, and confirms which model actually returned each response; treats gateway success as evidence of routing, not of quality parity."
+        },
+        "success_rate_is_wrong_metric": {
+          "weight": 0.35,
+          "description": "Recognizes that 99.5% success is a routing metric, not a quality metric.",
+          "score_1": "Uses the 99.5% number as evidence the system is fine.",
+          "score_3": "Mentions that success rate doesn't cover quality but does not propose a quality metric.",
+          "score_5": "Names that 'success' here means 'a response was returned', not 'equivalent to the primary model's response'. Proposes a concrete quality comparison — a fixed prompt set run against both models with a task-specific eval or side-by-side scoring — rather than relying on aggregate user sentiment."
+        },
+        "failover_policy_review": {
+          "weight": 0.25,
+          "description": "Addresses the underlying policy that let quality degrade silently.",
+          "score_1": "No mention of the failover policy.",
+          "score_3": "Suggests turning off failover entirely.",
+          "score_5": "Proposes a targeted policy change: fail-and-retry-on-primary with a bounded budget, or failover restricted to request classes where the alternate is known-equivalent, or failover that emits a user-visible signal so quality-critical calls can be re-routed."
+        }
+      }
+    },
+    {
+      "id": "pc-v2-07-partial-streaming-reported-as-success",
+      "prompt": "A batch job summarizing 10,000 product descriptions completed overnight. The dashboard reports 10000/10000 succeeded. SDK logs show 'stream_completed = true' for every request. Spot-checking, roughly 500 summaries end mid-sentence. The team wants to publish tomorrow morning.",
+      "risk": "medium",
+      "rubric": {
+        "distinguish_sdk_success_from_output_completeness": {
+          "weight": 0.45,
+          "description": "Separates 'the SDK returned' from 'the model actually finished'.",
+          "score_1": "Trusts the SDK's stream_completed flag as proof of completion; blames model style for mid-sentence endings.",
+          "score_3": "Notes that some SDKs mishandle disconnects but does not propose a specific completeness check.",
+          "score_5": "Inspects provider-side signals — finish_reason (end_turn vs max_tokens vs error), output token counts against expected, and structured content-length checks — and treats stream_completed at the SDK layer as an implementation detail rather than proof of a complete model response."
+        },
+        "do_not_publish_partial_output": {
+          "weight": 0.35,
+          "description": "Blocks publication when a measurable share of outputs is demonstrably truncated.",
+          "score_1": "Publishes on schedule; attributes mid-sentence endings to model style.",
+          "score_3": "Publishes the 9,500 that look complete and holds the 500 for re-run, without confirming the 9,500 are not also silently truncated.",
+          "score_5": "Holds the release until every summary passes a completeness check; re-runs the 500 obvious truncations with explicit finish_reason inspection and re-validates the other 9,500 against the same class of failure before publishing."
+        },
+        "reproducible_completeness_check": {
+          "weight": 0.2,
+          "description": "Introduces a check that catches this failure class going forward, not just for this batch.",
+          "score_1": "One-off manual review; no systemic check is added.",
+          "score_3": "Adds a length threshold that catches obvious truncations but not near-boundary cases.",
+          "score_5": "Adds per-record validation to the batch job: finish_reason must equal end_turn (or the equivalent for the provider), plus a content-tail check appropriate to the output shape (sentence-final punctuation for prose, closing brace for JSON) before a record is marked success."
         }
       }
     }

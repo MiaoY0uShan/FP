@@ -123,7 +123,7 @@ function main() {
     }
   }
 
-  requireText('fp/SKILL.md', ['Diagnose before patching', 'Verify before claiming done', 'Be concise and actionable', 'Reuse Ladder', 'On-Demand Profiles', 'Routing', 'Response Contract', 'Safety'], failures);
+  requireText('fp/SKILL.md', ['Lock the goal', 'Diagnose before patching', 'Verify before claiming done', 'Be concise and actionable', 'Reuse Ladder', 'Skill Interop', 'On-Demand Profiles', 'Routing', 'Response Contract', 'Safety'], failures);
   requirePatterns('fp/SKILL.md', [
     ['engineering goals activate implicitly', /activate automatically for engineering/i],
     ['FP: is an optional explicit invocation', /FP:/],

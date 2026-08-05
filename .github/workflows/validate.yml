@@ -76,7 +76,7 @@ jobs:
             --brief fp/examples/password-reset.compiled-execution-brief.json
 
       - name: Run textual router invariants and executable contract tests
-        run: node --test test/install-pack-contract.test.js test/router-contract.test.js test/evidence-ledger-contract.test.js test/metrics-collect.test.js test/response-eval-harness.test.js test/readme-language-contract.test.js
+        run: node --test test/install-pack-contract.test.js test/router-contract.test.js test/module-contract.test.js test/evidence-ledger-contract.test.js test/metrics-collect.test.js test/response-eval-harness.test.js test/readme-language-contract.test.js
 
       - name: Validate response evaluation catalog
         run: node scripts/run-response-evals.mjs validate --runner-config evals/fp-response/runners.example.json

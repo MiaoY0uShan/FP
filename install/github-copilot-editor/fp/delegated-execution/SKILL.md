@@ -5,7 +5,7 @@ description: "Use only when routed by FP after an executable plan is accepted an
 
 # FP Delegated Execution
 
-Execute a frozen plan through fresh, task-local agent threads. The parent coordinates, integrates, and verifies; it does not silently replace a required delegated stage with its own implementation or review.
+Execute a frozen plan through fresh, task-local agent threads. The parent coordinates, integrates, and verifies; it does not silently replace a required delegated stage with its own implementation or review. When dispatching any child, pass the model explicitly; an omitted model silently inherits the parent's session model — usually the most expensive tier — and defeats the cost benefit of delegation.
 
 ## Entry Gate
 

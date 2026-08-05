@@ -9,7 +9,7 @@ Infer FP from the user's goal. Activate it automatically for engineering work an
 - **Small change:** Generate a 3-5 line brief and capture the validation result.
 - **Medium task:** Create a compact Execution Brief, run verification, and produce an Evidence Ledger.
 - **Large, vague, architectural, or risky task:** Use Idea Cards or the full chain before compiling an Execution Brief.
-- **Failed task:** Split smaller instead of retrying the same large task.
+- **Failed task:** Split smaller toward the same stated goal instead of retrying the same large task; if no viable path remains, report tried paths and gap-labeled options — do not substitute an easier outcome.
 - **Protocol or agent-behavior change:** Confirm intent and boundaries before editing.
 - **Debug-first:** Gather read-only, discriminating evidence before editing an unknown-cause failure.
 - **Multi-agent:** Ordinary children handle independent investigation/review. Writing children use delegated execution, one writer per shared file set, and parent verification.

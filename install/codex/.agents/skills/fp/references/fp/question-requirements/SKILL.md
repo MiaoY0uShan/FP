@@ -66,6 +66,10 @@ The user appears to want:
 ...
 ```
 
+### 1a. Scope pre-check
+
+If the request describes two or more independent subsystems, stop and route to `semantic-architecture/SKILL.md` before the Five Whys. Detail-refinement on a compound goal wastes turns.
+
 ### 2. Separate the stated goal from the likely real goal
 
 The stated goal is what the user literally asked for.
@@ -235,7 +239,7 @@ investigate facts
 
 If two decisions depend on one another, the first turn asks only the upstream decision. The downstream question is not asked, defaulted, or implemented until the upstream answer has been recorded.
 
-Never answer a user-owned decision on the user's behalf. Do not edit until blocking decisions are resolved and shared understanding is confirmed. If the user says to stop asking and continue, record accepted defaults and unresolved risk; stop only when no safe default exists.
+Changes to the stated goal or its acceptance criteria are user-owned decisions. Never answer a user-owned decision on the user's behalf. Do not edit until blocking decisions are resolved and shared understanding is confirmed. If the user says to stop asking and continue, record accepted defaults and unresolved risk; stop only when no safe default exists.
 
 ### 6. Define success criteria
 
@@ -283,7 +287,7 @@ stop
 Use:
 
 - `continue` if the goal is clear and bounded
-- `reduce_scope` if the goal is valid but too broad
+- `reduce_scope` if the goal is valid but too broad; it may cut only extras the stated goal does not require, and every cut must be listed in the output. A reduction that weakens the stated goal or success criteria is `ask_user`, not `reduce_scope`
 - `ask_user` if a blocking unknown remains
 - `stop` if the request is unnecessary, unsafe, incoherent, or not worth doing
 
@@ -308,6 +312,10 @@ Usually recommend one of:
 - `schema-memory`
 
 Do not recommend implementation until the decision is `continue` or `reduce_scope`.
+
+### 10. Self-review before return
+
+Scan the report for placeholders, internal contradictions, scope violations, and ambiguity; fix them or convert them into blocking unknowns before returning.
 
 ## Output contract
 

@@ -1,6 +1,7 @@
 ---
 name: fp-evidence-ledger
 description: "Use only when routed by FP after execution, failure, or handoff to record canonical claims, checks, scope, authority, experiments, and optional continuation evidence."
+effort: low
 ---
 
 # FP: Evidence Ledger
@@ -19,7 +20,7 @@ Small clear changes may use the Tiny Evidence form instead.
 
 1. Record task ID, authority mode, write authorization, and scope.
 2. List files read and touched using normalized repository-relative paths when possible.
-3. Record each command/check with exact result and evidence; do not equate “ran” with “passed.”
+3. Record each command/check with exact result and evidence; do not equate “ran” with “passed.” For a bug-fix regression test, prove it can fail: temporarily revert the fix → the test must fail → restore the fix → the test passes. A regression test that has only ever passed is not evidence.
 4. For debug work, record hypothesis, probe, actual result, decision, and next step. Before completion, add `debug_evidence` with the causal chain, first divergence, condition-based wait evidence or a justified fixed wait, and distinct direct/sibling observed checks for any touched shared boundary.
 5. Tie every verified claim to evidence and list every remaining unverified claim.
 6. Record scope and context-budget violations explicitly.

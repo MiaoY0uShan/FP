@@ -10,13 +10,13 @@ This directory stores candidate observations and promoted reusable anti-patterns
 4. A severe one-off may create only a narrow expiring `bounded_shadow`; it does not become a reusable law.
 5. Promote a Lesson Card only after `generalization-gate` passes distinct task/session evidence, holdouts, negative controls, invariants, shadow, approval, and rollback.
 6. Revalidate promoted lessons when new evidence contradicts them or source provenance becomes stale.
-7. When a lesson accumulates evidence across multiple independent tasks, consider promoting it through the refinement pipeline: fleeting (evidence-ledger `unverified_claim`) → literature (lesson card, `observation`) → permanent (`schema-memory/` card, `promoted`/`active`). Load `templates/zettelkasten-conventions.md` for the full pipeline.
+7. When a lesson accumulates evidence across multiple independent tasks, consider promoting it through the refinement pipeline: fleeting (evidence-ledger `unverified_claim`) → literature (lesson card, `observation`) → permanent (`schema-memory/` card, `promoted`/`active`). Load `archive/templates/zettelkasten-conventions.md` for the full pipeline.
 
 Do not create a Lesson Card merely because a check failed once. Do not store secrets, raw logs, or long transcripts.
 
 ## Refinement Pipeline
 
-FP's lesson cards are the middle stage of a Zettelkasten refinement pipeline. Load `templates/zettelkasten-conventions.md` for conventions.
+FP's lesson cards are the middle stage of a Zettelkasten refinement pipeline. Load `archive/templates/zettelkasten-conventions.md` for conventions.
 
 | Stage | Artifact | Transition Trigger |
 |---|---|---|
@@ -56,7 +56,7 @@ See Graph Convention below for edge types and format.
 
 ## Backlinks (computed — do not author)
 Cards that reference this lesson via `[[wikilink]]`. Populated by the blast-radius
-protocol in `fp/templates/memory-graph-traversal.md`. Do not manually maintain.
+protocol in `fp/archive/templates/memory-graph-traversal.md`. Do not manually maintain.
 
 ## Reuse Trigger
 
@@ -107,7 +107,7 @@ canonical source — the canonical source is the source cards' own `## Related` 
 ### Cross-directory edges
 
 - A lesson card may reference a schema card via `[[schema-card-name]](edge_type)`.
-- A schema card references other cards via its `related-schemas` YAML frontmatter block (see `fp/templates/schema-memory-card.md`), not via body wikilinks.
+- A schema card references other cards via its `related-schemas` YAML frontmatter block (see `fp/archive/templates/schema-memory-card.md`), not via body wikilinks.
 - The graph boundary is `fp/` — wikilinks only reference files within `fp/lessons-learned/`, `fp/schema-memory/`, or `fp/examples/`. Do not wikilink to external URLs or non-FP files.
 
 ### Graph tooling
@@ -118,11 +118,16 @@ node fp/contracts/memory-graph.js build          # rebuild graph from source car
 node fp/contracts/memory-graph.js validate        # check referential integrity
 node fp/contracts/memory-graph.js blast-radius L001  # compute blast radius
 ```
-See `fp/templates/memory-graph-traversal.md` for the full protocol.
+See `fp/archive/templates/memory-graph-traversal.md` for the full protocol.
 
 ## Promoted Lessons
 
 - None yet under the v0.3 evidence standard.
+
+## Current Observations
+
+- `L004-cross-session-stage-state.md`: cross-session projects need one always-rewritten stage snapshot with verified facts, rollback points, classified blockers, and exactly one next step.
+- `L005-goal-substitution-under-difficulty.md`: when the stated goal gets hard, re-enumerate paths to the same goal or stop and report gap-labeled options; never silently substitute a lookalike outcome.
 
 ## Legacy Observations Awaiting Revalidation
 

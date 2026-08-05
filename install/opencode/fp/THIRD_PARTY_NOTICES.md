@@ -11,5 +11,8 @@ FP is an MIT-licensed implementation. The 0.3 design pass studied behavior and d
 | mattpocock/skills | [`66898f60`](https://github.com/mattpocock/skills/commit/66898f60e8c744e269f8ce06c2b2b99ce7660d5f) | [MIT](https://github.com/mattpocock/skills/blob/66898f60e8c744e269f8ce06c2b2b99ce7660d5f/LICENSE), Copyright © 2026 Matt Pocock |
 | tirth8205/code-review-graph | `main` (2026-07-19) | [MIT](https://github.com/tirth8205/code-review-graph/blob/main/LICENSE), Copyright © 2025 Tirth Patel |
 | ayghri/i-have-adhd | [`16a42a01`](https://github.com/ayghri/i-have-adhd/commit/16a42a01f7783e29db8557dfc46226baf8015618) | [MIT](https://github.com/ayghri/i-have-adhd/blob/16a42a01f7783e29db8557dfc46226baf8015618/LICENSE), Copyright © 2026 Ayoub Ghriss |
+| nendotools/tree-sitter-mcp | `main` (2026-08-04) | [MIT](https://github.com/nendotools/tree-sitter-mcp/blob/main/LICENSE) per repository LICENSE at audit time |
+| anthropics/skills | `main` (2026-08-04) | [License](https://github.com/anthropics/skills/blob/main/LICENSE) per repository LICENSE at audit time |
+| zilliztech/claude-context | `main` (2026-08-04) | [MIT](https://github.com/zilliztech/claude-context/blob/main/LICENSE) per repository LICENSE at audit time |
 
 The exact behavior-level influences and explicit exclusions are documented in [docs/upstream-influences.md](https://github.com/MiaoY0uShan/FP/blob/main/docs/upstream-influences.md). If a future change incorporates upstream software or a substantial portion of upstream text/assets, preserve that project's full copyright and MIT license notice with the redistributed material.

@@ -1,0 +1,52 @@
+# Development only
+.git
+.gitattributes
+.github
+.vscode
+.editorconfig
+node_modules
+test/
+evals/
+benchmarks/
+examples/
+scripts/
+
+# Install targets (not needed in npm package)
+install/
+pi-install/
+pi-skills-pr/
+
+# Source adapters (not needed for pi-package)
+adapters/
+.claude/
+.codebuddy/
+.cursor/
+.gemini/
+.kiro/
+.qoder/
+.code-review-graph/
+
+# Dist files
+dist/
+release-assets/
+
+# Docs (keep in repo, not in npm package)
+docs/case-studies.md
+docs/contracts.md
+docs/design.md
+docs/execution-protocol.md
+docs/forward-tests-2026-07-14.md
+docs/host-smoke-2026-07-14.md
+docs/metrics.md
+docs/portable-install.md
+docs/release-checklist.md
+docs/router.md
+docs/upstream-influences.md
+
+# Large / unnecessary
+*.zip
+*.tar.gz
+
+# Temp
+tmp/
+scratch/

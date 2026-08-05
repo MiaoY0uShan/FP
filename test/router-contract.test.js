@@ -9,8 +9,11 @@ function read(relativePath) {
   return fs.readFileSync(path.join(root, relativePath), 'utf8');
 }
 
-test('router v0.5.0 has three core rules', () => {
+test('router v0.5.0 has four core rules', () => {
   const router = read('fp/SKILL.md');
+  assert.match(router, /Four Core Rules/);
+  assert.match(router, /Lock the goal\. Optimize the path, never the goal\./);
+  assert.match(router, /never substitute a lookalike outcome/);
   assert.match(router, /Diagnose before patching/);
   assert.match(router, /Verify before claiming done/);
   assert.match(router, /Be concise and actionable/);
@@ -86,8 +89,9 @@ test('route order is not a fallback sequence', () => {
   assert.match(router, /Classify the whole task before decomposing/);
 });
 
-test('fp-minimal has three rules', () => {
+test('fp-minimal has four rules', () => {
   const minimal = read('fp-minimal/SKILL.md');
+  assert.match(minimal, /Lock the goal\. Optimize the path, never the goal\./);
   assert.match(minimal, /Diagnose before patching/);
   assert.match(minimal, /Verify before claiming done/);
   assert.match(minimal, /Be concise and actionable/);
@@ -97,4 +101,44 @@ test('fp-minimal has frontmatter', () => {
   const minimal = read('fp-minimal/SKILL.md');
   assert.match(minimal, /^---\r?\n/);
   assert.match(minimal, /name: fp-minimal/);
+});
+
+test('router coordinates installed skills without duplicating them', () => {
+  const router = read('fp/SKILL.md');
+  assert.match(router, /Skill Interop/);
+  assert.match(router, /never duplicates a specialist/);
+  assert.match(router, /most specific skill/);
+  const host = read('fp-host/SKILL.md');
+  assert.match(host, /Skill Interop/);
+});
+
+test('fp-host experimental variant keeps the four rules and delegates machinery', () => {
+  const host = read('fp-host/SKILL.md');
+  assert.match(host, /name: fp-host/);
+  assert.match(host, /Lock the goal\. Optimize the path, never the goal\./);
+  assert.match(host, /Diagnose before patching/);
+  assert.match(host, /Verify before claiming done/);
+  assert.match(host, /Be concise and actionable/);
+  assert.match(host, /Host-Native Ladder/);
+  assert.match(host, /one writer per shared file set/i);
+  assert.match(host, /experimental/i);
+  assert.match(host, /not yet/i);
+});
+
+test('goal lock binds modules to the stated goal', () => {
+  const optimize = read('fp/optimize-path/SKILL.md');
+  assert.match(optimize, /smallest stable path that reaches the stated goal/);
+  assert.match(optimize, /Shorter never means abandoning the stated goal/);
+  const requirements = read('fp/question-requirements/SKILL.md');
+  assert.match(requirements, /Changes to the stated goal or its acceptance criteria are user-owned/);
+  assert.match(requirements, /is `ask_user`, not `reduce_scope`/);
+  const scope = read('fp/delete-scope/SKILL.md');
+  assert.match(scope, /may not remove anything the stated goal or success criteria require/);
+  const agents = read('fp/AGENTS.md');
+  assert.match(agents, /split smaller toward the same stated goal/);
+  const claude = read('fp/CLAUDE.md');
+  assert.match(claude, /split smaller toward the same goal/);
+  const lesson = read('fp/lessons-learned/L005-goal-substitution-under-difficulty.md');
+  assert.match(lesson, /## Status\r?\n\r?\nobservation/);
+  assert.match(lesson, /never substitute|silent substitution/i);
 });

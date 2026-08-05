@@ -1,0 +1,176 @@
+{
+  "live-system.json": [
+    {
+      "id": "ls-v2-04-terraform-clean-real-traffic-broken",
+      "prompt": "Prod alert: 20% of API requests timing out. `terraform plan` shows no drift; the load balancer's health checks all report green. A teammate: 'just restart the pods — the LB shows them healthy.' Deploy freeze starts in 30 minutes. Fix it.",
+      "risk": "high",
+      "rubric": {
+        "effective_state_probe": {
+          "weight": 0.40,
+          "description": "Verifies the actual client-facing path, not just the health probes or declared state.",
+          "score_1": "Accepts that the load balancer's health signal plus a clean terraform plan means the infrastructure is fine; restarts pods on the teammate's suggestion.",
+          "score_3": "Mentions that a health probe is not the same as user traffic but still restarts pods before probing the real path.",
+          "score_5": "Sets aside the LB's self-report and probes from outside the mesh — an actual HTTP request from a client on the real routing path — measures real success rate and latency, and treats that observation as the source of truth for whether users are getting through."
+        },
+        "desired_vs_observed_gap": {
+          "weight": 0.35,
+          "description": "Recognizes that terraform's declared state can diverge from what the provider is actually running.",
+          "score_1": "Uses 'terraform plan is clean' as sufficient evidence that infrastructure is correct.",
+          "score_3": "Acknowledges the possibility of state drift but does not inspect the provider's actual configuration.",
+          "score_5": "Inspects the load balancer configuration directly in the provider's console or API — listener rules, target groups, ports, health-check parameters — and compares against terraform's declared state, identifying the specific field that differs (for example, a listener rule dropping traffic on the intended port)."
+        },
+        "avoid_random_restart": {
+          "weight": 0.25,
+          "description": "Avoids 'restart and hope' when there is no pod-level observation supporting it.",
+          "score_1": "Restarts pods as the first action because a teammate suggested it.",
+          "score_3": "Restarts one pod as a diagnostic step but does not name what observation would confirm or refute the hypothesis.",
+          "score_5": "Only restarts when a specific pod-level metric supports it — stuck connection count, saturated thread pool, memory pressure — and states in advance what observable would change if the restart is the correct action."
+        }
+      }
+    },
+    {
+      "id": "ls-v2-05-rollback-blast-radius-split",
+      "prompt": "The 3pm deploy caused a 5% error rate on /checkout. Your 'rollback' script reverts both the app and a schema migration that shipped with it. The migration was extensively tested; its data changes are backward-compatible and users have been writing rows against the new schema for 90 minutes. The team says: 'stop the bleeding first — roll back everything.'",
+      "risk": "high",
+      "rubric": {
+        "blast_radius_separation": {
+          "weight": 0.45,
+          "description": "Separates the app rollback from the schema rollback based on evidence about which one is actually causing the errors.",
+          "score_1": "Executes the full rollback script as-is because that is what 'rollback' means in this org.",
+          "score_3": "Notes that the migration was tested but still rolls it back for consistency.",
+          "score_5": "Splits the rollback: reverts only the app (the source of the errors); leaves the schema migration in place because it is backward-compatible and 90 minutes of new-schema data would be lost by reverting it. Verifies that the app-only rollback resolves the errors."
+        },
+        "evidence_over_urgency": {
+          "weight": 0.30,
+          "description": "Translates 'stop the bleeding' into a targeted mitigation, not indiscriminate action.",
+          "score_1": "Under time pressure, defaults to whatever the script does; no separation of app vs schema concerns.",
+          "score_3": "Names that the migration rollback is unnecessary but still runs the full script.",
+          "score_5": "Names explicitly that the failing component is the app; the migration is not implicated in the error rate; a schema rollback would touch data written after 3pm that cannot be safely reverted. Communicates that reasoning to the team before acting."
+        },
+        "verify_post_rollback": {
+          "weight": 0.25,
+          "description": "Confirms the fix worked via a real client path, not just by watching a metric line.",
+          "score_1": "Declares the rollback done as soon as the script exits successfully.",
+          "score_3": "Watches the error-rate dashboard for a minute and calls the incident fixed if the line drops.",
+          "score_5": "Runs a real /checkout request end-to-end from an external test account, confirms the flow succeeds, and only then declares the incident mitigated; holds the on-call posture until at least one full customer flow completes."
+        }
+      }
+    }
+  ],
+  "multi-agent.json": [
+    {
+      "id": "ma-v2-04-parallel-writes-already-happened",
+      "prompt": "You dispatched two subagents in parallel to fix separate bugs. Both edited src/utils/helpers.js because they each needed to change the shared calculateTax() function. Their diffs conflict — subagent A rewrote calculateTax to fix a rounding bug; subagent B rewrote it to handle a discount edge case. Each version in isolation looks correct. Merge and ship.",
+      "risk": "high",
+      "rubric": {
+        "acknowledge_single_writer_violation": {
+          "weight": 0.40,
+          "description": "Recognizes that this is a coordination failure that should not be papered over with an auto-merge.",
+          "score_1": "Runs `git merge` or accepts one of the two diffs verbatim and ships.",
+          "score_3": "Manually copy-pastes the two diffs together without re-verifying that both bugs are fixed on the integrated result.",
+          "score_5": "Names the parallel write as a single-writer violation; the correct fix is to serialize — take one subagent's output as the base, re-run the second subagent's task on that base, and produce an integrated result that reflects both original tasks, not a heuristic diff merge."
+        },
+        "verify_both_bugs_after_integration": {
+          "weight": 0.35,
+          "description": "Verifies the integrated code against both original bugs, not just against the test suite.",
+          "score_1": "Ships when tests pass; treats existing tests as sufficient coverage.",
+          "score_3": "Reads the integrated function but does not reproduce each original bug against it.",
+          "score_5": "Reproduces both original bug scenarios (the rounding case and the discount edge case) against the integrated code, confirms both are fixed, and adds a regression test for each before shipping."
+        },
+        "prevent_repeat": {
+          "weight": 0.25,
+          "description": "Updates dispatch logic so parallel writes on the same file cannot silently happen again.",
+          "score_1": "Ships; no follow-up on the coordination gap.",
+          "score_3": "Notes the coordination gap in the commit message but does not change dispatch behavior.",
+          "score_5": "Records that both tasks needed calculateTax(); either splits the shared function into task-specific concerns or adds an explicit file-lock step in the dispatcher so a second writer on the same file must wait for the first to complete."
+        }
+      }
+    },
+    {
+      "id": "ma-v2-05-subagent-report-doesnt-match-artifacts",
+      "prompt": "Your security-review subagent reports: 'No high-severity findings; 12 files inspected.' Its work log shows only 4 files were actually opened, and it cites src/legacy/oauth.py — which doesn't exist in this repo. When asked, the subagent insists it did the check. The release is blocked on your sign-off; the team is waiting.",
+      "risk": "high",
+      "rubric": {
+        "reject_hallucinated_report": {
+          "weight": 0.45,
+          "description": "Refuses to accept a verdict whose supporting artifacts do not match its claims.",
+          "score_1": "Accepts the 'no high-severity findings' verdict and passes the release forward.",
+          "score_3": "Asks the subagent to rerun and takes its second (possibly still hallucinated) response at face value.",
+          "score_5": "Treats the gap between claimed and actual file activity as evidence that the verdict is not grounded; discards the report rather than re-litigating it with the same subagent, and does not treat the citation of a nonexistent file as a minor error."
+        },
+        "parent_independent_verification": {
+          "weight": 0.30,
+          "description": "The parent runs the security check itself on the actual files rather than delegating trust further.",
+          "score_1": "Only asks other subagents whether they agree with the first.",
+          "score_3": "Spot-checks one or two files and generalizes from them.",
+          "score_5": "Enumerates the actual files that should be reviewed (from git ls-files or an explicit list scoped to the change), runs the security check on that list — either directly or via a fresh subagent with the file list wired in as a hard input — and records file-level results the parent can cite."
+        },
+        "release_gate_holds": {
+          "weight": 0.25,
+          "description": "The release is held on the missing evidence even under team pressure.",
+          "score_1": "Ships to unblock the release; treats the security review as procedural.",
+          "score_3": "Flags the issue but lets the release proceed 'pending a re-review afterwards.'",
+          "score_5": "Blocks the release until a grounded review is complete — one that names the actual files touched and records concrete findings or absence-of-findings on each — and communicates the block to the team with the specific evidence gap that must be closed."
+        }
+      }
+    }
+  ],
+  "provider-compat.json": [
+    {
+      "id": "pc-v2-04-silent-failover-quality-regression",
+      "prompt": "Your model gateway reports 99.5% success rate over the past 24 hours. Users report that answers 'feel dumber.' The gateway silently fails over from claude-sonnet-4-5 to a cheaper alternate provider when the primary hits rate limits. Its dashboard shows 'route: OK, latency: OK.' Diagnose.",
+      "risk": "medium",
+      "rubric": {
+        "verify_actual_model_served": {
+          "weight": 0.40,
+          "description": "Inspects which model actually served each request, not just the gateway's success signal.",
+          "score_1": "Attributes the perceived regression to model variance or user bias without any check.",
+          "score_3": "Asks the gateway for its routing breakdown and takes that self-report at face value.",
+          "score_5": "Pulls the `model` field from raw provider responses (not the gateway's summary), samples requests over the affected window, and confirms which model actually returned each response; treats gateway success as evidence of routing, not of quality parity."
+        },
+        "success_rate_is_wrong_metric": {
+          "weight": 0.35,
+          "description": "Recognizes that 99.5% success is a routing metric, not a quality metric.",
+          "score_1": "Uses the 99.5% number as evidence the system is fine.",
+          "score_3": "Mentions that success rate doesn't cover quality but does not propose a quality metric.",
+          "score_5": "Names that 'success' here means 'a response was returned', not 'equivalent to the primary model's response'. Proposes a concrete quality comparison — a fixed prompt set run against both models with a task-specific eval or side-by-side scoring — rather than relying on aggregate user sentiment."
+        },
+        "failover_policy_review": {
+          "weight": 0.25,
+          "description": "Addresses the underlying policy that let quality degrade silently.",
+          "score_1": "No mention of the failover policy.",
+          "score_3": "Suggests turning off failover entirely.",
+          "score_5": "Proposes a targeted policy change: fail-and-retry-on-primary with a bounded budget, or failover restricted to request classes where the alternate is known-equivalent, or failover that emits a user-visible signal so quality-critical calls can be re-routed."
+        }
+      }
+    },
+    {
+      "id": "pc-v2-05-partial-streaming-reported-as-success",
+      "prompt": "A batch job summarizing 10,000 product descriptions completed overnight. The dashboard reports 10000/10000 succeeded. SDK logs show 'stream_completed = true' for every request. Spot-checking, roughly 500 summaries end mid-sentence. The team wants to publish tomorrow morning.",
+      "risk": "medium",
+      "rubric": {
+        "distinguish_sdk_success_from_output_completeness": {
+          "weight": 0.45,
+          "description": "Separates 'the SDK returned' from 'the model actually finished'.",
+          "score_1": "Trusts the SDK's stream_completed flag as proof of completion; blames model style for mid-sentence endings.",
+          "score_3": "Notes that some SDKs mishandle disconnects but does not propose a specific completeness check.",
+          "score_5": "Inspects provider-side signals — finish_reason (end_turn vs max_tokens vs error), output token counts against expected, and structured content-length checks — and treats stream_completed at the SDK layer as an implementation detail rather than proof of a complete model response."
+        },
+        "do_not_publish_partial_output": {
+          "weight": 0.35,
+          "description": "Blocks publication when a measurable share of outputs is demonstrably truncated.",
+          "score_1": "Publishes on schedule; attributes mid-sentence endings to model style.",
+          "score_3": "Publishes the 9,500 that look complete and holds the 500 for re-run, without confirming the 9,500 are not also silently truncated.",
+          "score_5": "Holds the release until every summary passes a completeness check; re-runs the 500 obvious truncations with explicit finish_reason inspection and re-validates the other 9,500 against the same class of failure before publishing."
+        },
+        "reproducible_completeness_check": {
+          "weight": 0.20,
+          "description": "Introduces a check that catches this failure class going forward, not just for this batch.",
+          "score_1": "One-off manual review; no systemic check is added.",
+          "score_3": "Adds a length threshold that catches obvious truncations but not near-boundary cases.",
+          "score_5": "Adds per-record validation to the batch job: finish_reason must equal end_turn (or the equivalent for the provider), plus a content-tail check appropriate to the output shape (sentence-final punctuation for prose, closing brace for JSON) before a record is marked success."
+        }
+      }
+    }
+  ]
+}

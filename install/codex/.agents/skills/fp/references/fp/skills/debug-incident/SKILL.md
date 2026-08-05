@@ -22,6 +22,7 @@ pin symptom → read-only baseline → falsifiable hypothesis
 3. Speculative patches are never probes.
 4. Three consecutive non-narrowing probes → architecture/observability checkpoint.
 5. After hypothesis is supported, extra probes must change a named decision or fill a named acceptance row. Otherwise stop and reuse evidence.
+6. Structural methods at the three-non-narrowing-probe checkpoint, concretely: (a) git axis + deterministic reproduction → `git bisect run <repro>` and log the commit range in the experiment ledger; (b) oversized reproduction (>~50 lines/files) → reduce with binary-partition delta debugging (ddmin) before probing further; (c) flaky or semantic failure → no bisect auto-mode; review each candidate commit before the good/bad call.
 
 **Active incident variant:** `OBSERVE → CONTAIN → RESTORE → REPAIR → LEARN`
 Preserve evidence, access, and rollback. Restore service before permanent repair.

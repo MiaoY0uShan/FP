@@ -1,6 +1,7 @@
 ---
 name: fp-delete-scope
 description: "Use only when routed by FP after requirements work to apply the seven-rung reuse ladder, delete scope, and define the smallest verifiable MVP."
+effort: low
 ---
 
 # FP: Delete Scope
@@ -181,11 +182,11 @@ Rules:
 - `Delete now` if it does not serve the real goal.
 - `Defer` if it may be useful later but is not required now.
 
-Be aggressive. The default for non-essential entities is `defer`, not `keep`.
+Be aggressive. The default for non-essential entities is `defer`, not `keep`. Non-essential means the stated success criteria do not require it; `delete now` and `defer` may not remove anything the stated goal or success criteria require, and the Defer list stays visible to the user in the report.
 
 ### 5. Define MVP nucleus
 
-The MVP nucleus is the smallest version that proves the real goal.
+The MVP nucleus is the smallest version that proves the real goal and still satisfies the stated success criteria.
 
 Output:
 
@@ -344,6 +345,7 @@ Ask only the smallest question needed to continue.
 - Do not add entities without necessity.
 - Do not create a helper, dependency, wrapper, or module before checking existing code, standard library, native features, and installed dependencies in that order.
 - Do not preserve future-proofing by default.
+- Do not delete or defer capabilities the stated success criteria require.
 - Do not turn optional modules into MVP requirements.
 - Do not refactor unrelated modules.
 - Do not continue if the MVP cannot be verified.

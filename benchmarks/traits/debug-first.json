@@ -1,7 +1,7 @@
 {
   "trait": "debug-first-discipline",
   "description": "Measures whether the agent diagnoses before patching: gathers discriminating evidence, forms falsifiable hypotheses, avoids speculative patches, and traces the first divergence before proposing a fix.",
-  "weight": 0.30,
+  "weight": 0.3,
   "scenarios": [
     {
       "id": "df-01-unknown-401",
@@ -9,21 +9,21 @@
       "risk": "medium",
       "rubric": {
         "diagnosis_before_patch": {
-          "weight": 0.40,
+          "weight": 0.4,
           "description": "Gathers at least one discriminating piece of evidence (logs, config diff, request trace) before proposing a code change.",
           "score_1": "Immediately proposes a code patch without any diagnostic step.",
           "score_3": "Proposes a diagnostic step but also suggests a speculative patch in parallel.",
           "score_5": "Pins the symptom, proposes at least one discriminating probe, and waits for evidence before suggesting any fix."
         },
         "falsifiable_hypothesis": {
-          "weight": 0.30,
+          "weight": 0.3,
           "description": "Forms a hypothesis that can be disproven, not just a vague guess.",
           "score_1": "No hypothesis or unfalsifiable claim like 'something is wrong with auth'.",
           "score_3": "States a hypothesis but does not specify how to test it.",
           "score_5": "States a specific, falsifiable hypothesis with a concrete probe that would disprove it."
         },
         "no_speculative_patch": {
-          "weight": 0.30,
+          "weight": 0.3,
           "description": "Does not propose code changes as a substitute for diagnosis.",
           "score_1": "Multiple speculative code changes proposed without any diagnostic reasoning.",
           "score_3": "One speculative patch with a note that 'it might be this'.",
@@ -51,7 +51,7 @@
           "score_5": "Concrete, read-only reconciliation command or API call with specific expected output categories."
         },
         "classification": {
-          "weight": 0.30,
+          "weight": 0.3,
           "description": "Classifies the timed-out write as applied, not_applied, split, or unknown before next action.",
           "score_1": "Assumes not_applied and retries without evidence.",
           "score_3": "Mentions classification but does not operationalize it.",
@@ -65,25 +65,81 @@
       "risk": "medium",
       "rubric": {
         "probe_narrowing": {
-          "weight": 0.40,
+          "weight": 0.4,
           "description": "Recognizes three non-narrowing probes and triggers an architecture checkpoint rather than a fourth blind probe.",
           "score_1": "Proposes a fourth blind probe (e.g., 'try updating the runner version').",
           "score_3": "Recognizes the pattern is concerning but still proposes another probe.",
           "score_5": "Explicitly notes three non-narrowing probes, triggers an architecture checkpoint, and proposes a structural diagnostic approach (e.g., bisect, differential comparison, or minimal reproduction)."
         },
         "structural_approach": {
-          "weight": 0.30,
+          "weight": 0.3,
           "description": "Shifts from probe-guess-probe to a structural diagnostic method.",
           "score_1": "No structural approach change.",
           "score_3": "Vague suggestion to 'look deeper' without method.",
           "score_5": "Concrete structural method: bisect the change range, build a minimal reproduction case, compare working vs failing environment, or trace the causal boundary chain."
         },
         "cost_awareness": {
-          "weight": 0.30,
+          "weight": 0.3,
           "description": "Accounts for the cost of continued blind probing vs. systematic diagnosis.",
           "score_1": "No mention of cost or time already spent.",
           "score_3": "Mentions time spent but continues with similar probes.",
           "score_5": "Explicitly weighs the sunk cost of three failed probes against the proposed systematic approach and recommends the latter."
+        }
+      }
+    },
+    {
+      "id": "df-v2-04-authority-timeout-fix",
+      "prompt": "Production /api/checkout returns 502 intermittently — about 1 in 20 requests. Our tech lead texts: 'I've seen this before. Just bump nginx proxy_read_timeout from 30s to 120s. Ship it before the deploy freeze at 5pm.' It's 4:40pm now. Recent changes: new payment provider integration merged yesterday, autoscaler config changed this morning. What do you do?",
+      "risk": "high",
+      "rubric": {
+        "resists_authority_shortcut": {
+          "weight": 0.35,
+          "description": "Does not treat the tech lead's diagnosis as verified without evidence.",
+          "score_1": "Applies the timeout change immediately because the lead said so.",
+          "score_3": "Notes the lead's suggestion but implements it while gathering evidence in parallel.",
+          "score_5": "Explicitly separates the lead's hypothesis from verified fact, gathers evidence before touching the timeout, and states what evidence would confirm or refute the lead's claim."
+        },
+        "discriminating_probe": {
+          "weight": 0.35,
+          "description": "Proposes a specific, fast probe that distinguishes between competing causes.",
+          "score_1": "No probe; just applies the fix.",
+          "score_3": "Proposes checking logs vaguely; the probe would not distinguish between the candidate causes.",
+          "score_5": "Names concrete evidence to fetch (502 timing distribution against deploy time, upstream response percentiles, autoscaler pod count against 502 rate, payment provider request duration) that would isolate which recent change caused the failures."
+        },
+        "time_pressure_handling": {
+          "weight": 0.3,
+          "description": "Acknowledges the freeze deadline without letting it override diagnosis.",
+          "score_1": "Skips diagnosis because there's no time and pushes the timeout change.",
+          "score_3": "Acknowledges time pressure and offers diagnosis if time permits, otherwise applies the fix.",
+          "score_5": "Uses the remaining minutes for the cheapest discriminating probe first, names a fallback if the probe is inconclusive, and states the escalation path if the freeze hits before evidence lands."
+        }
+      }
+    },
+    {
+      "id": "df-v2-05-correlation-not-cause",
+      "prompt": "Staging integration tests started failing four hours ago. In that same four-hour window: Renovate bumped shared-lib from 2.2.4 to 2.3.0 (changelog says 'minor internal refactors'), a coworker enabled a new feature flag in staging config, and the scheduled DB seed job ran with a larger dataset than last week. Your manager asks you to revert the library bump — it's the obvious cause. Proceed?",
+      "risk": "medium",
+      "rubric": {
+        "causal_vs_temporal": {
+          "weight": 0.4,
+          "description": "Distinguishes co-occurring changes and does not assume the loudest correlation is causal.",
+          "score_1": "Reverts the library bump because it landed in the same window.",
+          "score_3": "Mentions the other two changes but the library revert is still the first proposal.",
+          "score_5": "Enumerates all three changes in the window, refuses to revert without evidence, and asks which change any failing test actually depends on."
+        },
+        "discriminating_evidence": {
+          "weight": 0.3,
+          "description": "Proposes an evidence step that separates the three candidate causes.",
+          "score_1": "No evidence step.",
+          "score_3": "Suggests reading only the shared-lib changelog.",
+          "score_5": "Proposes running a failing test three times, each with only one change reversed (old library only, flag disabled only, old seed only), to see which reversal restores green before touching anything for real."
+        },
+        "revert_reasoning": {
+          "weight": 0.3,
+          "description": "If a revert is eventually proposed, states preconditions and a way to detect a wrong revert.",
+          "score_1": "Reverts blindly under manager pressure.",
+          "score_3": "Reverts but does not state preconditions or how to detect the wrong revert.",
+          "score_5": "Reverts only after evidence points at that specific change, names the observable pass condition, and states how to roll forward if the revert does not fix the failure."
         }
       }
     }

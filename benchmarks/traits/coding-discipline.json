@@ -1,0 +1,147 @@
+{
+  "trait": "coding-discipline",
+  "description": "Measures concrete programming judgment: test-first bugfixes, minimal and idiomatic diffs, edge-case-oriented test design, behavior-preserving refactors of high-blast-radius code, and code reviews that surface real defects without drowning them in style nits.",
+  "weight": 0.30,
+  "scenarios": [
+    {
+      "id": "cd-v2-01-bugfix-test-first",
+      "prompt": "Bug report: dates_in_range(date(2024, 1, 1), date(2024, 1, 3)) returns [2024-01-01, 2024-01-02], but callers expect the end date to be included.\n\ndef dates_in_range(start, end):\n    from datetime import timedelta\n    result = []\n    current = start\n    while current < end:\n        result.append(current)\n        current += timedelta(days=1)\n    return result\n\nFix the bug.",
+      "risk": "low",
+      "rubric": {
+        "test_before_fix": {
+          "weight": 0.40,
+          "description": "Writes or specifies a failing test that reproduces the reported bug before changing the function.",
+          "score_1": "Edits the function immediately; no test is written or planned.",
+          "score_3": "Mentions that a test would be good but writes the fix first, or writes a test only after the fix is in place.",
+          "score_5": "Writes (or names precisely, with input and expected output) a failing test for the reported case before touching the function, and only then applies the fix."
+        },
+        "minimal_targeted_diff": {
+          "weight": 0.30,
+          "description": "The fix is a small, localized change rather than a rewrite of the function.",
+          "score_1": "Rewrites the function (switches to a comprehension, restructures the loop, changes the signature) in addition to fixing the bug.",
+          "score_3": "Fixes the bug but also makes at least one unrelated cleanup in the same diff.",
+          "score_5": "Changes only the loop condition (or an equivalent single-token edit) needed to include the end date; leaves surrounding code untouched."
+        },
+        "regression_evidence": {
+          "weight": 0.30,
+          "description": "Establishes that the new test would have caught the bug: fails on the original code, passes after the fix.",
+          "score_1": "Neither runs nor states the pre-fix versus post-fix behavior of the test.",
+          "score_3": "Claims the fix works but does not tie the new test to the original failure mode.",
+          "score_5": "States explicitly that the new test fails against the original function and passes against the fixed one, so the test locks the regression in."
+        }
+      }
+    },
+    {
+      "id": "cd-v2-02-smallest-diff",
+      "prompt": "We need to add a middle_name field to this formatter. If present it should appear between first and last.\n\nfunction formatName(user) {\n    var s = \"\";\n    if (user.title) { s = s + user.title + \" \"; }\n    s = s + user.first;\n    if (user.last) { s = s + \" \" + user.last; }\n    if (user.suffix) { s = s + \", \" + user.suffix; }\n    return s;\n}\n\nAdd middle name support.",
+      "risk": "low",
+      "rubric": {
+        "extends_existing_idiom": {
+          "weight": 0.40,
+          "description": "New code matches the existing local pattern (guarded if-block with s = s + ...) instead of switching styles.",
+          "score_1": "Introduces a different style for the new field (template literal, array join, ternary, reduce) even though the surrounding lines all use the same guarded-concat pattern.",
+          "score_3": "Uses the same overall pattern but with cosmetic drift (changes spacing, quote style, or var-versus-let just for the new line).",
+          "score_5": "Adds the middle-name branch in exactly the same shape as the surrounding lines, so the diff reads as one more entry in an existing list."
+        },
+        "minimal_scope": {
+          "weight": 0.30,
+          "description": "The diff touches only what the feature requires.",
+          "score_1": "Rewrites the whole function (template literal one-liner or array-plus-join) as part of the change.",
+          "score_3": "Adds the middle-name branch but also makes one or two unrelated edits (renames, converts var to let, extracts a helper).",
+          "score_5": "Only the new middle-name lines are added; every other line in the function is unchanged."
+        },
+        "declines_drive_by_rewrite": {
+          "weight": 0.30,
+          "description": "Names, and declines, the tempting rewrite so the reviewer knows it was considered.",
+          "score_1": "Silently rewrites, or does not acknowledge that the surrounding code has an obvious cleanup opportunity.",
+          "score_3": "Mentions the code could be cleaner but does not clearly separate that from the requested change.",
+          "score_5": "Explicitly notes at least one available cleanup (template literal, join, var to let) and states it is out of scope for this feature diff and belongs in a separate change."
+        }
+      }
+    },
+    {
+      "id": "cd-v2-03-test-design",
+      "prompt": "Write tests for this function. Note anything you decide not to test and why.\n\ndef truncate(text, max_length):\n    \"\"\"Truncate text to max_length characters, appending '...' if truncated.\"\"\"\n    if len(text) <= max_length:\n        return text\n    return text[:max_length - 3] + \"...\"",
+      "risk": "low",
+      "rubric": {
+        "edge_case_coverage": {
+          "weight": 0.40,
+          "description": "Tests exercise boundary, error, and non-ASCII paths, not just happy-path variations.",
+          "score_1": "Only happy-path cases (a short string, a long string) with different sizes.",
+          "score_3": "Covers the equality boundary (len(text) equals max_length) but misses either the sub-ellipsis case (max_length less than 3), empty input, or any unicode / multi-byte case.",
+          "score_5": "Covers, at minimum: empty string, the equality boundary, one case where max_length is smaller than the length of the ellipsis, and at least one non-ASCII or multi-byte case where character-versus-byte truncation matters."
+        },
+        "test_independence": {
+          "weight": 0.30,
+          "description": "Each test stands on its own and has a name that describes its intent.",
+          "score_1": "Tests share mutable fixtures or rely on execution order; names are generic (test_1, test_truncate_2).",
+          "score_3": "Names are descriptive but tests share setup that couples them, or one test's assertions depend on another test's side effects.",
+          "score_5": "Each test is self-contained, uses fresh inputs, and is named after the property it checks (for example, test_returns_input_unchanged_when_shorter_than_max)."
+        },
+        "explicit_scope": {
+          "weight": 0.30,
+          "description": "Names at least one case deliberately left uncovered and gives a reason.",
+          "score_1": "No mention of what is not tested; scope is implicit.",
+          "score_3": "Mentions vaguely that other cases could be added without naming any.",
+          "score_5": "Names at least one specific case that is intentionally out of scope (None input, non-string types, negative max_length) with a short rationale (undefined behavior, caller responsibility, separate PR)."
+        }
+      }
+    },
+    {
+      "id": "cd-v2-04-refactor-safety",
+      "prompt": "resolve_config() has grown to about 200 lines and is called from roughly 40 sites across the codebase. It reads env vars, parses JSON files, merges defaults, and coerces values. It has no unit tests but is exercised indirectly by several integration tests. Refactor it so it is easier to maintain.",
+      "risk": "high",
+      "rubric": {
+        "characterization_tests_first": {
+          "weight": 0.40,
+          "description": "Establishes a safety net that pins current behavior before making structural changes.",
+          "score_1": "Proposes structural changes (extract, rename, split) with no plan for capturing existing behavior first.",
+          "score_3": "Mentions that tests would help but proceeds to structural changes without them, or relies solely on the existing integration tests without adding characterization tests targeted at resolve_config's specific inputs and outputs.",
+          "score_5": "First step is to add characterization or pinning tests that capture the current input-to-output behavior of resolve_config across representative inputs, and only then begins to change structure."
+        },
+        "staged_behavior_preserving_steps": {
+          "weight": 0.30,
+          "description": "Refactor is broken into small, individually verifiable steps that each preserve observable behavior.",
+          "score_1": "Proposes a big-bang rewrite or a single large diff that changes multiple concerns at once.",
+          "score_3": "Splits the work into steps, but at least one step mixes structural change with a behavioral change, or the ordering does not preserve behavior between steps.",
+          "score_5": "Sequences the work as small extract-and-delegate steps (extract env-var lookup, extract file parsing, extract merge, extract coercion), each behavior-preserving and each independently checkable against the pinning tests."
+        },
+        "flags_public_api_changes": {
+          "weight": 0.30,
+          "description": "Any change to the observable contract of resolve_config is called out explicitly, not slipped in.",
+          "score_1": "Changes the signature, return shape, or side effects of resolve_config without acknowledging the roughly 40 call sites.",
+          "score_3": "Mentions that some callers may need updates but does not enumerate the contract changes or offer a migration path.",
+          "score_5": "Either keeps the public signature and semantics of resolve_config unchanged, or explicitly lists each observable contract change with the affected call sites and a migration approach (deprecation shim, adapter, coordinated update) before making it."
+        }
+      }
+    },
+    {
+      "id": "cd-v2-05-review-real-defects",
+      "prompt": "Review this diff. List concrete issues; a short summary is fine.\n\n def process_batch(items, batch_size):\n-    if not items:\n-        return []\n-    results = []\n-    for i in range(0, len(items), batch_size):\n-        batch = items[i:i+batch_size]\n-        results.append(handle(batch))\n-    return results\n+    results = []\n+    for i in range(0, len(items) - 1, batch_size):\n+        batch = items[i:i+batch_size]\n+        if len(batch) == batch_size:\n+            results.append(handle_fast(batch))\n+        else:\n+            try:\n+                results.append(handle(batch))\n+            except Exception:\n+                pass\n+    return results",
+      "risk": "medium",
+      "rubric": {
+        "finds_both_defects": {
+          "weight": 0.40,
+          "description": "Identifies both real defects: the off-by-one in range(0, len(items) - 1, batch_size) that can drop trailing items, and the bare except Exception: pass that silently swallows handler errors.",
+          "score_1": "Misses both real defects, or only flags style issues.",
+          "score_3": "Finds one of the two real defects (off-by-one or swallowed exception) but not both.",
+          "score_5": "Names both defects specifically: the range upper bound should be len(items), not len(items) - 1 (with a concrete example such as 10 items with batch_size 3 dropping the last item), and the swallowed exception must at minimum be logged or re-raised rather than passed."
+        },
+        "actionable_specificity": {
+          "weight": 0.30,
+          "description": "Each finding points at the exact line or expression and proposes a concrete fix.",
+          "score_1": "Comments are vague (this loop looks off, error handling is suspect) without pointing at the specific expression or proposing a replacement.",
+          "score_3": "Points at the right lines but leaves the fix implicit (probably wrong upper bound).",
+          "score_5": "For each real defect, quotes the offending expression and gives a specific replacement (change range(0, len(items) - 1, batch_size) to range(0, len(items), batch_size); replace except Exception: pass with logging and re-raise, or with a narrowly named recoverable exception)."
+        },
+        "signal_to_noise": {
+          "weight": 0.30,
+          "description": "Does not drown the real defects in style-only nits.",
+          "score_1": "Treats style choices (dropped if not items guard, introducing handle_fast, indentation) as defects on equal footing with the real bugs, or produces a long list of nits without prioritizing.",
+          "score_3": "Includes several style comments alongside the real defects without labeling them as nits.",
+          "score_5": "Focuses the review on the two real defects; any style-level observations (the removed empty-list guard, the handle_fast split) are either omitted or clearly labeled as nits distinct from the bugs."
+        }
+      }
+    }
+  ]
+}

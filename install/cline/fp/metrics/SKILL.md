@@ -1,6 +1,7 @@
 ---
 name: fp-metrics
 description: "Use only when routed by FP after a canonical Evidence Ledger and when measurement or a comparable baseline matters."
+effort: low
 ---
 
 # FP: Metrics

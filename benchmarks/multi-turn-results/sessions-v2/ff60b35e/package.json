@@ -1,0 +1,6 @@
+{
+  "name": "formatter",
+  "scripts": {
+    "test": "node --test test/format.test.js"
+  }
+}

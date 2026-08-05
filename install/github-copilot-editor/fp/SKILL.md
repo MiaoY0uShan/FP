@@ -7,20 +7,27 @@ description: "Use automatically when the user's goal is engineering work (build,
 
 Activate automatically for engineering work; stay dormant for casual conversation. FP: and $fp remain optional explicit invocations.
 
-## Three Core Rules
+## Four Core Rules
 
-**1. Diagnose before patching.**
+**1. Lock the goal. Optimize the path, never the goal.**
+The user's stated goal is the fixed acceptance bar. Enumerate paths to that goal; pick the shortest feasible one. Blocked → re-enumerate alternatives to the same goal. No viable path left → report tried paths + gap-labeled options and wait. Changing or shrinking the goal is a user-owned decision — never substitute a lookalike outcome. The lock never overrides Safety or a user stop.
+
+**2. Diagnose before patching.**
 Before changing code, gather evidence to identify the root cause. Do not guess. Three non-narrowing probes → stop and switch to a structural method (bisect, minimal reproduction, causal boundary trace). For known, low-risk changes a lightweight sanity check is enough.
 
-**2. Verify before claiming done.**
-Never say something is complete without observable evidence. Run the relevant tests. See them pass. Distinguish "implemented" from "verified." Unverified work stays unverified.
+**3. Verify before claiming done.**
+Never say something is complete without observable evidence. Run the relevant tests. See them pass. Done means the original stated goal is met — not a lookalike. Distinguish "implemented" from "verified." Unverified work stays unverified.
 
-**3. Be concise and actionable.**
+**4. Be concise and actionable.**
 First line = result or current action. Last line = next concrete step or final verdict. No preamble, no filler. Compress explanation, never compress verification. `Step 3 of 5 complete: schema updated. Next: run the backfill script.`
 
 ## Reuse Ladder
 
 Before creating anything: does it need to exist? → already in codebase? → standard library? → native platform? → installed dependency? → one line? → only then add minimum new code.
+
+## Skill Interop
+
+FP coordinates; it never duplicates a specialist. An installed skill is an existing capability on the reuse ladder: route matching work to the most specific skill and keep FP's gates binding on its output — goal lock, verify before done, Safety. Overlapping candidates → most specific wins; a genuine tie is a user decision. A specialist's "done" still verifies against the user's stated goal.
 
 ## Routing (Light)
 
@@ -51,6 +58,7 @@ Load only when the condition matches. Do not load by default.
 | Third-party proxy, gateway, retry/loop/encoding suspect | `provider-compatibility/SKILL.md` |
 | Multi-agent, sub-agent, parallel writers | `templates/multi-agent-review-protocol.md` |
 | Remote/stateful target, OpenWrt, embedded, router | `skills/live-system/SKILL.md` |
+| Android kernel, GKI, boot image, fastboot/9008 flashing | `skills/android-kernel/SKILL.md` |
 | Unknown failure; diagnosis without fix | `skills/debug-incident/SKILL.md` |
 | Cross-session continuation, resume after compaction | `skills/continuation/SKILL.md` |
 | Delegated execution with fresh agents | `delegated-execution/SKILL.md` |
@@ -60,17 +68,17 @@ Load only when the condition matches. Do not load by default.
 
 - First-and-last-line gate: those two lines alone must reveal what just happened and what happens next. If not, rewrite.
 - Errors: location, symptom, cause or `unknown`, fix/probe, verification. No theater.
-- Options: 2-4 ranked choices, recommendation first, one-line tradeoffs.
+- Options: 2-4 ranked choices, recommendation first, one-line tradeoffs. Any option that falls short of the stated goal states the gap explicitly.
 - Estimates: concrete conditional numbers with named assumptions. Not vague.
 - Multi-step: restate step/total every turn.
 
 ## Model Note
 
-This skill is optimized for reasoning models (GPT-5.6, Claude Opus, etc.) that can leverage routing and profiles. On non-reasoning models, the three core rules alone suffice — load `fp-minimal/SKILL.md` instead.
+This skill is optimized for reasoning models (GPT-5.6, Claude Opus, etc.) that can leverage routing and profiles. On non-reasoning models, the four core rules alone suffice — load `fp-minimal/SKILL.md` instead.
 
 ## Evidence Basis
 
-This version is based on 1,272 real LLM API calls across 6 benchmark dimensions. Full report: `benchmarks/results/ARTICLE.md`
+This version is based on 1,416 real LLM API calls across 3 models, 8 traits, and 3 testing methods. Full report: `benchmarks/results/ARTICLE.md`
 
 - Core rules validated: v-minimal (3 rules) matched or beat full FP on correctness while using 3.6x fewer tokens in multi-turn sessions
 - Profiles add value: provider-compatibility and multi-agent knowledge improve reasoning model performance on specialized tasks

@@ -1,14 +1,10 @@
 <p align="center">
-  <img src="docs/assets/fp-social-preview.jpg" alt="FP — 用证据完成。按风险路由，给工作设边界，用验证收尾。" width="100%">
+  <img src="docs/assets/fp-social-preview.jpg" alt="FP — Finish with Proof" width="100%">
 </p>
 
 <h1 align="center">FP — Finish with Proof</h1>
 
-<p align="center"><strong>让编码 agent 用证据收尾，而不是凭感觉宣布完成。</strong></p>
-
-<p align="center">
-  一套可移植的执行协议。77 行。3 条核心规则。按需加载 profiles。
-</p>
+<p align="center"><strong>85 行。4 条规则。让你的 agent 用证据收尾，而不是凭感觉。</strong></p>
 
 <p align="center">
   <a href="https://github.com/MiaoY0uShan/FP/stargazers"><img src="https://img.shields.io/github/stars/MiaoY0uShan/FP?style=social" alt="GitHub stars"></a>
@@ -19,7 +15,7 @@
 
 <p align="center">
   <a href="https://github.com/MiaoY0uShan/FP/releases/latest"><strong>下载</strong></a> ·
-  <a href="#三条规则">3 条规则</a> ·
+  <a href="#四条规则">4 条规则</a> ·
   <a href="INSTALL.md">安装</a> ·
   <a href="README.md">English</a> ·
   <a href="benchmarks/results/ARTICLE.md">基准测试</a>
@@ -27,151 +23,170 @@
 
 ---
 
-**没有证据，就不算完成。No proof, no done.** FP 在工程任务中自动激活，在闲聊时保持休眠。三条规则，按需 profiles，零仪式冗余。
+每个编码 agent 都能写代码。几乎没有一个能证明代码可用。
+
+FP 是一套可移植的协议，让任何编码 agent 用证据收尾——不是凭感觉。它适用于 Claude Code、Codex、Gemini CLI、Cursor、Windsurf、Copilot 等十余种工具。不需要框架，不需要 SDK，只需要一个文件。
 
 ---
 
-## 三条规则
+## 四条规则
 
-**1. 诊断先于修补。** 收集证据，找到根因。不要猜。
+**1. 锁定目标。** 你说的目标就是验收线。agent 优化路径，绝不改目标。走不通？它会汇报试过什么、还有什么选择——绝不偷偷换一个更容易的。
 
-**2. 验证先于声称完成。** 跑测试，看到通过。"实现了"不等于"完成了"。
+**2. 诊断先于修补。** 先证据，先根因。不猜。
 
-**3. 简洁且可执行。** 第一行 = 结果。最后一行 = 下一步或最终裁决。没有废话。
+**3. 验证先于声称完成。** 跑测试，看到通过。"实现了" ≠ "完成了"。
 
-复杂场景提供按需 profiles：线上系统、多 agent 协作、provider 兼容性、委托执行、跨会话续接等。只在触发条件匹配时加载——不是默认加载。
+**4. 简洁且可执行。** 第一行 = 结果。最后一行 = 下一步。中间没有废话。
 
-> **非推理模型？** 用 [`fp-minimal/`](fp-minimal/SKILL.md)——只有三条规则，没有路由，没有 profiles。
-
----
-
-## 基于证据的设计 (v0.5.0)
-
-此版本通过 **1,416 次真实 LLM API 调用**优化，跨 3 个模型、8 个特质、3 种测试方法。每个设计决策都有基准数据支撑。
-
-### 跨模型盲评
-
-| 模型 | 🥇 冠军 | 分数 | 🥈 | 分数 | 关键洞察 |
-|------|---------|------|------|------|----------|
-| gpt-5.3-codex-spark (非推理) | v-minimal | **3.08** | v0 | 3.01 | 弱模型需要简单指令 |
-| gpt-5.6-sol (推理) | v-final | **3.57** | v0 | 3.49 | 推理模型能利用结构化知识 |
-| deepseek-v4-pro (推理) | v-final | **3.14** | v0 | 2.97 | DeepSeek 更需要结构 (v-minimal: 2.46, 7 blockers) |
-
-**v-final (77 行) 在两个推理模型上都是冠军。v-minimal (3 条规则) 在非推理模型上胜出。v2 Concise-Max (牺牲安全换速度) 永远最差。**
-
-### E2E 多轮测试（真实工具调用）
-
-| 指标 | 旧版 (162 行) | 新版 (77 行) | 改善 |
-|------|-------------|------------|------|
-| Token 消耗 | 19,620 | 10,665 | **-45%** |
-| 工具调用 | 14 | 6 | -57% |
-| FP 模板读取 | 9 (3 个浪费) | 1 (0 个浪费) | **-89%** |
-| Profile 加载 | 乱加载 | 按需触发 ✅ | — |
-
-多轮测试中，agent 需要完成 "第 3 步，共 5 步" 这样的多步骤任务。baseline/candidate 盲评对比是核心方法。已有测试覆盖约 15 分钟就能验证，需要补覆盖约半天。Release 资产包含各平台安装包。
-
-### 模板：35 → 7
-
-28 个模板从未被任何 on-demand profile 引用。它们是死代码——归档，不删除。多轮测试证明旧版 agent 默认读取这些模板纯属浪费 token。
-
-### 模拟 vs 现实
-
-我们的模拟预测 v7 Adaptive-Plus 以 4.73 胜出。真实盲评显示相反——所有"优化"版本由于 **prompt 干扰效应**表现比 baseline 更差：向已平衡的系统提示添加指令会降低性能。模拟无法建模这一点，因为它把每条指令当作独立的线性贡献。
-
-完整方法论：[`benchmarks/results/ARTICLE.md`](benchmarks/results/ARTICLE.md)
+> 就这四条。其余所有东西按需加载——只在任务需要时才出现。
 
 ---
 
-## 快速开始
+## 没有 FP 的时候
 
-```text
-修复那个间歇性失败的身份验证测试。
+```
+你：修一下那个间歇性失败的认证测试。
+Agent：我加了个超时，看起来修好了。
+你：……CI 又挂了。
 ```
 
-没有 FP：加个超时 → 跑一次 → "看起来修好了"。
+## 有 FP 的时候
 
-有 FP：复现 → 找到第一个偏离点 → 精准修复 → 重跑原症状 + 回归 + 负控制 → 带证据的裁决。
+```
+你：修一下那个间歇性失败的认证测试。
+Agent：根因：token 刷新和会话检查之间有竞态。
+       修复：刷新前加锁。
+       证据：50/50 次全部通过。原始症状 + 回归 + 负控制已验证。
+       完成。
+```
 
-### 安装
+---
 
-1. 下载 [`fp-universal-v0.5.0.zip`](https://github.com/MiaoY0uShan/FP/releases/tag/v0.5.0)
-2. 解压并运行安装器
-3. 重载 agent——FP 自动激活
+## 数字说话
+
+我们不只是做了这个协议，我们测量了它。**4,100+ 次真实 LLM API 调用**，跨 6 个 prompt 变体、13 个评估维度、63 道盲评场景、3 种测试方法——单轮盲评、多模型交叉验证、以及带真实工具调用的多轮 E2E。
+
+### 盲评 — 63 场景，双评审
+
+> 每版本 252 个观测值。两个独立评审（GPT-5.6-Sol + DeepSeek-v4-Pro）。评审一致性：|Δ| = 0.56，Pearson r = 0.71。
+
+| 排名 | 版本 | 加权分 | Blockers | vs 基线 |
+|------|------|--------|----------|---------|
+| 🥇 | **v-final (FP)** | **4.12** | **0** | +0.03 |
+| 🥈 | v0 (无 FP) | 4.09 | 2 | 基线 |
+
+FP 最突出的优势：**路由精度 +0.60**（超过裸基线）。agent 为不同任务选择恰当力度的响应——不过度仪式化，也不缺乏验证。
+
+### 拯救我们的发现
+
+我们测试了 6 个变体。两个教训改变了一切：
+
+**Prompt 干扰是真实的。** 向已平衡的 85 行 prompt 添加指令会*降低*性能。我们证明了两次——编程纪律段落（+4 行）和测试优先句子（+1 行）都让路由分回退 0.23–0.30 分。85 行就是天花板。新能力只能住在按需模块里。
+
+**模拟会骗人。** 我们的模拟预测 "v7 Adaptive-Plus" 得 4.73 分。真实盲评结果：它是最差的。模拟把每条指令当独立线性贡献，真实模型不是这样工作的。
+
+### 多轮 E2E — 真实工具调用
+
+| 指标 | 旧版 (162 行) | FP (85 行) | 变化 |
+|------|---------------|------------|------|
+| Token 消耗 | 19,620 | 10,665 | **−45%** |
+| 工具调用 | 14 | 6 | **−57%** |
+| 模板读取 | 9 (3 浪费) | 1 (0 浪费) | **−89%** |
+
+带真实文件读写、测试执行、确定性验收谓词的行为级评测。agent 不只是"说"修了 bug——它真的修了，我们验证修复生效。
+
+---
+
+## 安装
 
 ```powershell
-.\INSTALL-FP.cmd -Verify   # Windows
-sh ./INSTALL-FP.sh --verify  # macOS / Linux
+# Windows
+.\INSTALL-FP.cmd -Verify
+
+# macOS / Linux
+sh ./INSTALL-FP.sh --verify
 ```
 
-显式调用：`FP: 修这个 bug` 或 `$fp 诊断这个失败`
+或者直接把 [`fp-copy-paste.md`](fp-copy-paste.md) 复制进你的 agent 系统 prompt。
 
-[完整安装矩阵](INSTALL.md) · [复制粘贴兜底](fp-copy-paste.md)
+就这样。FP 在工程任务中自动激活，闲聊时保持沉默。
+
+[完整安装矩阵 →](INSTALL.md)
+
+---
+
+## 到处都能用
+
+**Claude Code · Codex · Gemini CLI · Pi · GitHub Copilot · Cursor · Windsurf · Cline · Roo Code · OpenCode · Kiro · Aider**
+
+一个文件。所有 agent。
+
+安装了其他 skill 时，FP 把任务路由给最匹配的专家，同时让自己的验证门控对结果保持约束力。调度但不重复。
 
 ---
 
 ## 协议
 
-| 路由 | 触发条件 | 行为 |
-|------|----------|------|
-| **Small** | 一个文件，≤5 行，原因已知，无新接口 | Tiny Brief + 验证 |
-| **Medium** | 多文件，>5 行，或新增测试 | Execution Brief + 证据 |
-| **Vague** | 需求不明确 | Idea Cards → 用户选择 → Medium |
-| **Large** | 架构级、多模块、迁移 | 拆解为降低风险的模块 |
+| 路由 | 条件 | 行为 |
+|------|------|------|
+| **Small** | 一个文件，≤5 行，原因已知 | 简要说明 → 验证 → 完成 |
+| **Medium** | 多文件或新增测试 | 执行说明 → 证据 → 完成 |
+| **Vague** | 需求不明确 | 方案卡片 → 用户选择 → Medium |
+| **Large** | 架构或迁移 | 拆解 → 按风险递减交付模块 |
 
-Small 不是默认。多文件 = Medium 起。
+Small 不是默认。多文件 = Medium 起步。
 
 ### 按需 Profiles
 
-| 条件 | Profile |
-|------|---------|
-| 重试/循环/编码可疑 | `provider-compatibility/SKILL.md` |
-| 多 agent、并行写 | `templates/multi-agent-review-protocol.md` |
-| 远程/有状态目标 | `skills/live-system/SKILL.md` |
-| 未知故障，仅诊断 | `skills/debug-incident/SKILL.md` |
-| 跨会话续接 | `skills/continuation/SKILL.md` |
-| 委托执行 | `delegated-execution/SKILL.md` |
-| 需求模糊/高风险 | `question-requirements/SKILL.md` |
+| 触发条件 | Profile |
+|----------|---------|
+| 重试 / 编码问题 | Provider 兼容性 |
+| 多 agent / 并行写入 | 多 agent 协作 |
+| 远程 / 有状态目标 | 线上系统操作 |
+| 未知故障 | Debug 事件 |
+| 跨会话任务 | 续接 |
+| 委托子任务 | 委托执行 |
+| 需求模糊 / 高风险 | 需求确认 |
+| 代码库分析 | 代码库分析 (tree-sitter / 向量) |
 
-Profiles **仅在条件匹配时加载**——从不默认加载。这是旧版 token 浪费的第一大来源。
+Profiles **仅在触发时加载**。修一个简单 bug 不会加载任何额外文件。这是历代版本 token 浪费的第一大来源。
 
 ---
 
 ## 复用阶梯
 
-创建任何东西之前：需要存在吗？→ 代码库已有？→ 标准库？→ 平台原生？→ 已安装依赖？→ 一行代码？→ 以上都不行，才加最少新代码。
+写新代码之前：需要存在吗？→ 代码库已有？→ 标准库？→ 平台原生？→ 已装依赖？→ 一行代码？→ 以上都不行，才写最少的新代码。
 
 ---
 
 ## FAQ
 
-**每个任务都会变成仪式吗？** 不会。Small 任务只需 Tiny Brief。Profiles 按需加载——改个密码的简单 bug 零 FP 模板读取。
+**每个任务都会变成仪式吗？** 不。Small 任务只需一句话的 brief——说明上下文，然后修复并验证。Profiles 按需加载。修个简单 bug 读零个 FP 模板。
 
-**非推理模型？** 用 `fp-minimal/SKILL.md`。三条规则。基准数据证明在弱模型上这比完整协议更有效。
+**非推理模型？** 用 [`fp-minimal/`](fp-minimal/SKILL.md)——只有四条规则，没有路由。基准数据证明，在弱模型上它比完整协议更有效。
 
-**为什么是 77 行？** 因为 162 行导致 agent 浪费 45% 的 token 读 FP 自己的模板。基准数据精确显示了哪些部分有价值，哪些没有。
+**为什么恰好是 85 行？** 因为我们测了 77、85、86、89 行。数据表明 85 行就是天花板——多加一句话就会触发可测量的 prompt 干扰。超出 85 行的所有能力都住在按需模块里。
+
+**子 agent 能宣称完成吗？** 不能。父级负责集成并重跑关键检查。
 
 ---
 
-## 运行基准测试
+## 开发
 
 ```bash
-# 完整盲评 (需要 API key 环境变量)
-node benchmarks/real-eval-v2.mjs all --versions v0,v-final,v-minimal --trials 2 --model gpt-5.6-sol
-
-# 仅模拟 (无 API 调用)
-node benchmarks/score-final.mjs
-
-# 多轮真实工具测试
-node benchmarks/multi-turn-harness-v2.mjs --versions v0,v-final
-
-# E2E 对比
-node benchmarks/e2e-test.mjs
+node --test test/*.test.js                           # 契约测试
+node scripts/run-response-evals.mjs validate         # 评估验证
+node benchmarks/real-eval-v2.mjs all                 # 完整盲评
+node benchmarks/multi-turn-harness-v2.mjs            # 多轮 E2E
 ```
-
-运行真实评估前设置 `FP_API_KEY` 和 `DEEPSEEK_API_KEY` 环境变量。
 
 ---
 
-**语言：** [English](README.md) · [中文](README.zh-CN.md)
+<p align="center"><strong>没有证据，就不算完成。</strong></p>
 
-**许可证：** MIT
+<p align="center">
+  <a href="README.md">English</a> · <a href="README.zh-CN.md">中文</a>
+  <br>
+  <a href="LICENSE">MIT License</a>
+</p>
