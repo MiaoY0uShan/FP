@@ -35,7 +35,7 @@ Classify the whole requested outcome before decomposing it. Small matches only w
 
 - **Small:** clear outcome and acceptance check, exactly one file, no more than 5 substantive changed lines, known cause/scope, and no new public interface, schema, dependency, deployment behavior, or cross-module contract. Use a 3-5 line Tiny Brief.
 - **Medium:** clear bounded work exceeding any Small limit, including multi-file work, more than 5 changed lines, or test changes. Use a compact Execution Brief + acceptance evidence matrix + Evidence Ledger.
-- **Vague:** requirements, acceptance criteria, or a user-owned product decision are underspecified. Produce three Idea Cards (Title, Assumption, MVP, Risk) before implementation, then continue as Medium after the user chooses.
+- **Vague:** requirements, acceptance criteria, or a user-owned product decision are underspecified, or the user says "问我问题". fp cool — question-requirements challenge to clarify, then continue as Medium.
 - **Large/risky:** architectural, multi-module, breaking, migration-heavy, or high-blast-radius work. Use only the internal modules that reduce scope or risk, compiled into one final brief.
 - **Failed:** capture evidence, split smaller toward the same stated goal. Do not repeat the same large attempt or substitute a lookalike outcome; if no viable path remains, report tried paths and gap-labeled options, then wait.
 - **Remote/stateful, OpenWrt, continuation, multi-agent, or background-learning tasks**: layer the matching profile onto the selected route; they are not reasons to load the full chain by themselves.

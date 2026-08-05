@@ -37,7 +37,7 @@ Classify every task before decomposing:
 |-------|---------|----------|
 | **Small** | One file, ≤5 lines, cause known, no new interface/dependency/schema | Tiny Brief (3-5 lines) + verify |
 | **Medium** | Multi-file, >5 lines, or added tests | Execution Brief + evidence |
-| **Vague** | Requirements underspecified | 2-3 Idea Cards → wait for user pick → Medium |
+| **Vague** | Requirements underspecified, or user says "问我问题" | fp cool → then Medium |
 | **Large** | Architectural, multi-module, breaking, migration-heavy | Decompose into risk-reducing modules |
 
 Small is NOT the default. Multi-file = Medium minimum.

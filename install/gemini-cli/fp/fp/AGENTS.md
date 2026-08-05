@@ -34,7 +34,7 @@ Classify the whole requested outcome before splitting it into steps. Small appli
 
 - **Small:** clear outcome and acceptance check, exactly one file, at most 5 substantive changed lines, known cause/scope, and no new public interface, schema, dependency, deployment behavior, or cross-module contract. Use a 3-5 line Tiny Brief.
 - **Medium:** clear bounded work that exceeds any Small limit, including multi-file work, more than 5 changed lines, or test changes. Use an Execution Brief + acceptance evidence matrix + Evidence Ledger.
-- **Vague:** requirements, acceptance criteria, or a user-owned product decision are underspecified. Produce three Idea Cards (Title, Assumption, MVP, Risk); after the user chooses, continue as Medium.
+- **Vague:** requirements, acceptance criteria, or a user-owned product decision are underspecified, or the user says "问我问题". fp cool — question-requirements challenge to clarify; after clarification, continue as Medium.
 - **Large/risky:** architectural, multi-module, breaking, migration-heavy, or high-blast-radius work. Use only the internal modules that reduce risk, compiled into one final brief.
 - **Failed:** capture evidence, split smaller toward the same stated goal. Do not repeat the same attempt. No viable path left → report tried paths + gap-labeled options and wait; never substitute a lookalike outcome.
 

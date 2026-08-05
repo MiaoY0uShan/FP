@@ -132,7 +132,7 @@ When other skills are installed, FP routes to the best specialist and keeps its 
 |-------|------|-------------|
 | **Small** | One file, ≤5 lines, cause known | Tiny brief → verify → done |
 | **Medium** | Multi-file or new tests | Execution brief → evidence → done |
-| **Vague** | Requirements unclear | Idea cards → user picks → Medium |
+| **Vague** | Requirements unclear, or user says "问我问题" | fp cool → Medium |
 | **Large** | Architecture or migration | Decompose → ship risk-reducing modules |
 
 Small is not the default. Multi-file = Medium minimum.
