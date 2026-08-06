@@ -152,6 +152,44 @@ Small is not the default. Multi-file = Medium minimum.
 
 Profiles load **only when triggered**. A simple bug fix loads zero extra files. This was the #1 source of wasted tokens in every previous version.
 
+### Development Mindset (底层开发思维)
+
+No reinventing the wheel.
+
+1. Before starting a project or major plan, search GitHub for existing projects, docs, implementations, and source code
+2. When a mature project exists, evaluate its license, maintenance status, security risks, and adaptation cost before reusing
+3. Simple bug fixes, clear small changes, or offline tasks are exempt from mandatory research
+4. Study and decompose open-source projects extensively — reuse directly when applicable, reference when valuable
+5. Cross-compare multiple open-source solutions — take strengths, discard weaknesses
+
+### Module Boundaries (模块边界)
+
+1. Before any coding task, confirm which module, component, service, hook, script, or test file the code belongs in
+2. Oversized files: only allow small bug fixes, minor style tweaks, interface adaptation, and low-risk patches — split complex new capabilities into new files with clear responsibilities
+3. Never pile new features, temporary validation logic, fake data, or one-off code into already-large files for convenience
+4. When a requirement would make a large file grow further, the agent should split it by responsibility — no need to ask unless the split would change product behavior, data structures, compatibility, or expand scope significantly
+5. Splitting is a design action before building, not a remediation after shipping
+
+### Doc Sync (文档同步)
+
+1. When features, business logic, API contracts, data structures, product interactions, or module responsibilities change, check whether related README, dev standards, API docs, and status docs need updating
+2. Doc sync is part of dev close — don't wait for user reminders. Check before saying "done," before tests pass, before commit
+3. Internal implementation detail changes that don't affect usage, interfaces, data, interactions, or module boundaries: state "no doc update needed"
+4. If stale docs would mislead future agents or developers, update or archive them — don't leave expired docs on the default reading path
+5. Prioritize updating current execution entry points and module READMEs; archived design/plan docs only get archival notes, not current execution status
+6. Update current docs by rewriting the body to reflect current rules — don't stack "revision notes" or "previously was" patches at the top
+7. Only record historical revision notes in archived docs, migration notes, changelogs, or when the user explicitly wants history preserved
+
+### Pre-Commit Cleanup (临时残留代码清理)
+
+1. Before commit after dev is done and tests pass, automatically check for leftover temporary code from this round
+2. Clearly temporary content: the agent cleans it up without asking the user
+3. Safe to clean: debug prints, temp files, one-off scripts, temp mocks, temp APIs, hardcoded fake data, temp switches, temp comments, and unreferenced validation code
+4. Do NOT clean: production code, regression tests, fixtures, docs, critical runtime logs, and intentionally preserved diagnostic logs
+5. Uncertain items: list separately with file location, purpose, risk, and recommendation — let the user decide
+6. When the user asks for git commit: first check and clean temp residue, then run tests, then commit
+7. When starting the next feature and prior residue may remain: remind the user whether to clean up before proceeding
+
 ### Four Iron Rules (四条铁律)
 
 Before changing code, think "how would I write this from scratch?" — not "how do I patch on top?"
