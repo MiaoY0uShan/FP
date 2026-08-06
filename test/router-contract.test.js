@@ -145,4 +145,10 @@ test('router has development discipline sections in Chinese', () => {
   assert.match(router, /文档同步属于开发收尾的一部分/);
   assert.match(router, /临时残留代码清理/);
   assert.match(router, /Agent（代理程序）应自行清理/);
+  assert.match(router, /四条铁律/);
+  assert.match(router, /不打补丁/);
+  assert.match(router, /代码自解释/);
+  assert.match(router, /不留残渣/);
+  assert.match(router, /部署一致/);
+  assert.match(router, /最终形态/);
 });

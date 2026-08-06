@@ -152,6 +152,17 @@ Small is not the default. Multi-file = Medium minimum.
 
 Profiles load **only when triggered**. A simple bug fix loads zero extra files. This was the #1 source of wasted tokens in every previous version.
 
+### Four Iron Rules (四条铁律)
+
+Before changing code, think "how would I write this from scratch?" — not "how do I patch on top?"
+
+1. **No patching** — find the root cause, dare to rewrite. Never stack if-guards, clone-and-tweak, or add bypass switches
+2. **Self-documenting code** — names express *what*; comments only for *why* and business rules. No explanatory comments, no commented-out blocks
+3. **No residue** — no backups, no leftover files, no dead code. Fix mistakes, don't preserve intermediate states
+4. **Deployment parity** — server and local source md5 must match exactly
+
+The iron rules are the quality floor beneath the discipline sections: single source of truth, unified pipeline, root-cause debugging, document filtering, and quality braking are all corollaries. Every line is written as its final form — each iteration gets cleaner, never messier.
+
 ---
 
 ## FAQ

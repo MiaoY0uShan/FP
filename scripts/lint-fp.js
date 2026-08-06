@@ -123,7 +123,7 @@ function main() {
     }
   }
 
-  requireText('fp/SKILL.md', ['Lock the goal', 'Diagnose before patching', 'Verify before claiming done', 'Be concise and actionable', 'Skill Interop', 'On-Demand Profiles', 'Routing', 'Response Contract', 'Safety', '底层开发思维', '模块边界', '文档同步', '临时残留代码清理'], failures);
+  requireText('fp/SKILL.md', ['Lock the goal', 'Diagnose before patching', 'Verify before claiming done', 'Be concise and actionable', 'Skill Interop', 'On-Demand Profiles', 'Routing', 'Response Contract', 'Safety', '底层开发思维', '模块边界', '文档同步', '临时残留代码清理', '四条铁律', '不打补丁', '代码自解释', '不留残渣', '部署一致'], failures);
   requirePatterns('fp/SKILL.md', [
     ['engineering goals activate implicitly', /activate automatically for engineering/i],
     ['FP: is an optional explicit invocation', /FP:/],
