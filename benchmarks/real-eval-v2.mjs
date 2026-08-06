@@ -51,6 +51,8 @@ const VERSION_DELTAS = {
   'v-host2': { debug_first_strength: 0.90, evidence_burden: 0.80, route_strictness: 0.88, concision_pressure: 0.88, autonomy_level: 0.88, safety_paranoia: 0.88, ceremony_level: 0.22 },
   'v-coding': { debug_first_strength: 0.92, evidence_burden: 0.82, route_strictness: 0.85, concision_pressure: 0.85, autonomy_level: 0.85, safety_paranoia: 0.88, ceremony_level: 0.35 },
   'v-tf2': { debug_first_strength: 0.92, evidence_burden: 0.80, route_strictness: 0.85, concision_pressure: 0.85, autonomy_level: 0.85, safety_paranoia: 0.88, ceremony_level: 0.35 },
+  'v-core': { debug_first_strength: 0.90, evidence_burden: 0.80, route_strictness: 0.85, concision_pressure: 0.85, autonomy_level: 0.85, safety_paranoia: 0.88, ceremony_level: 0.30 },
+  'v-pre053': { debug_first_strength: 0.90, evidence_burden: 0.80, route_strictness: 0.85, concision_pressure: 0.85, autonomy_level: 0.85, safety_paranoia: 0.88, ceremony_level: 0.35 },
 };
 
 const VERSION_NAMES = {
@@ -62,6 +64,8 @@ const VERSION_NAMES = {
   'v-host2': 'v-host2 Host-Native r2',
   'v-coding': 'v-coding Mainline+CodingDiscipline',
   'v-tf2': 'v-tf2 Mainline+TestFirstRule',
+  'v-core': 'v-core Core-Tier (no discipline)',
+  'v-pre053': 'v-pre053 Pre-Tiers (v0.5.3 absolute language)',
 };
 
 // ── Helpers ──
@@ -138,6 +142,22 @@ Now respond to the following task:`;
     const v1Path = path.join(SCRIPT_DIR, 'version-snapshots', 'v-host-v1.md');
     if (fs.existsSync(v1Path)) {
       return fs.readFileSync(v1Path, 'utf8') + '\n\nNow respond to the following task:';
+    }
+    // fallback: use modifiers
+  }
+  // v-core: the Core tier (no discipline sections)
+  if (versionId === 'v-core') {
+    const corePath = path.join(ROOT, 'fp', 'presets', 'core.md');
+    if (fs.existsSync(corePath)) {
+      return fs.readFileSync(corePath, 'utf8') + '\n\nNow respond to the following task:';
+    }
+    // fallback: use modifiers
+  }
+  // v-pre053: pre-tiers version (absolute language iron rules)
+  if (versionId === 'v-pre053') {
+    const prePath = path.join(SCRIPT_DIR, 'version-snapshots', 'v-final-v053-pre-tiers.md');
+    if (fs.existsSync(prePath)) {
+      return fs.readFileSync(prePath, 'utf8') + '\n\nNow respond to the following task:';
     }
     // fallback: use modifiers
   }

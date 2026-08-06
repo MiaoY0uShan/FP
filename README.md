@@ -192,14 +192,28 @@ No reinventing the wheel.
 
 ### Four Iron Rules (四条铁律)
 
-Before changing code, think "how would I write this from scratch?" — not "how do I patch on top?"
+Before changing code, think "how would I write this from scratch?" — this is the default stance, not an absolute prohibition.
 
-1. **No patching** — find the root cause, dare to rewrite. Never stack if-guards, clone-and-tweak, or add bypass switches
-2. **Self-documenting code** — names express *what*; comments only for *why* and business rules. No explanatory comments, no commented-out blocks
-3. **No residue** — no backups, no leftover files, no dead code. Fix mistakes, don't preserve intermediate states
-4. **Deployment parity** — server and local source md5 must match exactly
+1. **No patching** (principle) — default to root-cause resolution. Rewriting beats stacking patches, but when blast radius, time constraints, or downstream contracts make rewriting far costlier than the benefit, a local patch needs a stated reason and cleanup plan
+2. **Self-documenting code** (principle) — names express *what*; comments only for *why* and business rules. Commented-out code blocks count as residue
+3. **No residue** (principle) — no backups, no leftover files, no dead code. Clean up intermediate states proactively; when uncertain, annotate rather than silently keep
+4. **Deployment parity** (hard rule) — source and deployed artifact hashes must match exactly, no exceptions
 
-The iron rules are the quality floor beneath the discipline sections: single source of truth, unified pipeline, root-cause debugging, document filtering, and quality braking are all corollaries. Every line is written as its final form — each iteration gets cleaner, never messier.
+The core is not "absolute prohibition" but "default stance" — deviations require an explicit reason, not a silent slide. Single source of truth, unified pipeline, root-cause debugging, and quality braking are all corollaries. Every line is written as its final form — each iteration gets cleaner, never messier.
+
+---
+
+## Strategy Tiers
+
+One size doesn't fit all. Pick the enforcement level that matches your team:
+
+| Tier | What's included | Best for | File |
+|------|----------------|----------|------|
+| **Core** | 4 rules + routing + safety + on-demand profiles | Teams that want verification protocol without code-style opinions | [`fp/presets/core.md`](fp/presets/core.md) |
+| **Strict** | Core + development discipline + four iron rules | Solo developers or teams wanting maximum discipline | [`fp/SKILL.md`](fp/SKILL.md) (default) |
+| **Team** | Core + pick-your-discipline modules | Team leads who want to enable specific disciplines | [`fp/presets/team.md`](fp/presets/team.md) |
+
+To use a tier: copy the corresponding file as your agent's skill file. The Strict tier is the default install.
 
 ---
 

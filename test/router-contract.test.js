@@ -151,4 +151,7 @@ test('router has development discipline sections in Chinese', () => {
   assert.match(router, /不留残渣/);
   assert.match(router, /部署一致/);
   assert.match(router, /最终形态/);
+  assert.match(router, /原则/);
+  assert.match(router, /硬规则/);
+  assert.match(router, /默认立场/);
 });
