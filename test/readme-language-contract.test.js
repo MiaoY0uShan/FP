@@ -33,14 +33,14 @@ test('Chinese README mirrors English structure and media', () => {
   assert.ok(h2(english).length >= 8, 'English README has core sections');
   assert.ok(h2(chinese).length >= 6, 'Chinese README has core sections');
   assert.ok(h2(chinese).includes('四条规则'));
-  assert.ok(h2(chinese).includes('数字说话'));
+  assert.ok(h2(chinese).includes('FP 到底解决了什么'));
   assert.ok(h2(chinese).includes('FAQ'));
 });
 
 test('Chinese README carries current English positioning and actionable-response copy', () => {
   const chinese = fs.readFileSync(path.join(root, 'README.zh-CN.md'), 'utf8');
   for (const marker of [
-    '用证据收尾',
+    '不再猜测，开始证明',
     '没有证据，就不算完成',
     '4,100',
     'Prompt 干扰',
