@@ -1,6 +1,6 @@
 {
   "name": "@miaoy0ushan/fp",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "FP — Finish with Proof. A portable execution protocol for coding agents. 4 core rules, development discipline, on-demand profiles.",
   "keywords": [
     "pi-package",
